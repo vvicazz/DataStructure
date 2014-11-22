@@ -1,9 +1,15 @@
 package com.akash.dp.coindenomination;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 
 /**
  * 
@@ -34,29 +40,91 @@ public class ChangeMakingPermutationProblem {
 	 * C(3)=C(1)+C(-2)+C(0)+C(-3)=0+1+0+0=1		<br>
 	 * C(4)=C(2)+C(-1)+C(1)+C(-2)=1+0+0+0=1		<br>
 	 * C(5)=C(3)+C(0)+C(2)+C(-1)=1+1+1+0=2		<br>
-	 * C(5) is 2 because {2,3} and {3,2} are same.
+	 * C(5) is 2 because {2,3} and {3,2} are same.	<br>
+	 * 
+	 * The Set in memoizedList contains list of integers.	<br>
+	 * The first list contains cost value of the key with a dummy number which is zero.	<br>
+	 * The rest of the list contains the actual combination of coins.	<br>
+	 * This dummy number is added to make it different from coin combination.	<br>
+	 * e.g:		<br>
+	 * C(5)=2	<br>
+	 * key=5	<br>
+	 * value=[{2,0} , {2,3} , {5}]	<br>
 	 */
-	private static Map<Integer,List<List<Integer>>> memoizedList = new HashMap<Integer, List<List<Integer>>>();
+	private static Map<Integer,Set<List<Integer>>> memoizedList = new HashMap<Integer, Set<List<Integer>>>();
 	
 	private static final int num=10;
 	private static final List<Integer> coinList=new ArrayList(){{add(2);add(5);add(3);add(6);}};
 	
 	public static void main(String args[]) {
-		memoizedList.put(0, new ArrayList(){{add( new ArrayList(){{add(1);}} );}});
+		addListToSetOfMemoizedList(0, new int[]{1,0});
 		int minValueInCoinList=coinList.get(0);
 		for(int counter=1;counter<minValueInCoinList;counter++) {
-			memoizedList.put(counter, new ArrayList(){{add( new ArrayList(){{add(0);}} );}});
+			addListToSetOfMemoizedList(counter, new int[]{0,0});
 		}
-		getCountForCoins(num, coinList);
+		int costForNum=getCountForCoins(num, coinList);
+		System.out.println(costForNum);
+		Set<List<Integer>> listOfCoins=memoizedList.get(num);
+		Iterator it=listOfCoins.iterator();
+		if(it.hasNext()) {
+			List<Integer> list=(List<Integer>)it.next();
+			System.out.println(Arrays.toString(list.toArray()));
+		}
 	}
 	
 	private static int getCountForCoins(int number,List<Integer> listOfCoin) {
-		if(number<0)
-			return 0;
-		else
-		{
-			
+		int costOfNumber=0;
+		if(number >= 0) {
+			Set<List<Integer>> finalCostSet = new HashSet<List<Integer>>();
+			for(int counter=0; counter<listOfCoin.size(); counter++) {
+				Set<List<Integer>> cloneSetForCostOfSubNumber = null;
+				int subNumber = number - listOfCoin.get(counter);
+				Set setForCostOfSubNumber = memoizedList.get(subNumber);
+				int costOfSubNumber = 0;
+				if(setForCostOfSubNumber != null) {
+					List<Integer> firstList=(List<Integer>) setForCostOfSubNumber.iterator().next();
+					costOfSubNumber = firstList.get(0);
+				}
+				else {
+					costOfSubNumber = getCountForCoins(subNumber, listOfCoin);
+				}
+				costOfNumber = costOfNumber + costOfSubNumber;
+				if(costOfSubNumber > 0) {
+					setForCostOfSubNumber = memoizedList.get(subNumber);
+					cloneSetForCostOfSubNumber = new HashSet<List<Integer>>();
+					cloneSetForCostOfSubNumber.addAll(setForCostOfSubNumber);
+					Iterator it=(Iterator) cloneSetForCostOfSubNumber.iterator();
+					if( it.hasNext() ) {
+						ArrayList<Integer> listOfCoins= (ArrayList<Integer>) it.next();
+						if( listOfCoins.contains(0) ) {
+							it.remove();
+						}
+					}
+					calculateFinalCostSet(cloneSetForCostOfSubNumber, finalCostSet, subNumber);
+				}
+			}
+			addListToSetOfMemoizedList(number, new int[]{finalCostSet.size(),0});
 		}
-		return 0;
+		return costOfNumber;
+	}
+	
+	private static void calculateFinalCostSet(Set<List<Integer>> cloneSetForCostOfSubNumber, Set<List<Integer>> finalCostSet, int subNumber) {
+		for(List<Integer> list : cloneSetForCostOfSubNumber) {
+			list.add(subNumber);
+			finalCostSet.add(list);
+		}
+	}
+	
+	private static void addListToSetOfMemoizedList(int key, int[] arr) {
+		List<Integer> list=new ArrayList<Integer>();
+		for(int num : arr) {
+			list.add(num);
+		}
+		Set<List<Integer>> setOfList=memoizedList.get(key);
+		if(setOfList==null) {
+			setOfList=new HashSet<List<Integer>>();
+		}
+		setOfList.add(list);
+		memoizedList.put(key, setOfList);
 	}
 }
