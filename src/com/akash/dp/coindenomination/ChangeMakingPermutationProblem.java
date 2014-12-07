@@ -82,8 +82,7 @@ public class ChangeMakingPermutationProblem {
 				Set setForCostOfSubNumber = memoizedList.get(subNumber);
 				int costOfSubNumber = 0;
 				if(setForCostOfSubNumber != null) {
-					List<Integer> firstList=(List<Integer>) setForCostOfSubNumber.iterator().next();
-					costOfSubNumber = firstList.get(0);
+					costOfSubNumber = fetchOrRemoveFirstListFromSetOfList(setForCostOfSubNumber, true).get(0);
 				}
 				else {
 					costOfSubNumber = getCountForCoins(subNumber, listOfCoin);
@@ -93,14 +92,8 @@ public class ChangeMakingPermutationProblem {
 					setForCostOfSubNumber = memoizedList.get(subNumber);
 					cloneSetForCostOfSubNumber = new HashSet<List<Integer>>();
 					cloneSetForCostOfSubNumber.addAll(setForCostOfSubNumber);
-					Iterator it=(Iterator) cloneSetForCostOfSubNumber.iterator();
-					if( it.hasNext() ) {
-						ArrayList<Integer> listOfCoins= (ArrayList<Integer>) it.next();
-						if( listOfCoins.contains(0) ) {
-							it.remove();
-						}
-					}
-					calculateFinalCostSet(cloneSetForCostOfSubNumber, finalCostSet, subNumber);
+					fetchOrRemoveFirstListFromSetOfList(cloneSetForCostOfSubNumber, false);
+					calculateFinalCostSet(cloneSetForCostOfSubNumber, finalCostSet, subNumber, number);
 				}
 			}
 			addListToSetOfMemoizedList(number, new int[]{finalCostSet.size(),0});
@@ -108,10 +101,36 @@ public class ChangeMakingPermutationProblem {
 		return costOfNumber;
 	}
 	
-	private static void calculateFinalCostSet(Set<List<Integer>> cloneSetForCostOfSubNumber, Set<List<Integer>> finalCostSet, int subNumber) {
+	/**
+	 * If fetch=true , return first list that contains 0
+	 * else delete first list that contains 0
+	 * @param setOfListOfInt
+	 * @param fetch
+	 * @return
+	 */
+	private static List<Integer> fetchOrRemoveFirstListFromSetOfList(Set<List<Integer>> setOfListOfInt , boolean fetch) {
+		List<Integer> firstList=null;
+		Iterator it=(Iterator) setOfListOfInt.iterator();
+		while( it.hasNext() ) {
+			ArrayList<Integer> listOfCoins= (ArrayList<Integer>) it.next();
+			if( listOfCoins.contains(0) ) {
+				if(fetch)
+					firstList = listOfCoins;
+				else
+					it.remove();
+				break;
+			}
+		}
+		return firstList;
+	}
+	
+	private static void calculateFinalCostSet(Set<List<Integer>> cloneSetForCostOfSubNumber, Set<List<Integer>> finalCostSet, int subNumber, int number) {
 		for(List<Integer> list : cloneSetForCostOfSubNumber) {
 			list.add(subNumber);
 			finalCostSet.add(list);
+		}
+		if(cloneSetForCostOfSubNumber.size()==0 && subNumber==0) {
+			//
 		}
 	}
 	
