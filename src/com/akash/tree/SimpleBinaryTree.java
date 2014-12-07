@@ -7,7 +7,6 @@ public class SimpleBinaryTree<T> extends AbstractBinaryTree<T> {
 		super(t);
 	}
 
-	@Override
 	public Node<T> addLeftNode(Node<T> node, T t) {
 		if (node != null) {
 			Node<T> tempNode = createNode(t);
@@ -17,7 +16,6 @@ public class SimpleBinaryTree<T> extends AbstractBinaryTree<T> {
 		return null;
 	}
 
-	@Override
 	public Node<T> addRightNode(Node<T> node, T t) {
 		if (node != null) {
 			Node<T> tempNode = createNode(t);

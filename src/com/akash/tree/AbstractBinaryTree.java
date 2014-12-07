@@ -24,10 +24,6 @@ public abstract class AbstractBinaryTree<T> {
 		return node;
 	}
 
-	abstract public Node<T> addLeftNode(Node<T> node, T t);
-
-	abstract public Node<T> addRightNode(Node<T> node, T t);
-
 	/**
 	 * The implementation class can implement this method in its own way.
 	 * There could many ways to delete a node from a tree.
