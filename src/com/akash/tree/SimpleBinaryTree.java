@@ -1,7 +1,7 @@
 package com.akash.tree;
 
 
-public class SimpleBinaryTree<T> extends AbstractBinaryTree<T> {
+public class SimpleBinaryTree<T extends Comparable> extends AbstractBinaryTree<T> {
 
 	public SimpleBinaryTree(T t) {
 		super(t);

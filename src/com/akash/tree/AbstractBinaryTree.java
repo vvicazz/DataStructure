@@ -1,6 +1,6 @@
 package com.akash.tree;
 
-public abstract class AbstractBinaryTree<T> {
+public abstract class AbstractBinaryTree<T extends Comparable> {
 
 	public AbstractBinaryTree(T t) {
 		setRoot(createNode(t));
@@ -57,7 +57,7 @@ public abstract class AbstractBinaryTree<T> {
 		}
 	}
 
-	class Node<Type> {
+	class Node<Type extends Comparable> {
 
 		private Node<Type> left;
 		private Node<Type> right;
