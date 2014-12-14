@@ -109,4 +109,41 @@ public class MyLinkedList {
 		temp3.setNext(temp2);
 		temp2.setNext(temp1);
 	}
+	
+	/**
+	 * Input 1 : 1,2,3,4,5 	<br>
+	 * Input 2 : 11,12,13,14,15		<br>
+	 * Output  : 1,11,2,12,3,13,4,14,5,15	<br>
+	 * 
+	 * @param l1
+	 * @param l2
+	 * @return
+	 */
+	public static MyLinkedList mergeList(MyLinkedList l1, MyLinkedList l2) {
+		Node temp1 = l1.getRoot();
+		Node temp2 = l2.getRoot();
+		Node temp3 = null;
+		
+		// If l1 is empty then return l2
+		if(temp1 == null) {
+			return l2;
+		}
+		
+		// Traversing parallel on both list until l1 and l2 are equal
+		while(temp1!=null && temp2!=null) {
+			temp3 = temp2;
+			l2.setRoot(temp2.getNext());
+			temp3.setNext(temp1.getNext());
+			temp1.setNext(temp3);
+			temp2 = l2.getRoot();
+			temp1 = (temp1.getNext()!=null) ? temp1.getNext().getNext() : null ; 
+		}
+		
+		//when l1 is smaller than l2 , so at the end of parallel traversal
+		if(temp1==null && temp3!=null && temp3.getNext()==null) {
+			temp3.setNext(l2.getRoot());
+		}
+		
+		return l1;
+	}
 }
