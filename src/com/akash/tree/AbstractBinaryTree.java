@@ -62,6 +62,9 @@ public abstract class AbstractBinaryTree<T extends Comparable> {
 		private Node<Type> left;
 		private Node<Type> right;
 		private Type value;
+		
+		//See AvlTree
+		private Integer nodeHeight; 
 
 		public Node<Type> getLeft() {
 			return left;
@@ -85,6 +88,14 @@ public abstract class AbstractBinaryTree<T extends Comparable> {
 
 		public void setValue(Type value) {
 			this.value = value;
+		}
+
+		public Integer getNodeHeight() {
+			return nodeHeight;
+		}
+
+		public void setNodeHeight(Integer nodeHeight) {
+			this.nodeHeight = nodeHeight;
 		}
 	}
 }

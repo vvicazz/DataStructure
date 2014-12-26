@@ -1,26 +1,41 @@
 package com.akash.tree;
 
 /**
- * All operations in BST <br> 
- * 1. Adding new element <br> 
- * 2. Search an element <br> 
- * 3. Remove an element <br> 
+ * AVL tree makes the binary tree balanced.	<br><br>
  * 
- * will take a time complexity = height of the tree <br> 
+ * Height of Tree   = height of root node = length of longest path from root to leaf	<br>
  * 
- * Avg case   : height = log(n)
- * Worst case : height = n
+ * Height of a Node = length of longest path from that node to leaf	
+ * 					= 1 + MAX {
+ * 								height of left child ,
+ * 								height of right child
+ * 								}
  * 
- * @author Akash Sharma
- *
+ * 	<br>
+ * 
+ *  AVL requires heights of left and right child of every node in the tree,
+ *   must have a difference of {-1,0,+1} .	<br><br>
+ * 
+ * Here we maintain height of each node with node itself (as nodeHeight). <br>
+ * While adding or deleting a node from tree, we update the height of each node coming in that path.
+ * 
+ * @author Akash
  * @param <T>
  */
-public class BinarySearchTree<T extends Comparable> extends AbstractBinaryTree<T> {
+public class AvlTree<T extends Comparable> extends BinarySearchTree<T> {
 
-	public BinarySearchTree(T t) {
+	public AvlTree(T t) {
 		super(t);
+		getRoot().setNodeHeight(0);
 	}
-
+	
+	private void updateHeight(Node<T> node, int updateValue) {
+		Integer height=node.getNodeHeight();
+		if(height!=null) {
+			node.setNodeHeight(height + updateValue);
+		}
+	}
+	
 	public void addNode(T t) {
 		addNode(getRoot(), t);
 	}
@@ -33,8 +48,9 @@ public class BinarySearchTree<T extends Comparable> extends AbstractBinaryTree<T
 					tempNode = createNode(t);
 					node.setRight(tempNode);
 				}
-				else
+				else {
 					addNode(node.getRight(), t);
+				}
 			}
 			else {
 				Node<T> tempNode = node.getLeft();
@@ -42,12 +58,13 @@ public class BinarySearchTree<T extends Comparable> extends AbstractBinaryTree<T
 					tempNode = createNode(t);
 					node.setLeft(tempNode);
 				}
-				else
+				else {
 					addNode(node.getLeft(), t);
+				}
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean delete(T t) {
 		Node<T> parentNode = searchNode(getRoot(), t);
@@ -98,30 +115,5 @@ public class BinarySearchTree<T extends Comparable> extends AbstractBinaryTree<T
 				tempNode1.setLeft(null);
 			}
 		}
-	}
-	
-	public T find(T t) {
-		return searchNode(getRoot(), t).getValue();
-	}
-	
-	protected Node<T> searchNode(Node<T> node, T t) {
-		Node<T> tempNode = null;
-		if(node != null) {
-			if(node.getValue().compareTo(t) < 0) {
-				tempNode = node.getRight();
-				if(tempNode==null) 
-					tempNode = node;
-				else
-					tempNode = searchNode(tempNode, t);
-			}
-			else {
-				tempNode = node.getLeft();
-				if(tempNode==null) 
-					tempNode = node;
-				else
-					tempNode = searchNode(tempNode, t);
-			}
-		}
-		return tempNode;
 	}
 }
