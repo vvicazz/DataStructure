@@ -12,6 +12,8 @@ public class MyLinkedList {
 		this.root = root;
 	}
 
+	//logic should be changed.
+	//last node must be maintained
 	public void add(int value) {
 		Node node = getRoot();
 		if (node == null) {
@@ -158,6 +160,7 @@ public class MyLinkedList {
 	 * 
 	 * @param n
 	 */
+	//still in progress
 	public void reverInParts(int n) {
 		int counter=1;
 		
@@ -196,6 +199,25 @@ public class MyLinkedList {
 		if (temp3 == null) {
 			temp2.setNext(temp1);
 			setRoot(temp2);
+		}
+	}
+	
+	public void printReverse() {
+		System.out.print("[");
+		printReverseList(getRoot());
+		System.out.print("]");
+	}
+	
+	private void printReverseList(Node node) {
+		if(node==null) {
+			return;
+		}
+		if(node.getNext()==null) {
+			System.out.print(node.getValue());
+		} else {
+			printReverseList(node.getNext());
+			System.out.print(",");
+			System.out.print(node.getValue());
 		}
 	}
 }

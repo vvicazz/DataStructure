@@ -22,5 +22,7 @@ public class App {
 		
 		list = MyLinkedList.mergeList(list, list2);
 		System.out.println(list);
+		
+		list.printReverse();
 	}
 }
