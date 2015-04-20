@@ -1,0 +1,44 @@
+Synchronization
+
+http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
+
+Synchronization works on the concept of monitors.
+A monitor is always associated with an object.
+Whenever a synchronized block come into execution,
+(1)first of all it performs a lock action on the object , if another object has acquired this lock then current object has wait for the lock.
+(2)When execution comes out of synchronized block , it automatically leaves the monitor on object.
+
+eg:
+
+public synchronized void executeAtomically() {
+....
+}
+
+OR
+
+public void executeAtomically() {
+	synchronized(this) {
+	...
+	}
+}
+
+There are two kinds of lock (OR two kinds of monitors) for a class:
+(1)Object level  
+	monitor of object of a class is checked by synchronized block
+	eg:
+	Abc ob = new Abc();
+	synchronized(Abc obj) {
+	...
+	}
+	
+(2)Class level
+	monitor of Class class object of a class
+	eg:
+	synchronized(Abc.class) {
+	...
+	}
+
+
+Object level monitor can be used for non-static methods
+Class level monitor can be used for static methods
+

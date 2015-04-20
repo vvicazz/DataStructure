@@ -1,0 +1,62 @@
+http://tutorials.jenkov.com/java-collections/hashcode-equals.html
+
+http://www.technofundo.com/tech/java/equalhash.html
+
+(1)equals() method in Object class checks for shallow comparison.Custom Objects must override equals method for deep copy comparison.
+Whenenver we add custom objects to List , Map or other collections ,it internally uses these to two methods.
+
+eg: Abc ob = new Abc();
+    List listOb = new ArrayList();
+	listOb.add(ob);
+	listOb.contains(ob);  // this internally checks for equals method for each object in listOb
+	
+	equals() method can be overriden by first checking Class class object and then comparing other fields of two object depending on requirement.
+	e.g:
+Class Test {
+public boolean equals(Object obj) {
+	if(this == obj)
+		return true;
+	if((obj == null) || (obj.getClass() != this.getClass()))
+		return false;
+	// object must be Test at this point
+	Test test = (Test)obj;
+	return (id == test.id);
+}
+}
+
+(2)hashcode() method
+
+Every object in java has a hashcode. returns Integer
+
+Why?
+Because when we add any object in hashtable,hashMap,HashSet or any other hashtable like implementation,
+it takes hashcode value as object hash value.
+
+Now two objects can have same hashcode value,that means these two objects will have hashcode collision.
+So when we try find an object in hashtable , we first check for its hashcode and find the appropriate Linked list and 
+then we try to compare each object in Linked list using equals() method.
+
+Two equal object will always return equal hashcode value (if called more than once)
+ unless no information used in equals comparisons on the object is modified.
+
+Rule (1) If two objects are equal then their hashcode are same and equals() will return true.
+(2)There may be a case where two different objects have same hashcode value but thier equals() will return false.
+
+
+Note:
+Default implementation of equals() checks for shallow comparison.
+
+public boolean equals(Object obj) {
+	return this==obj;
+}
+
+By defalut hashcode() method in Object class implemented by converting the internal address of the object into an integer.
+
+
+=====================
+
+Web services:
+
+http://www.mkyong.com/webservices/jax-ws/jax-ws-attachment-with-mtom/
+
+http://docs.oracle.com/cd/E14571_01/web.1111/e13734/mtom.htm#WSADV137
