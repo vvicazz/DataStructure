@@ -5,7 +5,8 @@ http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
 Synchronization works on the concept of monitors.
 A monitor is always associated with an object.
 Whenever a synchronized block come into execution,
-(1)first of all it performs a lock action on the object , if another object has acquired this lock then current object has wait for the lock.
+(1)first of all it performs a lock action on the object , 
+if another object has acquired this lock then current object has wait for the lock.
 (2)When execution comes out of synchronized block , it automatically leaves the monitor on object.
 
 eg:
