@@ -29,3 +29,14 @@ http://www.programcreek.com/2009/02/notify-and-wait-example/
 suspend() method do not release monitor from the object and that may result in deadlock,
 if suspend method is called from a synchronized block.
 
+(Q)Why wait() notify() and notifyAll() methods are in Object class?
+These methods are used either to get or remove object's monitor.
+The object that is shared with different threads.
+
+Note : wait(0) == wait(0,0) == wait()
+
+Three stages of a thread:
+(1)Runnable pool
+(2)Running
+(3)Blocked pool
+

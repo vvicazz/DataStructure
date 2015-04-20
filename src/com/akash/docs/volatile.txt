@@ -35,3 +35,5 @@ ideally x must be 2.
 =>Reading from and writing to main memory is more expensive than accessing the CPU cache.
 =>Effectively, a variable declared volatile must have it’s data synchronized across all threads,
  so that whenever you access or update the variable in any thread, all other threads immediately see the same value.
+ 
+ 
