@@ -1,0 +1,31 @@
+Wait Notify NotifyAll
+
+These concepts are used for communication between multiple threads sharing same resource.
+Inter Threaded communication.
+
+Serialization solves the problem of memory inconsistencies but
+ We also want our shared resource to be used wisely.
+
+final void wait( ) throws InterruptedException 
+final void notify( ) 
+final void notifyAll( )
+
+wait() : tells the current thread to go in sleep mode and removing lock from objects monitor
+		(if object lock is held in synchronized block).
+		It comes out of sleep when some other thread calls notify() or notifyAll() on same monitor 
+		OR
+		some other thread interrupt this current thread.
+notify() : removes the first thread from sleep mode.
+notifyAll() : removes all threads from sleep mode.
+
+If wait() was called in synchronized block then after coming from sleep mode
+ it again gains monitor(depending on its priority).
+
+see coding examples at :
+http://www.java-samples.com/showtutorial.php?tutorialid=306
+http://www.programcreek.com/2009/02/notify-and-wait-example/
+
+(Q)Why suspend() and resume() methods are deprecated?
+suspend() method do not release monitor from the object and that may result in deadlock,
+if suspend method is called from a synchronized block.
+
