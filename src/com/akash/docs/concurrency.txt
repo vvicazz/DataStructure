@@ -1,0 +1,14 @@
+Race condition : when multiple processes/threads access same resource and order of accessing resource matters.
+Critical section : code that contains race condition
+
+Thread safe : code that has no critical section
+
+all local primitive variable are stored in thread stack
+objects are stored in heap, so they can be shared with multiple threads
+
+ThreadLocal
+
+http://stackoverflow.com/questions/1202444/how-is-javas-threadlocal-implemented-under-the-hood
+http://java.dzone.com/articles/painless-introduction-javas-threadlocal-storage
+
+WeakRefrences ???

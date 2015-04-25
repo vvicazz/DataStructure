@@ -1,7 +1,10 @@
 Wait Notify NotifyAll
 
 These concepts are used for communication between multiple threads sharing same resource.
-Inter Threaded communication.
+Inter Threaded communication OR Thread Signalling
+
+Thread Signalling can be obtained by using a variable inside a shared object and check it.
+But it would result in busy waiting.
 
 Serialization solves the problem of memory inconsistencies but
  We also want our shared resource to be used wisely.
@@ -11,7 +14,6 @@ final void notify( )
 final void notifyAll( )
 
 wait() : tells the current thread to go in sleep mode and removing lock from objects monitor
-		(if object lock is held in synchronized block).
 		It comes out of sleep when some other thread calls notify() or notifyAll() on same monitor 
 		OR
 		some other thread interrupt this current thread.
@@ -33,10 +35,16 @@ if suspend method is called from a synchronized block.
 These methods are used either to get or remove object's monitor.
 The object that is shared with different threads.
 
-Note : wait(0) == wait(0,0) == wait()
+NOTE : wait(0) == wait(0,0) == wait()
+NOTE : wait(),notify(),notifyAll() are always called from inside synchronized block
+NOTE : Once a thread is awakened it cannot exit the wait() call until the thread calling notify() has left its synchronized block
 
-Three stages of a thread:
-(1)Runnable pool
-(2)Running
-(3)Blocked pool
+http://stackoverflow.com/questions/2779484/why-must-wait-always-be-in-synchronized-block
+
+(Q)Why wait and notify are always called from inside synchronized block?
+These methods are created to perform inter thread communication.
+wait() waits for a condition that is held by some other thread.
+
+(Q)IllegalMonitorStateException when this exception comes?
+when wait or notify called outside synchronized block
 
