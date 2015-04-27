@@ -1,0 +1,102 @@
+OAuth 2.0
+=>client side
+=>server side
+
+Server side
+
+(1)client browser(Client App) -> service provider(fb) with a url and parameters
+
+parameters:
+-fb login page url configured for OAuth
+-redirect_uri 	: Redirect Url of client App
+-client_id 		: App Id of your registered Application in fb
+	Why this required?
+	So that facebook can be informed about who is watching/updating whose data.
+-scope 			: it specifies the list of permissions client application is accessing on behalf of an end user.
+-response_type
+-state
+
+Error handling :
+-invalid_request
+-unauthorized_client
+-unsupported_response_type
+-invalid_scope
+-server_error
+-temporarily_unavailable
+
+Url of first call for facebook service provider : http://www.facebook.com/dialog/oauth
+
+
+(2)Login page of fb opens , after successful login page is redirected to client App redirect Url,
+with some parameters.
+A POST request will be sent to Service provider.
+
+Parameters in request:
+-redirect_uri
+-code 			: code for status of login credentials
+-client_id
+-client_secret
+
+Parameters in Response:
+-access_token
+-token_type
+-expires_in
+-refresh_token
+
+Url for getting access token : https://graph.facebook.com/v2.2/oauth/access_token
+
+
+(3)Now client App needs to get access token from Service provider with the help of this code.
+Client App will hit another service url with some parameters :
+
+-code
+-secretKey
+-AppId
+
+This will give us an accessToken
+
+(4)Using accessToken we can hit OAuth API urls and get/post required data.
+
+ 
+======================================
+
+(Q)Why we use OAuth?
+->if two diff applications want to synch (eg: our App and FB) ,
+then other application do not need to save passwords.
+
+
+Roles :
+Resource server
+Resource owner
+Client
+Authorization server
+
+=========================================
+
+(1)Get OAuth code :
+	http://www.facebook.com/dialog/oauth?client_id={clientId}&
+redirect_uri={redirect_uri}&scope={comma seperated list of scopes}
+
+(2)Get profile pic for user :
+	https://graph.facebook.com/v2.2/{userId}/picture
+?format=json&method=get&redirect=false&access_token=accessToken
+
+(3)Get loggedIn user details :
+	https://graph.facebook.com/v2.2/me?accessToken={accessToken}
+
+(4)Post on User profile (POST request)
+	https://graph.facebook.com/v2.2/me/feed
+?message=testing+facebook+api&?access_token={accessToken}
+ 
+ host:graph.facebook.com method:POST path:/v2.2/me/feed scheme:https
+ 
+ output {"id": "172202062836724_873505378039442"}
+ 
+ posted message : testing facebook api
+ 
+ 
+ (5)list of friend
+ https://graph.facebook.com/v2.2/{user_id}/friends?access_token={accessToken}
+ 
+ NOTE : This gives total number of friends for user but gives details of only
+ those users who are using this app.
