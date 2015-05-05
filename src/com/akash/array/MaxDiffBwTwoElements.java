@@ -29,6 +29,11 @@ public class MaxDiffBwTwoElements {
 		return maximumSumFound;
 	}
 	
+	/*
+	 * { -2, -3, 4, -1, -2, 1, 5, -3 }  -- 7
+	 * { -2, -3, 4, -1, -20, 1, 5, -3 } -- 6
+	 * { -2, -3, 4, -1, -20, 1, 1, -3 } -- 4
+	 */
 	private int maxSubArraySum(int arr[])
 	{
 	   int max_so_far = 0, max_ending_here = 0;
