@@ -1,0 +1,55 @@
+(1)union and intersection of two sorted array
+	--as technique used in merge sort, after sorting these two arrays
+	--
+union and intersection of two unsorted array
+
+(2)pythagorean triplet in array -- triplet pair in array a2=b2+c2
+	--sort the array
+	--store squares of numbers in another array = O(nlog(n))
+	--apply meet in the middle algo by taking each element  = O(n2)
+
+(3)meet in the middle algorithm -- a+b=given sum , a and b are in array 
+  || Given an array A[] and a number x, check for pair in A[] with sum as x
+  
+	--using sorting
+	--using hashmap
+	
+
+(4)Maximum profit by buying and selling a share at most twice
+10, 22, 5, 75, 65, 80
+87  (22-10 , 80-5)
+
+2, 30, 15, 10, 8, 25, 80
+100 (30-2,80-8)
+
+100, 30, 15, 10, 8, 25, 80
+72 (80-8)
+
+90, 80, 70, 60, 50
+0
+
+1st approach = O(n2)
+--We can use Maximum difference between two elements such that larger element appears after the smaller number
+--use once the logic to find minimum and maximum numbers with max sum
+--then take rest of the array i.e. two sub arrays left and right part of that , one of the part may be empty
+--apply the same algo again on that array and find the second sum.
+eg:
+10, 22, 5, 75, 65, 80
+
+5, 75, 65, 80  = 75
+10, 22 = 12
+
+
+
+(5)Maximum difference between two elements such that larger element appears after the smaller number
+2, 3, 10, 6, 100, 8, 1
+
+1 7 -4 94 -92 -7 
+
+8 -4 94 -92 -7 
+
+98
+
+(6)finding the maximum sum subarray || Largest Sum Contiguous Subarray
+
+
