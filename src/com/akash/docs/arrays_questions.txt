@@ -1,7 +1,11 @@
 (1)union and intersection of two sorted array
-	--as technique used in merge sort, after sorting these two arrays
-	--
+	
 union and intersection of two unsorted array
+
+	--as technique used in merge sort, after sorting these two arrays   - O(mlogm + nlogn)
+	--sort smaller array,iterate larger array and use binary search over the small array  -  O(min[nlogn+mlogn , nlogm+mlogm])
+	--use hashtable 	-  O(m+n)
+
 
 (2)pythagorean triplet in array -- triplet pair in array a2=b2+c2
 	--sort the array

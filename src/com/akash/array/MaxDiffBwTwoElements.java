@@ -2,7 +2,9 @@ package com.akash.array;
 
 public class MaxDiffBwTwoElements {
 
-	private int arr[] = { 2, 3, 10, 6, 100, 8, 1 };
+	private int arr[] = { -2, -3, 4, -2, 8, 9, -3 };
+
+	// { 2, 3, 10, 6, 100, 8, 1 }
 
 	public static void main(String args[]) {
 
@@ -12,7 +14,14 @@ public class MaxDiffBwTwoElements {
 	}
 
 	/*
-	 * time -- O(n) space -- O(1)
+	 * time -- O(n) space -- O(1) This algo tries to find 1) position of min
+	 * number 2) position of max number
+	 * 
+	 * various ways to solve this algo: (1)use any sorting algo which find
+	 * min/max in single iteration heap,selection,bubble.
+	 * 1st method is time consuming if array is in descending order. 
+	 * (2)get difference of consecutive numbers and save it in an array of (n-1) 
+	 * now find max sum subArray for this array (3)Use the below logic
 	 */
 	private int findMaxDiff() {
 		int arr[] = this.arr;
@@ -28,25 +37,34 @@ public class MaxDiffBwTwoElements {
 		}
 		return maximumSumFound;
 	}
-	
+
 	/*
-	 * { -2, -3, 4, -1, -2, 1, 5, -3 }  -- 7
-	 * { -2, -3, 4, -1, -20, 1, 5, -3 } -- 6
-	 * { -2, -3, 4, -1, -20, 1, 1, -3 } -- 4
+	 * { -2, -3, 4, -1, -2, 1, 5, -3 }-->7 { -2, -3, 4, -1, -20, 1, 5, -3 }-->6
+	 * {-2, -3, 4, -1, -20, 1, 1, -3 }-->4
 	 */
-	private int maxSubArraySum(int arr[])
-	{
-	   int max_so_far = 0, max_ending_here = 0;
-	   int i;
-	   for(i = 0; i < arr.length; i++)
-	   {
-	     max_ending_here = max_ending_here + arr[i];
-	     if(max_ending_here < 0)
-	        max_ending_here = 0;
-	     if(max_so_far < max_ending_here)
-	        max_so_far = max_ending_here;
-	    }
-	    return max_so_far;
+	private int maxSubArraySum(int arr[]) {
+		int max_so_far = 0, max_ending_here = 0;
+		int previous_max_ending_here = 0;
+		int minPos = -1;
+		int maxPos = -1;
+		for (int counter = 0; counter < arr.length; counter++) {
+			max_ending_here = max_ending_here + arr[counter];
+			if (max_ending_here < 0) {
+				max_ending_here = 0;
+			}
+			if (max_so_far < max_ending_here) {
+				if (previous_max_ending_here == 0) {
+					minPos = counter;
+				} else {
+					maxPos = counter;
+				}
+				max_so_far = max_ending_here;
+			}
+			previous_max_ending_here = max_ending_here;
+		}
+		System.out.println("min :" + minPos);
+		System.out.println("max :" + maxPos);
+		return max_so_far;
 	}
 }
 
