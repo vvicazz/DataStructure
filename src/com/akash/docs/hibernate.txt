@@ -1,0 +1,64 @@
+Hibernate
+
+*** http://www.onjava.com/pub/a/onjava/2006/09/13/dont-let-hibernate-steal-your-identity.html?page=1
+
+<version name="version"  unsaved-value="null" generated="always"  insert="true" />
+
+
+Methods of Session class
+
+get()
+load()
+
+save()
+persist()
+
+update()
+saveOrUpdate()
+merge()
+
+delete()
+
+
+Methods of EntityManager
+
+find()
+persist()
+merge()
+remove()
+
+(Q)Difference b/w merge() and update() ?
+Ans : 
+update will fire only one sql for update
+merge will first fire select (if entity is not loaded) and then update
+
+update will throw exception if identifier not found
+merge will add a new row if identifier not found
+
+(Q)Difference b/w get() and load() ?
+Ans :
+When an entity already exists in DB we should use load()
+It first checks in session cache then in DB.
+if not found it throws exception
+load() will return a proxied object.
+
+get() can be used to check if entity exists in DB or not.
+It returns null if not found
+
+
+(Q)What is N+1 problem and how to resolve it ?
+Ans :
+There may be a scenario where we fetch an object and its children are fetch after that
+As a result , their will be N+1 sql queries.
+1 parent object can have N children
+1 for the parent and
+N for the children
+
+To solve this we can load all entities in single sql as :
+SELECT parent LEFT OUTER JOIN child
+
+this query can also be used in HQL as :
+FROM parent JOIN FETCH child 
+
+NOTE : we can use this logic whenever we have to load full object graph.
+
