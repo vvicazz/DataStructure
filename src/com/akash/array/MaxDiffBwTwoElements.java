@@ -1,5 +1,8 @@
 package com.akash.array;
 
+import java.util.Calendar;
+
+
 public class MaxDiffBwTwoElements {
 
 	private int arr[] = { -2, -3, 4, -2, 8, 9, -3 };
@@ -8,9 +11,14 @@ public class MaxDiffBwTwoElements {
 
 	public static void main(String args[]) {
 
-		MaxDiffBwTwoElements ob = new MaxDiffBwTwoElements();
-		System.out.println(ob.findMaxDiff());
-		System.out.println(ob.maxSubArraySum(ob.arr));
+		String s = null;
+		Integer i;
+		Calendar c = Calendar.getInstance();
+		c.set(2012, Calendar.APRIL, 12);
+		System.out.println(s instanceof Object);
+//		MaxDiffBwTwoElements ob = new MaxDiffBwTwoElements();
+//		System.out.println(ob.findMaxDiff());
+//		System.out.println(ob.maxSubArraySum(ob.arr));
 	}
 
 	/*

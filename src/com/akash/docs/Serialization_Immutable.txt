@@ -1,0 +1,237 @@
+Immutable class
+
+How to make a class immutable
+(1)make all variables of class as final.
+(2)make class itself as final, so that no other class can override and modify.
+(3)remove all setters.
+(4)constructor should have all parameters to set all variables. 
+	Also try to create new object in costructor for mutable objects.
+(5)getter method for immutable objects must return a copy of object.
+(6)hashcode of immutable objects never change.
+	hashcode of immutable objects can be cashed.
+(7)Keys for hashMap must be immutable.
+(8)immutable objects are always thread safe.
+
+
+eg:
+String
+Integer
+Long
+
+
+class Abc {
+
+	Abc(String s,Integer i,Date d) {
+		this.s=s;
+		this.i=i;
+		//Note
+		this.d=new Date(d.getTime())
+	}
+	
+	private String s;
+	private Integer i;
+	private Date d;
+	public String getS() {
+		return s;
+	}
+	public Integer getI() {
+		return i;
+	}
+	public Date getD() {
+		return new Date(d.getTime());
+	}
+	//hashcode value can be cashed
+	private int hashcode;
+	//implement equals and hashcode
+}
+
+=========================================================
+
+Singleton class
+
+singleton class can be implemented in many ways:
+
+(1)
+Lazy initialization
+object will be created at class loading time
+
+class Abc {
+	private Abc() {}
+	private Abc ob;
+	static {
+		ob = new Abc();
+	}
+	public static Abc getInstance() {
+		return ob;
+	}
+}
+
+
+(2)
+making whole method synchronized
+but this is less efficient as 
+synchronization is only required when first time object is created
+
+class Abc {
+	private Abc() {}
+	private Abc ob;
+	public static synchronized Abc getInstance() {
+		if(ob==null) {
+			ob=new Abc();
+		}
+		return ob;
+	}
+}
+
+
+(3)
+synchronizing critical section using volatile
+
+class Abc {
+	private Abc() {}
+	private volatile Abc ob;
+	public static Abc getInstance() {
+		if(ob==null) {
+			synchronized(Abc.class) {
+				if(ob==null) {
+					ob=new Abc();
+				}
+			}
+		}
+		return ob;
+	}
+}
+
+(Q)Why double check for null?
+(Q)Why volatile is used here?
+
+If two threads enter the method and check first condition at same time,
+then only one will get lock and create object.
+after lock release second will enter and if condition will not allow to create new object.
+
+Volatile     insures visibilty
+Synchronized insures atomicity
+
+volatile ensures that if a thread creates an object fully then
+any read operation after that can read that full object.
+i.e. any read operation of any other thread cannot get half initialized object.
+This is called happens before relationship.
+
+(4)
+Enum Abc {
+	Abc INSTANCE;
+}
+
+==============================================
+
+Serialization with singleton class
+
+ObjectOutputStream   ==   writeObject()
+ObjectInputStream    ==   readObject()
+
+
+(Q)What changes are required for a singleton class to implement Serializable interface?
+
+readObject() of ObjectInputStream class creates new copy for object.
+for this we can override methods in our class
+
+readObject()   --  readResolve()
+
+writeObject()  --   writeReplace()
+
+we can return our own singleton instance from readResolve() method
+
+eg:
+
+private Object readResolve() throws ObjectStreamException {
+	return INSTANCE;
+}
+
+private Object writeReplace() throws ObjectStreamException {
+	return INSTANCE;
+}
+
+
+<=>execution flow =>
+
+writeReplace()		   readResolve()
+     |						|
+	 |						|
+writeObject()   ----   readObject()
+
+
+============================================================
+
+Serialization
+
+http://javarevisited.blogspot.in/2011/04/top-10-java-serialization-interview.html
+http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html
+http://docs.oracle.com/javase/8/docs/platform/serialization/spec/serial-arch.html
+**http://www.onjava.com/pub/a/onjava/excerpt/JavaRMI_10/index.html?page=1
+
+(1)static and transient fields of a class are not serialized.
+(2)if parent class implement Serializable, child class is also serializable
+(3)if child class implements Serializable and parent class not, 
+	then parent class parameters are not serialized.
+(4)if child class implements Serializable and parent class not, 
+	then parent class must have a no argument constructor.
+(5)constructor for serializable class never run while deserialization
+(6)transient fields in serializable class are assigned their default value or value defined in readResolve()
+(7)if child class implements Serializable and parent class not, 
+	then a no argument constructor of parent will be executed.
+	All fields of parent transient or non transient are initialized in constructor.
+
+
+(Q)If a serializable class has a refrence of non-serializable class?
+Ans : it will throw NotSerializableException exception
+
+(Q)Serialize a class, add a new field , then deserialize ?
+(Q)Serialize a class, remove a field , then deserialize ?
+
+=>valid in serialization:
+adding new fields
+converting static to non-static,transient to non-transient
+
+=>Invalid in serialization
+removing non-transient/non-static fields
+converting non-transient to transient and non-static to static
+changing data type of fields
+converting serializable to externalizable or vice versa
+changing enum to non-enum or vice versa
+
+
+private void writeObject(java.io.ObjectOutputStream out) throws IOException 
+private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException;
+
+NOTE : 
+(1)readObject() and writeObject() methods are used together
+(2)we must use defaultWriteObject() to initialize non-transient and non-static fields
+(3)We must use this method when we override the default behaviour of readObject() and writeObject()
+
+
+private static final ObjectStreamField[] serialPersistentFields =  { 
+ new ObjectStreamField("size", Integer.TYPE),
+ new ObjectStreamField("money", Double.TYPE)
+};
+
+NOTE:
+(1)making a field as serialPersistentFields is just opposite of transient
+(2)if a field is both transient and declared in serialPersistentFields ,
+	priority goes to serialPersistentFields.
+	
+
+	
+==============================================================
+
+Interview questions on:
+Exception
+Collection
+String,StringBuffer,StringBilder
+Threading
+
+Spring
+hibernate
+hibernate search
+lucene
+SolR
+camel
