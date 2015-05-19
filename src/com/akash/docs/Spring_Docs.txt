@@ -1,0 +1,428 @@
+
+
+servlet,filter,jsp
+spring , hibernate, HS , camel , spring integration, web services , spring security
+
+HS - query , analyser , facets , spatial
+using camel via xml
+
+blog
+
+
+motm
+Rest web services in spring project
+spring : properties file(java and js) , forward , redirect, tag
+
+http://www.journaldev.com/2610/spring-mvc-internationalization-i18n-and-localization-l10n-example
+
+*****J2EE
+*****http://docs.oracle.com/javaee/5/tutorial/doc/bnama.html
+**https://docs.oracle.com/cd/E19159-01/819-3669/bnalj/index.html
+
+
+outer left join ?
+tld file in META-INF ?
+
+
+----------------------------
+(1)init()
+(2)constructor
+(3)setter
+
+InitializingBean			--	(8)afterPropertiesSet()			--	@PostConstruct
+DisposableBean				--	(10)destroy()					--	@PreDestroy
+BeanPostProcessor			--	(7)postProcessBeforeInitialization(Object bean, String beanName)
+								(9)postProcessAfterInitialization(Object bean, String beanName)
+ApplicationContextAware		--	(6)setter
+BeanNameAware				--	(4)setter
+BeanFactoryAware			--	(5)setter
+ServletContextAware 		--	setter
+ServletConfigAware			--	setter
+					
+observer-design-pattern
+
+
+BeanPostProcessor  - custom logic is executed before and after initializing the bean(initialization methods)
+BeanPostProcessors are scoped per-container
+AOP auto-proxying is implemented as a BeanPostProcessor
+RequiredAnnotationBeanPostProcessor
+
+All BeanPostProcessors and beans that they reference directly are instantiated on startup, as part of the special startup phase of the
+ ApplicationContext. Next, all BeanPostProcessors are registered in a sorted fashion and applied to all further beans in the container.
+
+
+BeanFactoryPostProcessor - works on bean configuration metadata like xml
+BeanFactoryPostProcessors are scoped per-container
+PropertyPlaceholderConfigurer  - properties file
+
+
+<context:annotation-config/>
+http://www.springframework.org/schema/context/spring-context.xsd
+only looks for annotations on beans in the same application context in which it is defined.
+@Required , @Autowired
+
+@Autowired, @Inject, @Resource, and @Value annotations are handled by a Spring BeanPostProcessor implementations which in turn means 
+that you cannot apply these annotations within your own BeanPostProcessor or BeanFactoryPostProcessor
+
+@Qualifier
+associate qualifier values with specific arguments, narrowing the set of type matches
+NOTE : the bean name is considered a default qualifier value
+
+@Resource
+Directly get the bean by its defined name
+JSR 250
+If no name is specified explicitly, the default name is derived from the field name or setter method
+@Resource(name="abc")
+
+=>Difference b/w @Resource and @Autowired
+(1) Autowired picks up the bean via type and qualifier applies a filter over it.
+    But @Resource picks up the bean via name.
+	
+(2) beans that are themselves defined as a collection or map type cannot be injected through @Autowired
+
+(3) @Autowired applies to fields, constructors, and multi-argument methods
+	@Resource is supported only for fields and bean property setter methods with a single argument
+
+@Component is a generic stereotype for any Spring-managed component. 
+@Repository, @Service, and @Controller are specializations of @Component for more specific use cases
+
+@RestController == @Controller and @ResponseBody
+
+NOTE: The use of <context:component-scan> implicitly enables the functionality of <context:annotation-config>
+
+@Inject with @Named
+@Named can be used with @Inject
+@Named can be used as @Component
+
+@Any
+
+
+NOTE : In Spring, instantiated beans have a singleton scope by default. This is where the magic comes in: 
+	All @Configuration classes are subclassed at startup-time with CGLIB. In the subclass, the child method checks the container first
+	for any cached (scoped) beans before it calls the parent method and creates a new instance.
+	
+	
+@Configuration  - xml configuration
+@Bean           - bean in xml
+@Profile        - profile of bean(s) in configuration
+
+Environment - profile and properties
+Different profiles are used for different environment
+
+-------------------------
+
+========Data Binding and validations========
+
+An application can also register additional Spring Validator instances per DataBinder instance
+
+====================================================
+
+(Q)What is spring IOC ?
+(Q)How Spring implemented it?
+
+IOC means inversion of control i.e. control is in framework's hand.
+Dependency Injection is implemented via IOC.
+
+for eg: if bean A requires bean B , then spring injects bean B inside bean A.
+Both bean A and B have to register themselves in spring container.
+
+There are many lifecycle interfaces and Aware interfaces in spring that helps it to perform DI.
+
+=====================================================
+Spring AOP is proxy-based.
+
+(1)standard JDK dynamic proxies		=> when implementing interfaces
+(2)CGLIB							=> when not implementing interfaces (proxies are created by classes)
+
+**NOTE** : CGLIB is used by default if a business object does not implement an interface.
+It is possible to force the use of CGLIB, in those (hopefully rare) cases where you need to advise a method that is not declared
+ on an interface, or where you need to pass a proxied object to a method as a concrete type.
+If the target object to be proxied implements at least one interface then a JDK dynamic proxy will be used
+ 
+ Spring AOP based on @AspectJ
+ Spring AOP schema based  i.e. xml based
+ 
+==>By autoproxying we mean that if Spring determines that a bean is advised by one or more aspects, 
+it will automatically generate a proxy for that bean to intercept method invocations and ensure that advice is executed as needed.
+
+@Configuration
+@EnableAspectJAutoProxy
+public class AppConfig {........}
+
+<aop:aspectj-autoproxy/>
+
+
+=>final methods cannot be advised, as they cannot be overridden.
+=>The constructor of your proxied object will be called twice when implemented via CGLIB.
+Using JDK dynamic proxies one constructor call will be done but in case of CGLIB two instances will be created.
+
+=> To force proxy class implementation using CGLIB
+<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+constructor runs two times with cglib
+*****http://forum.spring.io/forum/spring-projects/container/342-constructor-called-twice-when-using-cglib-proxy-beans
+
+
+the method serving as the pointcut signature must have a void return type
+
+pointCut designators =>
+(1)execution
+(2)this		-- refrence to proxy object
+(3)target		-- refrence to actual object
+(4)args
+(5)within
+(6)annotation
+(7)bean
+
+Advice =>
+
+@Before
+@AfterReturning			-- can get returned value
+@AfterThrowing			-- can get thrown exception
+@After (After finally)	-- 
+
+Around advice is often used if you need to share state before and after a method execution in a thread-safe manner 
+(starting and stopping a timer for example)
+
+=>We can get arguments of a method in our aspect using args()
+=>We can add JoinPoint refrence to our join point method so that we can get all the information regarding it.
+=>Around advice already contain PrecedingJoinPoint refrence
+
+execution(modifiers-pattern? ret-type-pattern declaring-type-pattern? name-pattern(param-pattern) throws-pattern?)
+
+--any public method
+@Pointcut("execution(public * *(..))")
+
+--Any method in trading package
+@Pointcut("within(com.xyz.someapp.trading..*)")
+
+@Pointcut("anyPublicOperation() && inTrading()")
+
+--Where proxy implements AccountService
+this(com.xyz.service.AccountService)
+
+--Where target object implements AccountService
+target(com.xyz.service.AccountService)
+
+--where the argument passed at runtime is Serializable
+args(java.io.Serializable)
+
+--Executing method has a @Transactional annotation
+@annotation(org.springframework.transaction.annotation.Transactional)
+
+--A spring bean named tradeService
+bean(tradeService)
+
+&&    ||   !
+
+--Handling exception
+@AfterThrowing(pointcut="com.xyz.myapp.SystemArchitecture.dataAccessOperation()",throwing="ex")
+    public void doRecoveryActions(DataAccessException ex) {
+        //
+    }
+
+
+--Getting arguments
+@Before("com.xyz.myapp.SystemArchitecture.dataAccessOperation() && args(account,..)")
+public void validateAccount(Account account) {
+    // ...
+}
+	
+
+Note : Point cut method never executes itself.
+Note : Advice is applied on only public methods
+
+http://java-sample-program.blogspot.in/2012/11/spring-aop-advice-ordering.html
+=======================================
+
+Spring Data Tier
+
+PlatformTransactionManager
+
+TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException;
+void commit(TransactionStatus status) throws TransactionException;
+void rollback(TransactionStatus status) throws TransactionException;
+
+
+TransactionDefinition
+TransactionStatus
+
+TransactionDefinition includes following parameters :
+Isolation
+Propagation
+Timeout
+Read-only status
+
+There are various implementations of PlatformTransactionManager :
+JDBC
+JTA
+Hibernate
+
+http://tomcat.apache.org/tomcat-6.0-doc/jndi-resources-howto.html#JDBC_Data_Sources
+
+https://docs.jboss.org/hibernate/orm/4.3/manual/en-US/html_single/
+
+
+Spring Framework’s transaction infrastructure code only marks a transaction for rollback in the case of runtime, unchecked exceptions;
+Checked exceptions that are thrown from a transactional method do not result in rollback in the default configuration.
+
+<tx:advice id="txAdvice" transaction-manager="txManager">
+...
+<tx:method name="get*" read-only="true" rollback-for="NoProductInStockException"/>
+<tx:method name="updateStock" no-rollback-for="InstrumentNotFoundException"/>
+</tx:advice>
+
+@transactional annotation can be applied to 
+(1)a method on an interface, 
+(2)a class definition, or 
+(3)a public method on a class
+
+There may be more than one transaction manager in one application
+The value attribute of the @Transactional annotation can be used to optionally specify the identity of the PlatformTransactionManager to be used
+
+14. Data access with JDBC
+
+
+
+
+===============================
+
+*******http://java.dzone.com/articles/how-does-spring-transactional
+
+web example for hibernate in spring web project
+
+mtom
+http component in spring ws
+
+passport
+
+
+spring mvc
+hibernate
+hibernate search
+spring interceptor
+database queries interceptor
+soap client and server with mtom
+rest security
+data structure
+  sorting => insertion,merge,heap,
+  array questions
+  linked list question
+  binary questions
+  tree => binary,BST,AVL,Red Black
+  min heap,max heap
+  graph
+  dynamic programming algos
+  greedy algos
+
+  
+  intercept the call of session in db in hibernate
+  https://github.com/ttddyy/datasource-proxy
+
+===========================
+
+hum apki ankhon me --- pyasa
+aja sanam madhur chandni me hum -- 
+roshan tumhi se duniya --- paras mani
+unse mili nazar to hosh ud gaye -- jhukta asmaan
+
+==================================
+
+Rest
+
+Rest is an architectural style
+transfer of representational state of an object
+
+
+========================================
+
+rejex
+http://regexone.com/
+
+. 	-> any character
+\. 	-> for .
+\d 	-> any number
+\w	-> [a-zA-Z0-9_] alphanumeric character  any character or digit(a-z A-Z 0-9) or underscore
+[]  -> specify characters
+*   -> zero or more occurence
++   -> one or more occurence
+?	-> optional (zero or one occurence)
+\s	-> space , tab \t , new line \n , carriage return \r
+^$	-> start and end
+()	-> capture
+|	-> logical OR
+	[abc] 			- word starts with either a or b or c , 
+	[^abc]			- word do not start with abc
+	[^drp]an		- word cannot be dan,ran,pan but it can be aan,ban,zan
+	
+	[hd]og 			- hog,dog but not bog
+	[^b]og 			- hog,dog but not bog
+	[hd][a-z][a-z] 	- hog,dog but not bog
+	[^b][a-z][a-z]	- hog,dog but not bog
+	
+	waz{2,4}up		- 
+	
+	a{2,4}b{0,4}c{1,2}	-	match all aaaabcc , aabbbbc , aacc	
+	[abc]+				-	match all aaaabcc , aabbbbc , aacc
+	aa+b*c+				-	same
+	a*b*c*				-	same
+	
+	\w files? found\?
+	
+	[0-9^4]\.\s+abc
+	\d\.\s+abc
+	
+	^([a-z_]+)\.pdf$
+	(\w+).pdf$
+	
+	([A-Za-z]+\s+(\d+))		Jan 1987 => Jan 1987, 1987
+	(\w+ (\d+))				same
+	(\w+\s+(\d+))			same
+	
+	\d{4}x\d{3,4}			1280x720 , 1920x1600
+	
+	I love (cats|dogs)
+	
+	[a-zA-Z][a-zA-Z0-9]+	name starts with charater a to z and can have a number
+	
+	-?\d+(,\d+)*(.\d+(e\d+)?)?(\d)+$		float number , negative , positive , exponent-mantissa , normal number
+											number can contain ,
+											
+	\d+[ \d+]*[-\d+]*		phone number
+	
+	
+	
+	
+================================
+
+
+Log4J
+
+http://www.avajava.com/tutorials/lessons/how-do-i-change-my-log4j-settings-while-my-web-application-is-running.html
+
+(1)Log4j has three main components: loggers, appenders and layouts. 
+(2)"com.foo" is a parent of "com.foo.Bar"
+(3)The inherited level for a given logger C, is equal to the first non-null level in the logger hierarchy, 
+	starting at C and proceeding upwards in the hierarchy towards the root logger.
+(4)Logging requests are made by invoking one of the printing methods of a logger instance. 
+	These printing methods are debug, info, warn, error, fatal and log.
+(5)A log request of level p in a logger with (either assigned or inherited, whichever is appropriate) level q, is enabled if p >= q.
+(6)an output destination is called an appender.
+(7)More than one appender can be attached to a logger.
+	Each enabled logging request for a given logger will be forwarded to all the appenders in that logger as well as the appenders higher
+	in the hierarchy.
+	Additivity is set to true by default, that is children inherit the appenders of their ancestors by default.
+(8)The layout is responsible for formatting the logging request according to the user's wishes, 
+	whereas an appender takes care of sending the formatted output to its destination.
+	
+(9)"%r [%t] %-5p %c - %m%n"
+
+	176 [main] INFO  org.foo.Bar - Located nearest gas station.
+
+	number of milliseconds elapsed since the start of the program
+	thread making the log request
+	level of the log statement
+	name of the logger associated with the log request
+	message of the statement.
+
+	
