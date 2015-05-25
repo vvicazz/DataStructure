@@ -1,0 +1,88 @@
+Delegation Event Model
+Event Handling
+
+http://www.cs.mun.ca/~michael/java/jdk1.1-beta2-docs/guide/awt/designspec/events.html
+
+Event handing in java has 3 parts:
+(1)Source
+(2)Event
+(3)Listener
+
+An event can be defined as a subclass of java.util.EventObject class.
+An event class provides all the details regarding an event and its source.
+
+Source originates/fires the event.
+Source provides a way to register itself with listener.
+Source class passes event object to the listener.
+In AWT, source can be considered as GUI component.
+
+Every listener must implement EventListener interface.
+java api provides listener interface for every event.
+implementation of the listener interface is done by programmer to handle the event functionality.
+AWT also provided some abstract implementation of listener interfaces as Adapter classes.
+
+Lets implement our custom event handling example.
+
+MyButton.java class
+ButtonListerner.java interface
+MyButtonEvent.java class
+
+MyButtonListenerImpl.java class
+
+class ButtonListerner {
+	void clicked(MyButtonEvent event);
+}
+
+class MyButtonEvent {
+	private MyButton source;
+	
+	public MyButtonEvent(MyButton source) {
+		this.source=source;
+	}
+	
+	public MyButton getSource() {
+		return source;
+	}
+}
+
+class MyButton {
+	private ButtonListerner listener;
+
+	public void register(ButtonListerner listener) {
+		this.listener=listener;
+	}
+	
+	//this method is executed by jvm
+	private void execute() {
+		MyButtonEvent event=new MyButtonEvent(this);
+		listener.clicked(event);
+	}
+}
+
+class MyButtonListenerImpl implements ButtonListerner {
+	
+	public void clicked(MyButtonEvent event) {
+		....
+	}
+}
+
+class MainClass {
+	public static void main(String args[]) {
+		MyButton bt = new MyButton();
+		bt.register(new MyButtonListenerImpl());
+	}
+}
+
+============================================================
+
+In Spring
+
+event 		--	ApplicationEvent class
+listener	--	ApplicationListener interface
+
+ContextRefreshedEvent
+ContextStartedEvent
+ContextStoppedEvent
+ContextClosedEvent
+RequestHandledEvent
+
