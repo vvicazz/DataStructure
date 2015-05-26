@@ -1,0 +1,99 @@
+Collection
+
+http://www.journaldev.com/1330/java-collections-interview-questions-and-answers
+http://www.journaldev.com/2774/java-8-stream-api-example-tutorial
+
+(1)Every implementation of Collection have atleast following two constructors
+public className(){}
+public className(Collection e){}  // to copy all elements to new collection
+
+ There is no way to enforce this convention (as interfaces cannot contain constructors) 
+ but all of the general-purpose Collection implementations in the Java platform libraries comply.
+ 
+(2)If any operation is unsupported for any implementation,then may/may not throw unSupportedException
+or any other checked exception
+
+(3)Each implementation determines its own synchronization policy.
+
+
+Note that Iterator.remove is the only safe way to modify a collection during iteration; 
+the behavior is unspecified if the underlying collection is modified in any other way while the iteration is in progress.
+
+Iterable (I)
+Collection (I)
+-->Set		 == do not allow duplicate,allow single null,do not maintain ordering	==  HashSet,LinkedHashSet
+-->List		 == maintain insertion order,allow duplicate,allow null		==  LinkedList,ArrayList,Vector
+-->SortedSet == elements are in sorted order,do not allow duplicate		==  TreeSet
+
+-->Map		 == maintains key value pair								==  HashMap,LinkedHashMap
+-->SortedMap == maintains key value pair,elements are sorted 			==  TreeMap
+
+===============================================
+
+Iterator,ListIterator,Enumeration
+
+Iterator Design Pattern
+****Provides a way to access the elements of an aggregate object without exposing its underlying represenation.
+
+Iterator and ListIterator provides a way to traverse or modify a collection.
+ListIterator is child class of Iterator.
+
+Collection -> Iterator
+List       -> ListIterator,Iterator
+
+ListIterator also provides traversing back or forward.
+Iterator only provides forward.
+
+=>Iterator
+hasNext()
+next()
+remove()
+
+=>ListIterator
+hasNext()
+hasPrevious()
+next()
+previous()
+
+
+(Q)why ListIterator is provided only in list?
+(Q)Why ListIterator has extra functionalities?
+(Q)Difference b/w Iterator and ListIterator
+Because list maintains ordering of insertion.Set do not maintain insertion order.
+
+=>Enumeration
+hasMoreElements()
+nextElement()
+
+(Q)Diff b/w Iterator and Enumeration?
+legacy interface
+no remove method
+faster performance than iterator,because collection is not modified using enumeration.
+
+
+
+
+
+
+List interface
+(1)ArrayList
+
+Internally it uses array.If array gets fill,a new array is created with 50% more size.
+Initial size of array in arrayList is 10.
+
+Note : If array in hashtable is filled upto threadhold value,(generaly threshold is 0.75)
+		then new array is created 100% more size(i.e double the original).
+		Initial size of array in hashtable is 16.
+Note : While calculating the index of a new element in hashtable,
+		index = (size of hashtable) XOR (hashcode of key)
+		eg: String s = "abc";	hashcode for s=96354
+		HashMap hm=new HashMap();
+		hm.put("abc","123");
+		hashcode for key object "abc" = 93442
+		
+		int h=0;
+		h ^= 96354;
+		h ^= (h >>> 20) ^ (h >>> 12);
+        h=h ^ (h >>> 7) ^ (h >>> 4);
+		h=93442
+		
