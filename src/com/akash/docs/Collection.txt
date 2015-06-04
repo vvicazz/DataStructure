@@ -3,6 +3,8 @@ Collection
 http://www.journaldev.com/1330/java-collections-interview-questions-and-answers
 http://www.journaldev.com/2774/java-8-stream-api-example-tutorial
 
+**http://stackoverflow.com/questions/253492/static-nested-class-in-java-why/253507#253507
+
 (1)Every implementation of Collection have atleast following two constructors
 public className(){}
 public className(Collection e){}  // to copy all elements to new collection
