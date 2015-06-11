@@ -1,5 +1,8 @@
 package com.akash.bst;
 
+//We can take a comparator in constructor and compare values
+//OR
+//if no comparator defined, then elements are sorted acc to their order of insert
 public class BinarySearchTree<E extends Comparable> {
 
 	private Node root;
@@ -26,17 +29,46 @@ public class BinarySearchTree<E extends Comparable> {
 				parent.setRight(createNode(e));
 			}
 		}
-		updateheight();
+		updateHeight();
 	}
-	
-	
-//	http://stackoverflow.com/questions/575772/the-best-way-to-calculate-the-height-in-a-binary-search-tree-balancing-an-avl
-//	http://stackoverflow.com/questions/2597637/finding-height-in-binary-search-tree
-	private void updateheight() {
-		
-		if(root==null) {
+
+	// http://stackoverflow.com/questions/575772/the-best-way-to-calculate-the-height-in-a-binary-search-tree-balancing-an-avl
+	// http://stackoverflow.com/questions/2597637/finding-height-in-binary-search-tree
+	private void updateHeight() {
+
+		if (root == null) {
 			return;
-		} 
+		}
+		updateHeightForEachNode(root);
+	}
+
+	/*
+	 * This method will take O(n) time complexity
+	 */
+	private int updateHeightForEachNode(Node<E> node) {
+
+		int leftHeight = 0;
+		int rightHeight = 0;
+		int height = 0;
+		if (node.getLeft() == null && node.getRight() == null) {
+			node.setNodeHeight(0);
+			return 0;
+		} else if (node.getLeft() != null && node.getRight() != null) {
+			leftHeight = updateHeightForEachNode(node.getLeft());
+			rightHeight = updateHeightForEachNode(node.getRight());
+			height = leftHeight > rightHeight ? leftHeight + 1
+					: rightHeight + 1;
+			node.setNodeHeight(height);
+			return height;
+		} else if (node.getLeft() != null) {
+			height = updateHeightForEachNode(node.getLeft()) + 1;
+			node.setNodeHeight(height);
+			return height;
+		} else {
+			height = updateHeightForEachNode(node.getRight()) + 1;
+			node.setNodeHeight(height);
+			return height;
+		}
 	}
 
 	public boolean contains(E e) {
@@ -88,6 +120,7 @@ public class BinarySearchTree<E extends Comparable> {
 		inOrderTraversal(tempNode);
 	}
 
+	//we can also make it without recursion
 	private void inOrderTraversal(Node<E> node) {
 		if (node != null) {
 			inOrderTraversal(node.getLeft());
