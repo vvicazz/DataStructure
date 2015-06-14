@@ -62,3 +62,41 @@ FROM parent JOIN FETCH child
 
 NOTE : we can use this logic whenever we have to load full object graph.
 
+(Q)Difference b/w save() and persist() ?
+persist() method saves entities and their children inside a transaction.
+persist() method throws TransactionRequiredException when it is used outside transaction
+
+save() method can be used outside transaction, but then it will not save children entities.
+
+save() with transaction ==== persist()
+
+(Q)saveOrUpdate
+
+It can be used outside transaction.
+If used outside transaction then only parent entity saved.
+
+NOTE : save() and saveOrUpdate() if used outside transaction, and you want to save mapped entities,
+		you have to use session.flush()
+		
+Things that save data to DB :
+(1)session.flush()
+(2)transaction.commit()
+(3)fire a DDL command, all queries before DDL command will be committed.
+(4)fire HQL select command, all previous queries that include in SELECT HQL are commited.
+
+
+Object is part of persistent context and tracked for any changes:
+save()
+saveOrUpdate()
+merge()
+update()
+persist()
+
+NOTE : One SessionFactory object is created for each Data source.
+
+Session and Transaction
+http://stackoverflow.com/questions/5409085/what-is-the-difference-between-a-session-and-a-transaction-in-jpa-2-0
+
+JPA vs Hibernate
+http://stackoverflow.com/questions/9881611/whats-the-difference-between-jpa-and-hibernate
+
