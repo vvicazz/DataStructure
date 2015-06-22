@@ -11,8 +11,24 @@ public class MergeSort {
 		MergeSort ms = new MergeSort();
 		System.out.println(Arrays.toString(ms.arr));
 		ms.sort(0, ms.arr.length - 1);
+		//ms.iterativeMergeSort();
 		System.out.println(Arrays.toString(ms.arr));
 	}
+	
+	private void iterativeMergeSort() {
+		 
+        int length = this.arr.length;
+        for (int currentSize = 1 ; currentSize < length ; currentSize = currentSize * 2) {
+            for (int startIndex = 0 ; startIndex < length ; startIndex = startIndex + 2 * currentSize) {
+                int endIndex = startIndex + 2 * currentSize - 1;
+                if (endIndex >= length) {
+                    endIndex = length - 1;
+                }
+                int middleIndex = (startIndex + endIndex) / 2;
+                merge(startIndex, middleIndex, endIndex);
+            }
+        }
+    }
 
 	private void sort(int low, int high) {
 
