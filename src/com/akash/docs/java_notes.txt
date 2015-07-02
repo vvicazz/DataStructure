@@ -1,0 +1,38 @@
+In Java, methods are virtual by default and can be made non-virtual by using final keyword.
+
+we cannot change the protection level of members of base class in Java, if some data member is public or protected in base class then it remains public or protected in derived class
+
+private methods are not allowed for function overriding,
+i.e
+private void f1(){}
+private final void f1(){}
+are same
+
+An inner class can access private members of its outer class. What if we extend an inner class and create fun() in the inner class?
+
+In Java, methods declared as private can never be overridden, they are in-fact bounded during compile time. 
+private methods in parent class can be overridden in child class, but they will never involve in fn overriding.
+So private methods can never be overridden.
+
+static method in parent class can not be overridden as instance method in child class
+
+java 8
+interfaces can have static methods with declaration.
+interfaces have default methods i.e. instance method with body.
+
+why default methods are used?
+
+
+BigInteger is a class which is created for big calculations.
+BigInteger bi = new BigInteger("987654321987654321");
+BigInteger bi2 = bi.multiply(bi);
+
+It is immutable.
+BigInteger.ZERO.equals(0);  // returns false
+
+It has two properties :
+int signum;		//0 for 0 , -1 for negative, 1 for positive
+int mag[];		//represents array of integers
+
+BigDecimal is wrapper for BigInteger containing floating point numbers.
+
