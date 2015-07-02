@@ -59,6 +59,12 @@ public boolean equals(Object obj) {
 By defalut hashCode() method in Object class implemented
  by converting the internal address of the object into an integer.
 
+-> If we override equals() but not hashCode() , 
+then there may be a case where two same objects have different hashCode.
+
+-> If we override hashCode() but not equals() ,
+ then if two different objects have same hashCode ,
+ they will never return equals() as true because equals() will check their refrence. 
 
 =====================
 
