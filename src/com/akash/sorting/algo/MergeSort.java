@@ -10,14 +10,14 @@ public class MergeSort {
 
 		MergeSort ms = new MergeSort();
 		System.out.println(Arrays.toString(ms.arr));
-		ms.sort(0, ms.arr.length - 1);
-		//ms.iterativeMergeSort();
+		//ms.sort(ms.arr, 0, ms.arr.length - 1);
+		ms.iterativeMergeSort(ms.arr);
 		System.out.println(Arrays.toString(ms.arr));
 	}
 	
-	private void iterativeMergeSort() {
+	private void iterativeMergeSort(int arr[]) {
 		 
-        int length = this.arr.length;
+        int length = arr.length;
         for (int currentSize = 1 ; currentSize < length ; currentSize = currentSize * 2) {
             for (int startIndex = 0 ; startIndex < length ; startIndex = startIndex + 2 * currentSize) {
                 int endIndex = startIndex + 2 * currentSize - 1;
@@ -25,50 +25,44 @@ public class MergeSort {
                     endIndex = length - 1;
                 }
                 int middleIndex = (startIndex + endIndex) / 2;
-                merge(startIndex, middleIndex, endIndex);
+                merge(arr, startIndex, middleIndex, endIndex);
             }
         }
     }
 
-	private void sort(int low, int high) {
+	private void sort(int arr[], int low, int high) {
 
+		
 		if (low < high) {
 			int mid = (high + low) / 2;
-			sort(low, mid);
-			sort(mid + 1, high);
-			merge(low, mid, high);
+			sort(arr, low, mid);
+			sort(arr, mid + 1, high);
+			merge(arr, low, mid, high);
 		}
 	}
 
-	private void merge(int low, int mid, int high) {
+	private void merge(int arr[], int low, int mid, int high) {
 
-		int arr[] = this.arr;
 		int length = high - low + 1;
 		int[] tempArr = new int[length];
 		int i, j, counter = 0;
 
 		// compare each element in two list
-		for (i = low, j = mid + 1; (i <= mid) && (j <= high);) {
+		for (i = low, j = mid + 1; (i <= mid) && (j <= high); ) {
 			if (arr[i] < arr[j]) {
-				tempArr[counter] = arr[i];
-				i++;
+				tempArr[counter++] = arr[i++];
 			} else {
-				tempArr[counter] = arr[j];
-				j++;
+				tempArr[counter++] = arr[j++];
 			}
-			counter++;
 		}
 
 		// if any list ends for comparison,fill rest of the elements for other
 		// list
-		if (i > mid && j <= high) {
-			for (; j <= high; j++, counter++) {
-				tempArr[counter] = arr[j];
-			}
-		} else if (j > high && i <= mid) {
-			for (; i <= mid; i++, counter++) {
-				tempArr[counter] = arr[i];
-			}
+		while (j <= high) {
+			tempArr[counter++] = arr[j++];
+		}
+		while (i <= mid) {
+			tempArr[counter++] = arr[i++];
 		}
 
 		// put sorted list in original list
