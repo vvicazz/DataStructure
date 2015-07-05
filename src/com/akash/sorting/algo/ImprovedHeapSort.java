@@ -11,17 +11,17 @@ public class ImprovedHeapSort {
 	public static void main(String[] args) {
 		ImprovedHeapSort hs = new ImprovedHeapSort();
 		System.out.println(Arrays.toString(hs.arr));
-		hs.createHeap();
+		hs.createHeap(hs.arr);
 		System.out.println(Arrays.toString(hs.arr));
-		hs.sortHeap();
+		hs.sortHeap(hs.arr);
 		System.out.println(Arrays.toString(hs.arr));
 	}
 
-	void createHeap() {
+	void createHeap(int arr[]) {
 
 		int startCounter = heapSize >> 1;
 		for (int counter = startCounter - 1; counter >= 0; counter--) {
-			satisfyHeapForNode(counter);
+			satisfyHeapForNode(arr, counter);
 		}
 	}
 
@@ -31,7 +31,7 @@ public class ImprovedHeapSort {
 	 * 
 	 * @param nodePos
 	 */
-	void satisfyHeapForNode(int nodePos) {
+	void satisfyHeapForNode(int arr[], int nodePos) {
 
 		// this condition is used to check if a node is leaf,
 		// then no need to check it further for heap property
@@ -53,18 +53,18 @@ public class ImprovedHeapSort {
 			int temp = arr[largerIndex];
 			arr[largerIndex] = arr[nodePos];
 			arr[nodePos] = temp;
-			satisfyHeapForNode(largerIndex);
+			satisfyHeapForNode(arr, largerIndex);
 		}
 	}
 
-	void sortHeap() {
+	void sortHeap(int arr[]) {
 
 		while (heapSize > 1) {
 			int temp = arr[0];
 			arr[0] = arr[heapSize - 1];
 			arr[heapSize - 1] = temp;
 			heapSize--;
-			satisfyHeapForNode(0);
+			satisfyHeapForNode(arr, 0);
 		}
 	}
 }
