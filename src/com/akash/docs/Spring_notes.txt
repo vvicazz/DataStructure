@@ -79,3 +79,19 @@ headers
 
 @RequestHeader
 
+------------------------
+
+WebApplicationInitializer					---  web.xml
+public void onStartup(ServletContext container) {}
+
+AnnotationConfigWebApplicationContext		---  webApplicationContext
+
+@Configuration								---  xml file
+
+
+(Q) How to load initial data in spring project?
+--> InitializingBean   afterPropertiesSet()
+
+--> ApplicationListener<ContextRefreshed>
+
+
