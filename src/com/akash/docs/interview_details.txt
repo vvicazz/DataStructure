@@ -1,0 +1,426 @@
+
+Log4J
+maven
+mongodb
+apache camel
+REST - SOAP
+Lucene
+Solr
+OAuth
+cache in java
+spring security
+Linux
+Spring WS
+
+
+=>j2ee
+filter
+interceptor
+
+===================================
+Maven
+
+project development tool, build automation tool
+file structure ,jar herarechy, dependency resolution, creating jar-war-ear files
+GAVS = group,artifact,version,scope
+maven has phases , eg: mvn package OR mvn compile
+maven has many plugins also.Plugin contain goals.
+plugin:goal
+eg: mvn architype:generate
+
+clean,compile,package,test,deploy
+
+==========================================
+
+REST
+
+based http method, there is no standard for sending a request
+representation of state of a resource
+get,put,post,delete
+xml and json
+faster data transfer
+easy to send and receive | easy to implement (uses in mobile applications)
+
+
+SOAP
+XML based messaging protocol
+independent of transfer protocol: http,smtp,ftp
+message is sent using protocols: envelope,header,body,faults
+security credentials can be added in header
+interceptors are present to block a message OR modify a message
+xml format
+complex message formats
+all details of request and response objects are available via wsdl
+Built in error handling - faults
+
+
+Difference:
+(1)soap is XML based messaging protocol
+	REST is architechtural style 
+	
+(2)SOAP is independent of transfer protocol:http,smtp,ftp
+	REST only works with http
+	
+(3)SOAP only works with xml
+	REST xml,json,CSV
+	
+(4)SOAP  difficult to implement
+	REST easy to implement
+	
+(5)SOAP messages are sent acc to a standards/protocol: envelope,body,header,faults
+	REST has no fixed standard for sending/receiving message
+	
+(6)SOAP has in built patterns for WS-security 
+	REST we have to apply security externally
+	
+(7)SOAP error handling treated as Faults
+	REST we have to handle error by ourself
+	
+	
+=================================================================
+
+Lucene/Hibernate Search
+
+Document oriented
+Denormalized data(flat structure)
+flexible schema
+
+-Data is taken for any data store (DB in case of HS)
+-this data is converted to simple words
+-tokens are created from words
+-some tokens are filtered and some tokens create multiple tokens (man men)
+(Tokenizer and Filter)
+-these tokens are stored in index files as reversed indexes
+-lucene queries are used with specified tokenizer to fetch data accordingly.
+
+-For every single data entity a document is created with a unique id
+
+Analyser
+
+-stop word processing, StopAnalyser  = a and the
+-Stemming = jump,jumper,jumping		
+
+-creating a query requires : query string + name of analyser
+-result of query returns hits which includes list of documents containing query data.
+
+
+public class Search { 
+  public static void main(String[] args) throws Exception {
+    String indexPath = args[0], queryString = args[1];
+    Searcher searcher = new IndexSearcher(indexPath);
+    Query query = QueryParser.parse(queryString, "body", 
+                              new SimpleAnalyzer());
+    Hits hits = searcher.search(query);
+    for (int i=0; i<hits.length(); i++) {
+      System.out.println(hits.doc(i).get("path") + "; Score: " + 
+                         hits.score(i));
+    };
+  }
+}
+
+Analyser = Char filter + Tokenizer + filter
+
+=============================================================
+
+
+Apache Camel
+
+https://dzone.com/articles/open-source-integration-apache
+
+-It provides implementation for enterprise integration patterns
+-connect with multiple transports and APIs
+-DSL
+Gangs of Four - enterprise integration patterns
+
+problems:
+(1)If we want to implement any transport layer functionality in our app like JMS, 
+	-we need to understand all basics of JMS
+	-we also need to consider its configuration with another app
+	
+(2)Gangs of four provided solutions to problems but they dont have implementation
+
+Components,Endpoint,Processor
+
+==>Components in Camel:
+quartz
+file
+sftp
+smtp
+jms
+ftp
+ftps
+rabbitMQ
+elasticsearch
+ec2
+s3
+facebook
+jdbc
+jpa
+log
+lucene
+
+
+Endpoint :
+One component can have one or more endpoints.
+Each endpoint has a URI which is exposed to get integration with other system
+
+Processor :
+Actual implementation of message/data that is sent or received.
+processors are linked to endpoints using DSL.
+
+
+
+DSL supports following lang :
+Java,Spring,Scala,Groovy
+
+
+Camel Context and Routes ??
+
+================================================
+
+Amazon -- cloud computing
+
+Virtualization
+cloud computing
+cloud storage
+
+internally openstack is used for cloud computing.
+It consists a pool of operating,storage and network resources that can be managed from web based tool or web services.
+
+amazon EC2  -- Elastic Compute cloud
+amazon S3   -- Simple Storage Service
+
+CDN  --  content delivery network
+
+=>EC2 :
+AMI
+security group  -- ports
+
+
+OS
+processor
+RAM
+
+micro
+small
+medium
+large
+
+=>S3
+
+
+Infrastructure AAS		-- OS, hardware, nw
+Platform AAS			-- application server, DB
+Service AAS				-- any kind of web service,portal
+
+--------------------------------------------------------------------
+
+MongoDB
+
+https://www.mongodb.com/blog/post/mongodb-vs-sql-day-1-2
+http://www.oodlestechnologies.com/blogs/FAQs-%3A-Scaling-MongoDB-using-Sharding
+http://www.oodlestechnologies.com/blogs/Scaling-MongoDB-and-setting-up-sharding-for-MongoDB-on-Ubuntu
+http://www.oodlestechnologies.com/blogs/Mysql-master-to-master-replication
+
+-Document oriented, denormalized data, embedded data in a single document, JSON data format
+-No Joins like RDB
+-No constraints like foreign key
+-No declared schema
+-Do not have transactions
+-have atomic operations
+
+-Collection 	-- table
+-document 	-- row
+
+-no requirement for predefination of collection schema or document schema
+-MongoDB is schema free
+
+NOTE : MongoDB can be better than RDBMS where actual requirement of user increases/changes time to time.
+		In RDB a change is req to create new tables,new constraints making the process of showing and saving data more complex.
+
+_id field is created for each document
+
+db.myColl.insert({name:'akash',age:20});
+
+db.myColl.find();		// get all
+db.myColl.findOne();	// get one
+
+db.myColl.find({name:'sachin'},{name,'_id'}).sort({name:1});
+
+db.myColl.update();
+
+db.myColl.remove({name:'ramesh'});
+
+db.myColl.count();
+
+db.dropDatabase();
+
+show dbs;
+
+show collections;
+
+
+
+======================================================
+
+Linux
+
+(1) Download java :
+wget -U Mozilla http://download.oracle.com/otn-pub/java/jdk/7u67-b01/jdk-7u67-linux-x64.tar.gz?AuthParam=1412515786_60b10819a2e3a31750842627d9ce238f
+
+(2) extract tar file
+tar -xvzf tar_file_name.tar
+
+(3) Set environment variable
+
+export JAVA_HOME=/opt/jdk1.7.0_67
+export PATH=$JAVA_HOME/bin:$PATH
+
+source ~/.bashrc
+
+(4) Extract zip file
+unzip filename.zip
+
+(5) Get process id
+ps -ef | grep java
+
+
+(6) Port configurations =>
+netstat -tunlp
+
+tomcat1 -> 8081
+
+tomcat2 -> 8082
+
+(7)
+
+nginx =>
+
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-centos-6-with-yum   == installation on centOS
+
+http://serverfault.com/questions/293348/configure-nginx-for-jboss-tomcat  == 
+
+(8) 
+chmod - modify file access rights
+su - temporarily become the superuser
+chown - change file ownership
+chgrp - change a file's group ownership
+
+
+get all files and folders (hidden also)
+ls -a
+
+get info about read/write/execute permissions(owner,group,others from left to right) of all files and folders
+ls -l
+
+give all permissions to a file
+chmod 777 file_name
+chmod -R 777 folder_name
+
+rwx = 111 in binary = 7
+rw- = 110 in binary = 6
+r-x = 101 in binary = 5
+r-- = 100 in binary = 4
+
+x=4,w=2,r=1
+
+
+(9)copy file
+cp folder_path/filename folder_path/file_name
+
+(10)move file
+mv folder_path/filename folder_path/file_name
+
+(11)performing operation as super user , su (short for substitute user)
+sudo su
+
+(12)Delete a file or folder
+rm file_name
+rm -rf folder_name
+
+(12)Get current path
+pwd
+
+(13)show file content 
+cat file_name
+
+(14)tail outputs the last part, or "tail", of files.
+tail -f file_name
+tail -500f file_name
+
+Outputs the last 10 lines of file_name, and monitors file_name for updates; 
+tail then continues to output any new lines that are added to file_name
+
+(15)Open file to edit
+vim file_name
+
+There are two modes in vim. One is the command mode and another is the insert mode.
+press i to go in insert mode
+press ESC to go in command mode
+
+:wq Write file to disk and quit the editor
+:q! Quit (no warning)
+:q Quit (a warning is printed if a modified file has not been saved)
+
+search in vim
+
+(16)
+
+sudo apt-get ...
+
+sudo yum ...
+
+--------------------------
+
+server {
+        listen       80;
+        server_name  drawingservice.in  *.drawingservice.in  www.drawingservice.in;
+        root         /opt/tomcat2/webapps/ROOT;
+
+        location / {
+                index index.jsp;
+        }
+        location ~ \.do$ {
+                proxy_pass              http://localhost:8082;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        Host $http_host;
+        }
+        location ~ \.jsp$ {
+                proxy_pass              http://localhost:8082;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        Host $http_host;
+        }
+        location ^~/servlets/* {
+                proxy_pass              http://localhost:8082;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        Host $http_host;
+        }
+    }
+
+
+
+----------------------------
+
+
+server {
+        listen       80;
+        server_name  drawingservice.in  *.drawingservice.in  www.drawingservice.in;
+        root         /opt/tomcat2/webapps/ROOT;
+
+
+        location / {
+		index index.jsp;
+               	proxy_pass              http://localhost:8082;
+        	proxy_set_header        X-Real-IP $remote_addr;
+        	proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        	proxy_set_header        Host $http_host;
+        }
+    }
+
+
+
+========================================================================================================
+

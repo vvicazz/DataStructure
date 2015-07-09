@@ -1,3 +1,14 @@
+project development tool, build automation tool
+file structure ,jar herarechy, dependency resolution, creating jar-war-ear files
+GAVS = group,artifact,version,scope
+maven has phases , eg: mvn package OR mvn compile
+maven has many plugins also.Plugin contain goals.
+plugin:goal
+eg: mvn architype:generate
+
+clean,compile,package,test,deploy
+
+
 **Ant doesn’t ship with any built-in idea of where source code or resources might be in a project; 
 you have to supply this information.
 
