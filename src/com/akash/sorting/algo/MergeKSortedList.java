@@ -4,45 +4,70 @@ import java.util.Arrays;
 
 public class MergeKSortedList {
 
-	static final int N = 3;
-	static final int K = 4;
+	final int N;
+	final int K;
+
+	private final int arr[][];
+
+	private int finalArr[];
+	private int tempArr[];
 
 	private MinHeap heap;
 
-	int arr[][] = { { 1, 2, 3, 4 }, { 10, 20, 30, 40 }, { 100, 200, 300, 400 } };
-
-	int finalArr[] = new int[K * N];
-
-	void addArrayElementToHeap(int arr[][], int arrNumber, int pos) {
-
-		heap.addElement(new MergeNode(arr[arrNumber][pos], arrNumber, pos));
-	}
-
 	public static void main(String args[]) {
 
-		MinHeap mh = new MinHeap(K);
-		MergeKSortedList mksl = new MergeKSortedList();
-		mksl.heap = mh;
-		for (int i = 0; i < mksl.arr.length; i++) {
-			mksl.addArrayElementToHeap(mksl.arr, i, 0);
-		}
-		mksl.applyMainLogic();
-		Arrays.toString(mksl.finalArr);
+		int arr[][] = { { 1, 2, 3, 4, 5, 6 }, { 10, 20, 30, 40, 50, 60 },
+				{ 100, 200, 300, 400, 500, 600 } };
+		MergeKSortedList mksl = new MergeKSortedList(arr);
+		mksl.printSortedArray();
 	}
 
-	void applyMainLogic() {
+	public void printSortedArray() {
+		System.out.println(Arrays.toString(finalArr));
+	}
+
+	public MergeKSortedList(int arr[][]) {
+
+		this.arr = arr;
+		K = arr.length;
+		N = arr[0].length;
+		finalArr = new int[K * N];
+		tempArr = new int[K];
+		MinHeap mh = new MinHeap(K);
+		heap = mh;
+		for (int i = 0; i < arr.length; i++) {
+			addArrayElementToHeap(arr, i, 0);
+		}
+		applyMainLogic();
+	}
+
+	private void addArrayElementToHeap(int arr[][], int arrNumber, int pos) {
+
+		heap.addElement(new MergeNode(arr[arrNumber][pos], arrNumber));
+		tempArr[arrNumber] = pos;
+	}
+
+	private void applyMainLogic() {
 
 		int finalArrCurrentPos = 0;
-		int arrNumber, posNumber;
+		int arrNumber = -1;
 		while (finalArrCurrentPos < K * N) {
 			MergeNode node = heap.popElement();
 			finalArr[finalArrCurrentPos++] = node.getValue();
 			arrNumber = node.getArrayNumber();
-			posNumber = node.getPos();
-			if (posNumber < K - 1) {
-				addArrayElementToHeap(arr, arrNumber, posNumber + 1);
+			if (tempArr[arrNumber] < N - 1) {
+				addArrayElementToHeap(arr, arrNumber, tempArr[arrNumber] + 1);
 			} else {
-				// find some other array
+				int randArrayNumber = 0;
+				for (int arrayPos : tempArr) {
+					if (arrayPos == N - 1) {
+						randArrayNumber++;
+					} else {
+						addArrayElementToHeap(arr, randArrayNumber,
+								tempArr[randArrayNumber] + 1);
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -50,15 +75,13 @@ public class MergeKSortedList {
 
 class MergeNode {
 
-	public MergeNode(int value, int arrayNumber, int pos) {
+	public MergeNode(int value, int arrayNumber) {
 		this.value = value;
 		this.arrayNumber = arrayNumber;
-		this.pos = pos;
 	}
 
 	private int value;
 	private int arrayNumber;
-	private int pos;
 
 	public int getValue() {
 		return value;
@@ -66,10 +89,6 @@ class MergeNode {
 
 	public int getArrayNumber() {
 		return arrayNumber;
-	}
-
-	public int getPos() {
-		return pos;
 	}
 }
 
@@ -125,14 +144,6 @@ class MinHeap {
 		}
 	}
 
-	public void createHeap(MergeNode arr[]) {
-
-		int startCounter = heapSize >> 1;
-		for (int counter = startCounter - 1; counter >= 0; counter--) {
-			satisfyHeapForNode(arr, counter);
-		}
-	}
-
 	private void satisfyHeapForNode(MergeNode arr[], int nodePos) {
 
 		if (nodePos > ((heapSize >> 1) - 1)) {
@@ -142,12 +153,12 @@ class MinHeap {
 		int leftPos = 2 * nodePos + 1;
 		int rightPos = 2 * nodePos + 2;
 		int smallerIndex = nodePos;
-		if (arr[nodePos].getValue() > arr[leftPos].getValue()
-				&& leftPos < heapSize) {
+		if (leftPos < heapSize
+				&& arr[nodePos].getValue() > arr[leftPos].getValue()) {
 			smallerIndex = leftPos;
 		}
-		if (arr[smallerIndex].getValue() > arr[rightPos].getValue()
-				&& rightPos < heapSize) {
+		if (rightPos < heapSize
+				&& arr[smallerIndex].getValue() > arr[rightPos].getValue()) {
 			smallerIndex = rightPos;
 		}
 		if (smallerIndex != nodePos) {
