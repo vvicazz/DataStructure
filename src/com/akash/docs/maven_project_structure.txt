@@ -41,10 +41,10 @@ Parent Pom :
 	
 	<dependencies>
         <dependency>
-            <groupId>org.sonatype.mavenbook.multi</groupId>
-            <artifactId>simple-weather</artifactId>
-            <version>1.0</version>
-        </dependency>
+			<groupId>org.akash.simpleweb</groupId>
+			<artifactId>simple-core</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 	
 ==========================================================
