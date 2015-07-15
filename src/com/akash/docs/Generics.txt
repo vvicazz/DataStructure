@@ -1,0 +1,83 @@
+https://docs.oracle.com/javase/tutorial/jdbc/index.html
+https://docs.oracle.com/javase/tutorial/reflect/index.html
+https://docs.oracle.com/javase/tutorial/essential/io/
+https://docs.oracle.com/javase/tutorial/essential/exceptions/
+https://docs.oracle.com/javase/tutorial/extra/certification/javase-7-programmer2.html
+Design Patterns : https://www.youtube.com/watch?v=vNHpsC5ng_E&list=PLF206E906175C7E07
+
+
+
+Generics in Java
+
+Why use ?
+To make generic classes
+To avoid errors
+avoid Type casting
+
+By convention, type parameter names are single, uppercase letters
+
+class name<T1, T2, ..., Tn> { /* ... */ }
+
+class Box<T> {
+	
+	private T t;
+
+	public T getT() {
+		return t;
+	}
+
+	public void setT(T t) {
+		this.t = t;
+	}
+	
+	public String toString() {
+		return "class:"+t.getClass().getName()+" , "+t.toString();
+	}
+}
+
+Box<Integer> integerBox = new Box<Integer>();
+Box<Integer> integerBox = new Box<>();			//java 7
+
+Raw types:
+Box box = new Box();
+
+box = integerBox;	//warning
+box.setT("hello");	//injecting error
+box.getT();			//error
+
+==========================================================
+
+=>Generic methods:
+
+void <T> f1(T t) {....}
+<Integer>f1(new Integer(10));
+
+Util.<Integer, String>compare(p1, p2);
+Util.compare(p1, p2);
+
+=>Bounded Type 
+
+class MyNumber<T extends Number> {....}
+
+class Abc<T extends A & B & C> {.....}
+
+NOTE : If one of the bounds is a class, it must be specified first.
+
+==========================================================
+
+=>Inheritence in Generics:
+
+Integer			---> 	Number			//Yes
+Box<Integer>	---> 	Box<Number>		//NO
+
+void f1(Number n){}
+
+f1(2);
+f1(2.2);
+
+void f2(Box<Number> n) {}
+
+f2(new Box<Integer>());		//error
+
+NOTE : You can subtype a generic class or interface by extending or implementing it.
+

@@ -1,0 +1,78 @@
+http://www.mkyong.com/logging/logback-xml-example/
+http://logging.apache.org/log4j/1.2/manual.html
+
+Log4j
+
+Log4j has three main components: loggers, appenders and layouts. 
+
+logger:
+"com.foo"  is parent of "com.foo.bar"
+"java" is parent of "java.util"
+
+ Logger.getRootLogger()
+ 
+org.apache.log4j.Level
+
+
+TRACE,
+DEBUG,
+INFO,
+WARN,
+ERROR and
+FATAL
+
+FATAL > ERROR > WARN > INFO > DEBUG > TRACE
+
+If a given logger is not assigned a level, then it inherits one from its closest ancestor with an assigned level.
+The inherited level for a given logger C, is equal to the first non-null level in the logger hierarchy, 
+starting at C and proceeding upwards in the hierarchy towards the root logger.
+
+To ensure that all loggers can eventually inherit a level, the root logger always has an assigned level.
+
+
+root	Proot	Proot
+X		Px		Px
+X.Y		none	Px
+X.Y.Z	none	Px
+
+root	Proot	Proot
+X		none	Proot
+X.Y		none	Proot
+X.Y.Z	none	Proot
+
+
+
+A logging request is said to be enabled if its level is higher than or equal to the level of its logger. 
+Otherwise, the request is said to be disabled. 
+
+logger.setLevel(Level.INFO);
+logger.warn("will print");
+logger.debug("will not print");
+
+Appender : an output destination is called an appender
+
+The addAppender method adds an appender to a given logger. 
+Each enabled logging request for a given logger will be forwarded to all the appenders in that logger
+ as well as the appenders higher in the hierarchy.
+ 
+ root logger is assigned to console appender
+ Abc logger is assinged to file appender
+ 
+ root and its all children will append to console.
+ Abc and all its children will append to file.
+ 
+ 
+ Additivity in Appenders :
+ 
+A -> B -> C -> D  (let say loggers with A as root)
+
+log statements of C will be logged to all appenders of B and A.
+this feature is additivity.
+we can disable this by setting additivity=false
+by default additivity=true
+
+if we set additivity=false for B
+then log statements of C will be included upto B only not in A.
+
+
+layout is responsible for formatting the logging request according to the user's wishes.

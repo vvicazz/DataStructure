@@ -1,0 +1,45 @@
+Server Side Configuration :
+
+(1)Create an XSD file in integration project. XSD file will help us to create wsdl file and stub classes at server side. 
+The XSD file can be kept at "src\main\resources\ws\schema" location. 
+For e.g:   /neutrino-integration-globalcustomer-webapp/src/main/resources/ws/schema/NegativeChecklistFileUpload.xsd .
+ Every xsd file must have a targetNamespace url. This namespace will be used while making an endpoint in step 5. 
+ If you are refering elements from other xsd or from same xsd then, you need to import it via xmlns . 
+ For example xmlns:xsd="http://www.w3.org/2001/XMLSchema" OR xmlns:xmime="http://www.w3.org/2005/05/xmlmime" .
+
+(2)Now you have to create Stub classes for this XSD at server side. You can use JAXB plugin of eclipse to create stub classes. 
+Right click on xsd file-> New -> other -> JAXB -> JAXB classes from schema 
+
+(3)Now we have to create a wsdl for this xsd file . Just create a bean for class NeutrinoWsdlDefination . 
+(This class is just a copy of DefaultWsdl11Definition) . Pass the path of xsd in  xsds  property of this bean . 
+This bean will create a wsdl for your xsd at specified location. 
+For eg: see bean negativeChecklistFileUploadServiceWsdlDefination  in  integration-globalcustomer-webapp-root-app-context.xml
+
+(4)As  NeutrinoWsdlDefination created the wsdl for us, we just need to expose it. Spring will do this task for us.
+ <sws:static-wsdl >  tag will help us to expose it. You just need to provide the path for wsdl file. 
+ Eg: negativeChecklistFileUploadService in integration-globalcustomer-webapp-root-app-context.xml .
+
+(5)Now we have to create an Endpoint for this wsdl. For this we will make a camel endpoint in a camel route file. 
+Eg: negativeChecklistFileUploadEndpoint in integration-globalcustomer-route-context.xml .  
+The endpoint will include namespace of the wsdl and Request object.
+
+(6)A camel route will be created for this endpoint. The route will have contain a camel component for handling the request , 
+it can be a processor bean, for eg: negativeChecklistFileUploadProcessor .
+
+
+
+Client Side Configuration :
+
+(1)First we have to make client stub classes from WSDL file created at server side. For this we will use jaxws-maven-plugin . 
+Here we have to specify 
+(A)Wsdl file location , 
+(B)package name for stub to be created and 
+(C)unique stalefile name. 
+
+See pom.xml file of neutrino-cas-integration project. 
+Also you need to specify the package name of the client stub in contextPaths  property of  Jaxb2Marshaller  bean.
+
+(2)To make a client  we just need to create a new class that inherit AbstractMessageExchangeClient.java class. 
+You also need to implement abstract method public void setWebServiceUrl(String webServiceUrl) .  
+WebServiceUrl will specify the soap service url for which this client is created. You can specify the url string with @Value annotation.
+Now create a Request object for the web service and call method webServiceTemplate.marshalSendAndReceive(webServiceUrl,request);
