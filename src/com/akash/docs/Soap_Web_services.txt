@@ -1,0 +1,60 @@
+Soap Web Services:
+
+Simple Object Access protocol
+
+Web services are different from RMI that it makes language neutrality.
+
+A good web Service should have following features:
+(1)Loosely coupled				--	one call must be independent to other and do not know the internal working
+(2)All calls must be stateless	--	no instance variable,only static or final variable
+
+**JAXB component:
+Java Architecture for XML Binding
+
+marshalling unmarshalling
+
+marshall 	=>	memory object (java object) --> document(xml)
+unmarshall 	=> 	document (xml) --> memory object (java object)
+
+
+**There are some java tools which can also perform this operation:
+schemagen	=>  java annotated class  -->  XML schema
+xjc			=>  XML schema -->	Java annotated class
+wsimport	=>	WSDL --> Stub classes 	(at client side)
+
+
+Features of SOAP :
+(1)Transport Neutral
+(2)Only works with XML
+(3)Every SOAP Request and SOAP Response object is a JAXB artifact.
+(4)Every Soap web Service has an Endpoint which needs to be published.
+	Endpoints are published with a specified url-pattern
+	http://java.sun.com/xml/ns/jax-ws/ri/runtime helps to publish an endpoint.
+	It requires an endpoint name, url pattern, implementation class,handlers (if required).
+(5)Handlers : before going for actual operation in Service, handlers are created to process incoming and outgoing data.
+			Handlers are provided both at client and Server side.
+			advantages : validate data,modify data, print data
+			implement SOAPHandler interface
+(6)Every namespace file is identified by its targetNamespace
+(7)Soap message contains one Envelope. Envelope consists of 
+	header,body,fault,attachment
+(8)Code first and Contract first are two ways to create SOAP web services.
+	Code first 		: Java code is written first and then wsdl is generated.
+	Contract first 	: WSDL is written first and then java code is generated.
+(9)get schema for Service 	= endpointUrl?xsd=1
+	get wsdl for Service 	= endpointUrl?wsdl
+(10)WSDL consists of:
+	Definition	:main tag of wsdl file.all tags are child of this.used to import any xsd.
+	types		:
+	message		:complex types like request and response types
+	portType	:one wsdl has one portType.portType contains all operations(req-res pair)
+	binding		:provides implementation details eg: transport layer protocol http,smtp
+	service		:combination of portType + binding
+	
+
+While registering JAX-ws in java for SOAP:
+-->WSServletContextListener regiter it in web.xml
+		Parses sun-jaxws.xml and sets up HttpAdapters for all deployed endpoints.
+-->WSServlet
+		JAX-WS dispatcher servlet.
+
