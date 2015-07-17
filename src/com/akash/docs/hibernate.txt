@@ -100,3 +100,54 @@ http://stackoverflow.com/questions/5409085/what-is-the-difference-between-a-sess
 JPA vs Hibernate
 http://stackoverflow.com/questions/9881611/whats-the-difference-between-jpa-and-hibernate
 
+======================================================
+
+
+hibernate
+
+http://www.javagyan.com/preparing-for-an-interview/hibernate-interview-questions
+http://blog.jhades.org/setup-and-gotchas-of-the-hibernate-second-level-and-query-caches/
+https://dzone.com/articles/sorting-collections-hibernate
+
+(Q)get()-load()
+(Q)merge()-update()
+(Q)session - sessionfactory
+(Q)session - transaction
+
+(Q)
+transient	: never persisted and not attached to a session
+persisted	: attached to a unique session
+detached	: previously persisted but not attached to session
+
+(Q)how lazy loading works and why required ?
+Related entity or collections in (OneToOne,OneToMany,ManyToMany) are not loaded when actual entity is loaded.
+These are loaded by calling getters of proxy classes.
+calling getter from proxy classes out of session will throw LazyInitializationException.
+We can get actual implementation for proxy class.
+entity = (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+
+(Q)sorted and ordered collection
+
+@OrderBy		-- to order list based on DB
+@Sort			-- to order list in memory
+@OrderColumn	-- to index the ordering
+
+@javax.persistence.OrderBy("startYear, endYear")
+@org.hibernate.annotations.Sort(type = SortType.COMPARATOR, comparator = EventCompator)
+@org.hibernate.annotations.OrderBy("start_year, nvl(end_year , start_year)")
+
+(Q)conditions while making your own entity class
+-private fields , public getter/setter
+-override equals() hashcode()
+-create no-argument constructor
+-do not make class as final,because hibernate will create proxy class
+
+(Q)first level cache - second level cache
+http://www.javalobby.org/java/forums/t48846.html
+
+
+(Q)Different fetching strategies
+(Q)Different cache strategies
+(Q)Types of inheritence in classes
+
+(Q) @JoinTable - @JoinColumn
