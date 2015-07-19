@@ -36,7 +36,7 @@ public class CountingSort {
 
 
 (2)
-value at C[i] denotes total no. of elemets less than equal to i .
+value at C[i] denotes total no. of elements less than equal to i .
 eg: 
 C[2] = 4 , there are 4 elements between 0 and 2 .
 
