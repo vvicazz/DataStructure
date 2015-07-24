@@ -151,3 +151,55 @@ http://www.javalobby.org/java/forums/t48846.html
 (Q)Types of inheritence in classes
 
 (Q) @JoinTable - @JoinColumn
+
+
+==============================================
+
+http://blog.jhades.org/setup-and-gotchas-of-the-hibernate-second-level-and-query-caches/
+http://www.javalobby.org/java/forums/t48846.html
+
+
+Difference bw get() and load()
+
+get() : 
+will fire SQL SELECT query
+return actual object
+if not found return null
+
+load() :
+it will return a proxy object, if you initialize the data for that object only then SELECT will be fired
+only by calling load() method will not fire any sql
+it will throw ObjectNotFoundException if entry not found
+
+
+Hibernate Cache :
+
+(1)First Level Cache :
+first level cache works by default.
+updates to an entity is updated to DB only once.
+it is available at session level (or transaction level)
+
+(2)Second level cache :
+It is a cache which is available at SessionFactory level.
+There must be a second level cache provider : EhCache, infispan
+There is a default time configured for cache entries to evict (timeToLiveSeconds="2000" and memoryStoreEvictionPolicy="LRU").
+We can also create different regions for different cache (like 4 caches for 4 different entities)
+Data is stored in dehydrated manner , like a map of ({id:1}, {name:'akash',age:20})
+LRU cache implementation (Least recently used)
+
+@Cache is applied on entity which we want to cache
+Strategies for second level cache :
+READ_ONLY
+READ_WRITE
+TRANSACTIONAL
+
+
+(3)Query Cache :
+Query cache is used when data is actually fetched from DB via NamedQuery or Criteria
+setCachable(true)
+Internally it stores query (i.e. preparedStatement and its dynamic data) as key and values as id of entity
+If a query is present in cache then fetches all its IDs
+These IDs are first checked in Second level cache, if found then data is hydrated
+if data not found in second level cache then SQL SELECT is fired for each ID .
+
+hence it is necessary to use Query cache with second level cache .
