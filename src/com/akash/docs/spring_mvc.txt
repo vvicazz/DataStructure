@@ -1,0 +1,21 @@
+DispatcherServlet acts as a front Controller
+Each Dispatcher Servlet has its own WebApplicationContext and it inherits all beans defined in root WebApplicationContext.
+
+upon initialization of DispatcherServlet it looks for [servlet-name]-servlet.xml in WEB-INF.
+
+Special bean types in DispatcherServlet:
+HandlerMapping
+HandlerAddapter
+ViewResolver
+ThemeResolver
+
+
+DipatcherServlet parameters:
+-contextConfigLocation  = xml file name
+-contextClass			= class name that implements WebApplicationContext
+
+
+http://docs.spring.io/spring/docs/4.2.1.BUILD-SNAPSHOT/spring-framework-reference/htmlsingle/#mvc-handlermapping
+RequestMappingHandlerMapping
+
+http://docs.spring.io/spring/docs/4.2.1.BUILD-SNAPSHOT/spring-framework-reference/htmlsingle/#mvc-handlermapping-interceptor
