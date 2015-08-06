@@ -119,6 +119,9 @@ An application can also register additional Spring Validator instances per DataB
 
 (Q)What is spring IOC ?
 (Q)How Spring implemented it?
+(Q)types of DI ?
+constructor
+setter
 
 IOC means inversion of control i.e. control is in framework's hand.
 Dependency Injection is implemented via IOC.

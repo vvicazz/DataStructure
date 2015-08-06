@@ -56,7 +56,10 @@ hasNext()
 hasPrevious()
 next()
 previous()
-
+set()
+add()
+nextIndex()
+previousIndex()
 
 (Q)why ListIterator is provided only in list?
 (Q)Why ListIterator has extra functionalities?
