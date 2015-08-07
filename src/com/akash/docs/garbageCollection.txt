@@ -1,0 +1,57 @@
+GC thread is a daemon thread in JVM which checks for unreachable objects in java,
+and remove them from memory.
+
+general steps for deleting unused memory:
+marking		: mark used and unused memory
+deletion	: deleting unused memory 
+compacting	: compacting the memory
+
+Three Generations are created :
+(1)Young
+(2)Old
+(3)Permanent
+
+==>Objects in Young gen are those which live very shortly.
+when an object stay in young for long duration(fixed for an algo),
+it is moved to Old gen.
+->Minor collection is done at Young generation space.
+
+OLD  = EDEN + S1 + S2
+
+
+==>Old gen is the space where long lived objects are saved.
+->Major collection is done here.
+
+
+==>Permanent gen is where class and methods metadata is saved.
+garbage collection is also performed here.
+
+(Q)Why these three generations are created?
+Analysis shows that there are very few objects that have a long life 
+as compared to short lived objects.
+
+(Q) finalize() in Object class
+this method runs when an object is garbage collected.
+can override this.
+
+(Q)How to call garbage collector?
+
+System.gc();
+
+Runtime.getRuntime().gc();
+
+we can only request garbage collector but cannot force it.
+
+
+=================================
+
+Refrence
+
+StrongRefrence
+	|
+WeakRefrence
+	|
+SoftRefrence
+	|
+PhantomRefrence
+
