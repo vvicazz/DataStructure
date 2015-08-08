@@ -9,6 +9,7 @@ HandlerAddapter
 ViewResolver
 ThemeResolver
 
+ViewResolver : InternalResouceViewResolver , UrlBasedViewResolver (for tiles)
 
 DipatcherServlet parameters:
 -contextConfigLocation  = xml file name

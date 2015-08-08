@@ -195,11 +195,34 @@ execution(modifiers-pattern? ret-type-pattern declaring-type-pattern? name-patte
 
 --any public method
 @Pointcut("execution(public * *(..))")
+public void anyPublicOperation() {}
 
 --Any method in trading package
 @Pointcut("within(com.xyz.someapp.trading..*)")
+public void inTrading() {}
 
 @Pointcut("anyPublicOperation() && inTrading()")
+public void mixOftwo() {}
+
+@Before("execution(* com.akash.MyService.myMethod(..))")
+public void logBefore(JoinPoint joinPoint) {
+	joinPoint.getSignature().getName();
+}
+
+@After("inTrading()")
+public void logAfter(JoinPoint joinPoint) {}
+
+@AfterReturning		-- get returned value
+@AfterThrowing		-- get thrown value
+@Around				-- get before and after state in thread safe manner with PrecedingJoinPoint
+
+@Around("mixOfTwo()")
+public void myAround(PrecedingJoinPoint joinPoint) {
+	//before work
+	joinPoint.proceed();
+	//after work
+}
+
 
 --Where proxy implements AccountService
 this(com.xyz.service.AccountService)
