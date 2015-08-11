@@ -1,3 +1,96 @@
+
+Spring Web Services 2.2.2
+
+(1)first we create xsd files.
+xsd->stub	(JAXB) Java Architecture for XML Binding
+xsd->wsdl	(spring ws dynamic-wsdl) 
+
+element -> complexType -> sequence
+
+(2)create wsdl from xsd file
+
+dynamic-wsdl	--  DefaultWsdl11Definition
+It helps us to create wsdl from xsd and publish this wsdl with an endpoint url.
+xsd=xsd file path
+locationUri=url to access wsdl relative to context path
+
+
+static-wsdl		--  SimpleWsdl11Definition
+static-wsdl helps to publish a wsdl file.It requires a wsdl file.
+
+
+MessageDispatcherServlet scans all beans of Wsdl11Definition in classpath and publish them.
+
+(3)Now we have to create an endpoint for this wsdl
+
+==>Below functionality can be implemented by Spring-ws.
+org.springframework.ws.server.endpoint.annotation package
+
+@Endpoint
+class Abc {
+
+	@Payload(namespace="endpoint_url" request="request_object")
+	
+	public @ResponsePayload ResponseObject myf1(@RequestPayload RequestObject req) {
+		
+	}
+}
+
+==>We can also implement this via apache camel.
+
+->Create an endpoint url using namespace and request object
+->Create bean processor that will receive request object as Exchange object
+->Create a Route for combining endpoint with processor.
+
+(4)Parts of WSDL file :
+definitions	: defines all namespace url
+types		: all type declarations are done here
+message		: all request response message
+portType	: one wsdl has one portType, it include all operations
+Binding		: transport level protocol
+service		: portType -- binding
+
+ 
+(5)At client side
+
+WSDL  -->  Stub classes
+
+->jaxws-maven-plugin
+->wsimport tool of java
+
+
+(6)SOAPHandler can be created at both server and client side.
+incoming and outgoing request can be intercepted.
+eg: ->adding user credentials at client side
+	->validating user credentials at server side
+	->printing soap envelope
+
+class MyHandlerClass implements SOAPHandler<SOAPMessageContext> {
+
+	public void close(MessageContext mCtx) {
+	}
+
+	public Set<QName> getHeaders() {
+		return null;
+	}
+
+	public boolean handleFault(SOAPMessageContext mCtx) {
+		return true;	// continue down the handler chain
+	}
+
+	public boolean handleMessage(SOAPMessageContext mCtx) {
+		Boolean outbound = (Boolean) mCtx
+				.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+				
+		return true; // continue down the handler chain
+	}
+}
+
+
+================================================================================
+
+
+
 Soap Web Services:
 
 Simple Object Access protocol
