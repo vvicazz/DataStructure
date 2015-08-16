@@ -1,0 +1,114 @@
+JDBC and J2EE basics:
+
+NOTE : Each request thread in a J2EE environment gets a single connection from Each Resource.
+There may be multiple resources for a single request, 
+so there will be single transaction for each request.
+
+Connection Object in JDBC has methods :
+commit()
+rollback()
+
+By default, for a JDBC connection AutoCommit is set to true.
+i.e. Each Query is treated as single transaction.
+
+For executing multiple statements, we have to call setAutoCommit(false)
+
+conn.commit();
+conn.rollback();
+
+SavePoint : points in transactions that can be commited or rollback separatly.
+
+
+=======================================================
+Hibernate :
+
+tx = session.getTransaction();
+
+tx.begin()
+
+session.flush();
+
+tx.commit();
+
+session.close();
+
+(Q)Difference bw session.flush() and tx.commit() ?
+flush : transfer data to DB but do not commit
+commit : transfer data to DB and commit
+
+(Q)When flush() method is executed?
+flush() called
+commit called
+query executed, when any query(HQL,native,named,Criteria) executed session data is flush to avoid getting Stale objects.
+
+FlushMode : 
+Manual	: call manualy only
+Commit	: when commit is called
+Auto	: when query is fired to avoid stale object, This is default
+Always	: Every query
+
+
+=======================================================
+
+How Transactional works in Spring
+
+(1)Transaction Manager
+(2)Transaction Interceptor
+(3)Transactional proxy
+
+(1)Transactional proxy :
+EntityManager proxy class which will operate jpa/hibernate operations.
+SharedEntityManagerInvocationHandler is the proxy class.
+
+class SharedEntityManagerInvocationHandler implements InvocationHandler
+
+public Object invoke(Object proxy,Method method,Object[] arrgs) {
+...
+method.invoke(target,args);
+..
+}
+
+
+(2)Transaction Interceptor :
+@Around advice for PlatformTransactionManager
+Any method in Spring that is annotated with @Transactional annotation will be intercepted by this class.
+
+class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor
+
+public Object invoke(final MethodInvocation invocation) throws Throwable
+
+=>This interceptor will decide if transaction has to commit or rollback.
+
+
+(3)Transaction Manager
+its main role is to link entityManager with Connection.
+JpatransactionManager is an implementation.
+its getTransaction() method checks the current transaction and create/suspend transaction accordingly.
+It checks if transaction has to be propagated or a new transaction has to be created.
+When Requires_new propagation is used ,then old connection in old transaction is suspended and
+new connection is opened.
+
+PROPAGATION_REQUIRED , PROPAGATION_REQUIRES_NEW
+ISOLATION_LEVEL = READ_COMMITED , READ_UNCOMMITED
+
+
+Note : All Runtime exceptions (unchecked exception) sets markAsRollbackOnly=true.
+This will rollback the transaction at the end.
+If a checked exception occurs inside a transaction method, it will never be rollback by itself.
+
+
+1.public class MyController {
+2.
+3.	@Transactional
+4.	public void myMethod() {
+5.		Person p = new Person();
+6.		entityManager.persist(p);
+7.	}
+8.}
+
+********NOTE*********
+
+(1)Control will go to TransactionInterceptor.invoke
+(2)Control will go to line 5
+(3)control will go to line 6 -> which transfer control to SharedEntityManagerInvocationHandler.invoke
+

@@ -2,10 +2,10 @@ package com.akash.array;
 
 import java.util.Arrays;
 
-public class MyQueue {
+public class MyQueue<E> {
 
 	public static void main(String args[]) {
-		MyQueue mq = new MyQueue(3);
+		MyQueue<Integer> mq = new MyQueue<Integer>(3);
 		mq.enqueue(1);
 		mq.enqueue(2);
 		mq.enqueue(3);
@@ -20,18 +20,18 @@ public class MyQueue {
 
 	private int queueSize;
 	private int arrSize;
-	private Integer[] queue;
+	private Object[] queue;
 
 	private int rear;
 	private int front;
 
 	public MyQueue(int arrSize) {
-		queue = new Integer[arrSize];
+		queue = new Object[arrSize];
 		this.arrSize = arrSize;
 		queueSize = front = rear = 0;
 	}
 
-	public void enqueue(Integer value) {
+	public void enqueue(E value) {
 
 		if (rear == front && queueSize == arrSize) {
 			System.out.println("queue is overflow");
@@ -42,13 +42,14 @@ public class MyQueue {
 		}
 	}
 
-	public Integer dequeue() {
+	@SuppressWarnings("unchecked")
+	public E dequeue() {
 
-		Integer value = null;
+		E value = null;
 		if (rear == front && queueSize == 0) {
 			System.out.println("queue is underflow");
 		} else {
-			value = queue[front];
+			value = (E) queue[front];
 			queue[front] = null;
 			incrementFront();
 		}
