@@ -81,3 +81,5 @@ f2(new Box<Integer>());		//error
 
 NOTE : You can subtype a generic class or interface by extending or implementing it.
 
+=>PECS
+Producer Extends Consumer super
