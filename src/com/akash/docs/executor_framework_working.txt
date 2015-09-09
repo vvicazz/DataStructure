@@ -1,0 +1,40 @@
+public class MyCallable implements Callable<String> {
+	
+	public String call() throws Exception {
+		...
+	}
+}
+
+
+(1)
+//ThreadPoolExecutor class instance for ExecutorService
+
+ExecutorService executor = Executors.newFixedThreadPool(10);
+List<Future<String>> list = new ArrayList<Future<String>>();
+
+(2)
+Future<String> future = executor.submit(new Callable());
+
+==>ThreadPoolExecutor.submit()
+create new RunnableFuture
+execute RunnableFuture
+assign a thread from worker pool
+
+(3)
+  Future		(I)
+	|
+RunnableFuture	(I)
+	|
+FutureTask		(C)
+
+
+future.get()	--> 	FutureTask.get() method is called
+
+->checks if this thread is completed
+->if no then this method goes for wait
+->if yes it returns the output
+
+
+================================================================
+
+http://crunchify.com/hashmap-vs-concurrenthashmap-vs-synchronizedmap-how-a-hashmap-can-be-synchronized-in-java/
