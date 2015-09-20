@@ -12,8 +12,8 @@ public class MyLinkedList {
 		this.root = root;
 	}
 
-	//logic should be changed.
-	//last node must be maintained
+	// logic should be changed.
+	// last node must be maintained
 	public void add(int value) {
 		Node node = getRoot();
 		if (node == null) {
@@ -106,6 +106,43 @@ public class MyLinkedList {
 		}
 	}
 
+	// reverse linked list using recursion
+	public void reverse2() {
+
+		if (root == null)
+			return;
+		Node D = null;
+		Node A = null;
+		Node B = root;
+		Node C = B.getNext();
+		if (C != null) {
+			D = C.getNext();
+		}
+		recursiveReverse(A, B, C, D);
+	}
+
+	private void recursiveReverse(Node A, Node B, Node C, Node D) {
+
+		B.setNext(A);
+		if (C != null) {
+			C.setNext(B);
+		}
+		if (C == null) {
+			root = B;
+			return;
+		} else if (D == null) {
+			root = C;
+			return;
+		}
+		A = C;
+		B = D;
+		C = B.getNext();
+		if (C != null) {
+			D = C.getNext();
+		}
+		recursiveReverse(A, B, C, D);
+	}
+
 	private void reverseFirstTwoElements(Node temp1, Node temp2, Node temp3) {
 		temp3.setNext(temp2);
 		temp2.setNext(temp1);
@@ -160,10 +197,10 @@ public class MyLinkedList {
 	 * 
 	 * @param n
 	 */
-	//still in progress
+	// still in progress
 	public void reverInParts(int n) {
-		int counter=1;
-		
+		int counter = 1;
+
 		// Initialization of 4 Node variables
 		Node temp1 = null;
 		Node temp2 = getRoot();
@@ -201,18 +238,18 @@ public class MyLinkedList {
 			setRoot(temp2);
 		}
 	}
-	
+
 	public void printReverse() {
 		System.out.print("[");
 		printReverseList(getRoot());
 		System.out.print("]");
 	}
-	
+
 	private void printReverseList(Node node) {
-		if(node==null) {
+		if (node == null) {
 			return;
 		}
-		if(node.getNext()==null) {
+		if (node.getNext() == null) {
 			System.out.print(node.getValue());
 		} else {
 			printReverseList(node.getNext());

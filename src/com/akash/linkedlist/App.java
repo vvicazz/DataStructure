@@ -10,7 +10,8 @@ public class App {
 		list.add(4);
 		list.add(5);
 		System.out.println(list);
-//		list.reverse();
+		list.reverse2();
+		System.out.println(list);
 		
 		MyLinkedList list2 = new MyLinkedList();
 		list2.add(11);
