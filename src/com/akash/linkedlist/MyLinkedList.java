@@ -67,6 +67,9 @@ public class MyLinkedList {
 		return sb.toString();
 	}
 
+	/**
+	 * reverse linked list using iterative method
+	 */
 	public void reverse() {
 
 		// Initialization of 4 Node variables
@@ -106,7 +109,9 @@ public class MyLinkedList {
 		}
 	}
 
-	// reverse linked list using recursion
+	/**
+	 * reverse linked list using recursion
+	 */
 	public void reverse2() {
 
 		if (root == null)
@@ -199,43 +204,77 @@ public class MyLinkedList {
 	 */
 	// still in progress
 	public void reverInParts(int n) {
-		int counter = 1;
-
-		// Initialization of 4 Node variables
-		Node temp1 = null;
-		Node temp2 = getRoot();
-		Node temp3 = null;
-		Node temp4 = null;
-		if (temp2 != null) {
-			temp3 = temp2.getNext();
+		if (n <= 1)
+			return;
+		if (root == null)
+			return;
+		Node A = null;
+		Node B = root;
+		Node C = B.getNext();
+		Node D = null;
+		if (C != null) {
+			D = C.getNext();
 		}
-		if (temp3 != null) {
-			temp4 = temp3.getNext();
-		}
+		int counter = 0;
+		// last node of previous part of list
+		Node previousLast = null;
+		// first node of current list, which will become last for this part
+		Node currentFirst = B;
+		while (true) {
 
-		// iterating over Node variables and reversing 2 nodes in one iteration
-		while (!(temp2 == null || temp3 == null)) {
-			temp3.setNext(temp2);
-			temp2.setNext(temp1);
-			temp1 = temp3;
-			temp2 = temp4;
-			if (temp2 != null) {
-				temp3 = temp2.getNext();
+			// reversing the list
+			B.setNext(A);
+			counter++;
+			if (C != null && counter % n != 0) {
+				C.setNext(B);
+				counter++;
 			}
-			if (temp3 != null) {
-				temp4 = temp3.getNext();
+			if (C == null) {
+				previousLast.setNext(B);
+				currentFirst.setNext(null);
+				return;
+			} else if (D == null) {
+				previousLast.setNext(C);
+				currentFirst.setNext(null);
+				return;
 			}
-		}
 
-		// Base case condition, N=2m (where m is any integer)
-		if (temp2 == null) {
-			setRoot(temp1);
-		}
+			// For n as even
+			if (n % 2 == 0 && counter % n == 0) {
+				if (previousLast == null)
+					root = C;
+				else
+					previousLast.setNext(C);
+				previousLast = currentFirst;
+				currentFirst = D;
+			}
 
-		// Base case condition, N=2m+1 (where m is any integer)
-		if (temp3 == null) {
-			temp2.setNext(temp1);
-			setRoot(temp2);
+			// For n as odd
+			if (n % 2 != 0 && counter % n == 0) {
+				if (previousLast == null)
+					root = B;
+				else
+					previousLast.setNext(B);
+				previousLast = currentFirst;
+				currentFirst = C;
+
+				// moving forward for odd
+				A = B;
+				B = C;
+				C = B.getNext();
+				if (C != null) {
+					D = C.getNext();
+				}
+				continue;
+			}
+
+			// moving forward
+			A = C;
+			B = D;
+			C = B.getNext();
+			if (C != null) {
+				D = C.getNext();
+			}
 		}
 	}
 
