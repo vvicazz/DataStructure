@@ -202,7 +202,6 @@ public class MyLinkedList {
 	 * 
 	 * @param n
 	 */
-	// still in progress
 	public void reverInParts(int n) {
 		if (n <= 1)
 			return;
