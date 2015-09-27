@@ -102,3 +102,48 @@ Note : While calculating the index of a new element in hashtable,
         h=h ^ (h >>> 7) ^ (h >>> 4);
 		h=93442
 		
+
+=>difference
+
+hashtable-hashmap
+arraylist-vector
+iterator-enumeration
+iterator-listIterator
+
+=>behaviour:
+thread safe -> concurrentModificationException , synchronized , full object lock , partial object lock 
+performance
+increment size %
+
+
+(Q)How ConcurrentHashMap internally works ?
+
+
+class ConcurrentHashMap {
+
+	final Segment segments[];
+	
+	static final class Segment extends ReentrantLock {
+		
+		volatile HashEntry<K,V> table[];
+	}
+	
+	static final class HashEntry<K,V> {
+		
+		K key;
+		volatile V value;
+		final HashMap<K,V> next;
+	}
+	
+	ConcurrentHashMap(int initialCapacity, float loadFactor, int concurrencyLevel)
+}
+
+
+(1)no. of elements in segments array = concurrenyLevel = no of threads accessing this map
+
+(2)Each bucket is assigned its own segment
+
+(3)all update operations on a single bucket are synchronized
+
+(4)all read operations not synchronized
+
