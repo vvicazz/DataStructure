@@ -1,0 +1,439 @@
+Race condition : when multiple processes/threads access same resource and order of accessing resource matters.
+Critical section : code that contains race condition
+
+Thread safe : code that has no critical section
+
+all local primitive variable are stored in thread stack
+objects are stored in heap, so they can be shared with multiple threads
+
+http://stackoverflow.com/questions/1202444/how-is-javas-threadlocal-implemented-under-the-hood
+http://java.dzone.com/articles/painless-introduction-javas-threadlocal-storage
+
+ThreadLocal
+WeakRefrences
+
+----------------------------------------------------------------
+
+read-then-modify
+check-then-act
+
+intrinsic locks -> every object has its own intrinsic lock
+
+reentrant 
+synchronized (1)method , (2)block
+
+race condition
+visibility
+stale object
+long and double in 64 bit environment
+volatile
+
+thread confinement
+ThreadLocal
+
+Object publication and escape
+
+Immutable objects 
+
+final
+
+combination of immutable and volatile
+
+Two ways to handle concurrency in collection:
+(1)throw exception when two threads read/write simultaneously,
+this solution is still not thread safe as threads can see stale value.
+(2)create new copy of collection while doing any operation, 
+as thread will not have any impact on copy.
+This might have some performance issues.
+
+
+NOTE:
+we have to apply locking where a shared collection is iterated, to avoid ConcurrentModificationException 
+In this example toString() method of HashSet uses iterator
+While one thread is iterating over set other thread may add new elements.
+
+
+====================================
+
+@NotThreadSafe
+public class UnsafeSequence {
+	private int value;
+	/** Returns a unique value. */
+	public int getNext() {
+		return value++;
+	}
+}
+
+UnsafeSequence illustrates a common concurrency hazard called a race condition.
+
+@ThreadSafe
+public class Sequence {
+	@GuardedBy("this") private int value;
+	public synchronized int getNext() {
+		return value++;
+	}
+}
+
+Whenever more than one thread accesses a given state variable, and one of them might
+write to it, they all must coordinate their access to it using synchronization.
+
+What is thread safety:
+No set of operations performed sequentially or concurrently
+on instances of a thread-safe class can cause an instance to be in an invalid
+state.
+
+
+A stateless Servlet:
+
+@ThreadSafe
+public class StatelessFactorizer implements Servlet {
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		BigInteger[] factors = factor(i);
+		encodeIntoResponse(resp, factors);
+	}
+}
+
+
+Atomicity:
+
+@NotThreadSafe
+public class UnsafeCountingFactorizer implements Servlet {
+	private long count = 0;
+	public long getCount() { return count; }
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		BigInteger[] factors = factor(i);
+		++count;
+		encodeIntoResponse(resp, factors);
+	}
+}
+
+
+it is not atomic, which
+means that it does not execute as a single, indivisible operation. Instead, it is a
+shorthand for a sequence of three discrete operations: fetch the current value, add
+one to it, and write the new value back. This is an example of a read-modify-write
+operation, in which the resulting state is derived from the previous state.
+
+read-modify-write causes operations to be non-Atomic.
+
+Race Condition :
+
+The most common
+type of race condition is check-then-act, where a potentially stale observation is
+used to make a decision on what to do next.
+
+Check-then-Act  problem causes Race Condition in multiple threads.
+
+Race condition can be understood as a problem in which 
+reaching the desired outcome depends on the relative timing of events.
+
+This type of race condition
+is called check-then-act: you observe something to be true (file X doesn’t
+exist) and then take action based on that observation (create X); but in fact the
+observation could have become invalid between the time you observed it and the
+time you acted on it (someone else created X in the meantime), causing a problem
+(unexpected exception, overwritten data, file corruption).
+
+Race Condition in Lazy Initialization:
+
+A common idiom that uses check-then-act is lazy initialization.
+
+@NotThreadSafe
+public class LazyInitRace {
+	private ExpensiveObject instance = null;
+	public ExpensiveObject getInstance() {
+		if (instance == null)
+			instance = new ExpensiveObject();
+		return instance;
+	}
+}
+
+LazyInitRace has race conditions that can undermine its correctness. Say that
+threads A and B execute getInstance at the same time. A sees that instance
+is null, and instantiates a new ExpensiveObject. B also checks if instance is
+null. Whether instance is null at this point depends unpredictably on timing,
+including the vagaries of scheduling and how long A takes to instantiate the ExpensiveObject
+and set the instance field.
+
+Compound actions:
+
+@ThreadSafe
+public class CountingFactorizer implements Servlet {
+	private final AtomicLong count = new AtomicLong(0);
+	public long getCount() { return count.get(); }
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		BigInteger[] factors = factor(i);
+		count.incrementAndGet();
+		encodeIntoResponse(resp, factors);
+	}
+}
+
+
+Locking :
+
+@NotThreadSafe
+public class UnsafeCachingFactorizer implements Servlet {
+	private final AtomicReference<BigInteger> lastNumber
+	= new AtomicReference<BigInteger>();
+	private final AtomicReference<BigInteger[]> lastFactors
+	= new AtomicReference<BigInteger[]>();
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		if (i.equals(lastNumber.get()))
+			encodeIntoResponse(resp, lastFactors.get());
+		else {
+			BigInteger[] factors = factor(i);
+			lastNumber.set(i);
+			lastFactors.set(factors);
+			encodeIntoResponse(resp, factors);
+		}
+	}
+}
+
+
+The definition of thread safety requires that invariants be preserved regardless
+of timing or interleaving of operations in multiple threads. One invariant of UnsafeCachingFactorizer
+is that the product of the factors cached in lastFactors
+equal the value cached in lastNumber; our servlet is correct only if this invariant
+always holds.
+
+An Invariant is a non-changing condition in our program that decides the successful implementation.
+here:
+last number must be equal multiplication of last factors
+
+Just as AtomicLong is a thread-safe holder class for a long integer, AtomicReference is a threadsafe
+holder class for an object reference.
+
+
+
+Intrinsic Lock :
+
+A synchronized
+block has two parts: a reference to an object that will serve as the lock, and a
+block of code to be guarded by that lock. A synchronized method is a shorthand
+for a synchronized block that spans an entire method body, and whose lock is
+the object on which the method is being invoked. (Static synchronized methods
+use the Class object for the lock.)
+synchronized (lock) {
+// Access or modify shared state guarded by lock
+}
+Every Java object can implicitly act as a lock for purposes of synchronization;
+these built-in locks are called intrinsic locks or monitor locks. The lock is automatically
+acquired by the executing thread before entering a synchronized block
+and automatically released when control exits the synchronized block, whether
+by the normal control path or by throwing an exception out of the block.
+
+
+Intrinsic locks in Java act as mutexes (or mutual exclusion locks), which means
+that at most one thread may own the lock.
+
+@ThreadSafe
+public class SynchronizedFactorizer implements Servlet {
+	@GuardedBy("this") private BigInteger lastNumber;
+	@GuardedBy("this") private BigInteger[] lastFactors;
+	public synchronized void service(ServletRequest req,ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		if (i.equals(lastNumber))
+			encodeIntoResponse(resp, lastFactors);
+		else {
+			BigInteger[] factors = factor(i);
+			lastNumber = i;
+			lastFactors = factors;
+			encodeIntoResponse(resp, factors);
+		}
+	}
+}
+
+This has poor performance.
+
+
+Reentrant or Reentrancy :
+
+When a thread requests a lock that is already held by another thread, the requesting
+thread blocks. But because intrinsic locks are reentrant, if a thread tries
+to acquire a lock that it already holds, the request succeeds. Reentrancy means
+that locks are acquired on a per-thread rather than per-invocation basis.
+When the count is zero, the lock is considered unheld. When a
+thread acquires a previously unheld lock, the JVM records the owner and sets the
+acquisition count to one. If that same thread acquires the lock again, the count
+is incremented, and when the owning thread exits the synchronized block, the
+count is decremented. When the count reaches zero, the lock is released.
+
+
+public class Widget {
+	public synchronized void doSomething() {
+		...
+	}
+}
+
+public class LoggingWidget extends Widget {
+	public synchronized void doSomething() {
+		System.out.println(toString() + ": calling doSomething");
+		super.doSomething();
+	}
+}
+
+
+A common locking convention is to encapsulate all mutable state within an
+object and to protect it from concurrent access by synchronizing any code path
+that accesses mutable state using the object’s intrinsic lock. This pattern is used
+by many thread-safe classes, such as Vector and other synchronized collection
+classes.
+Not all data needs to be guarded by locks—only mutable data that will be
+accessed from multiple threads.
+
+
+@ThreadSafe
+public class CachedFactorizer implements Servlet {
+	@GuardedBy("this") private BigInteger lastNumber;
+	@GuardedBy("this") private BigInteger[] lastFactors;
+	@GuardedBy("this") private long hits;
+	@GuardedBy("this") private long cacheHits;
+	public synchronized long getHits() { return hits; }
+	public synchronized double getCacheHitRatio() {
+		return (double) cacheHits / (double) hits;
+	}
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		BigInteger[] factors = null;
+		synchronized (this) {
+			++hits;
+			if (i.equals(lastNumber)) {
+				++cacheHits;
+				factors = lastFactors.clone();
+			}
+		}
+		if (factors == null) {
+			factors = factor(i);
+			synchronized (this) {
+				lastNumber = i;
+				lastFactors = factors.clone();
+			}
+		}
+		encodeIntoResponse(resp, factors);
+	}
+}
+
+===================================================================================
+
+=====Chapter 3======
+
+synchronized is not only about atomicity or demarcating “critical sections”. Synchronization also
+has another significant, and subtle, aspect: memory visibility. We want not only to
+prevent one thread from modifying the state of an object when another is using it,
+but also to ensure that when a thread modifies the state of an object, other threads
+can actually see the changes that were made.
+
+In order to ensure visibility of memory writes across threads, you must use synchronization.
+
+Visibilty :
+
+public class NoVisibility {
+	private static boolean ready;
+	private static int number;
+	private static class ReaderThread extends Thread {
+		public void run() {
+			while (!ready)
+				Thread.yield();
+			System.out.println(number);
+		}
+	}
+	public static void main(String[] args) {
+		new ReaderThread().start();
+		number = 42;
+		ready = true;
+	}
+}
+
+
+
+Stale data can cause serious and confusing failures such as unexpected exceptions,
+corrupted data structures, inaccurate computations, and infinite loops.
+
+Synchronizing only the setter would not be sufficient: threads calling get 
+ would still be able to see stale values.
+ 
+
+@NotThreadSafe
+public class MutableInteger {
+	private int value;
+	public int get() { return value; }
+	public void set(int value) { this.value = value; }
+}
+
+
+@ThreadSafe
+public class SynchronizedInteger {
+	@GuardedBy("this") private int value;
+	public synchronized int get() { return value; }
+	public synchronized void set(int value) { this.value = value; }
+}
+
+out-of-thin-air safety :
+
+When a thread reads a variable without synchronization, it may see a stale value,
+but at least it sees a value that was actually placed there by some thread rather
+than some random value.
+This safety guarantee is called out-of-thin-air safety.
+Out-of-thin-air safety applies to all variables, with one exception: 
+64-bit numeric variables (double and long) that are not declared volatile .
+ The Java Memory Model requires fetch and store operations to be atomic,
+but for nonvolatile long and double variables, the JVM is permitted to treat a
+64-bit read or write as two separate 32-bit operations.
+
+
+Locking and Visibilty :
+Intrinsic locking can be used to guarantee that one thread sees the effects of another in a predictable manner.
+
+
+Volatile variable :
+
+weaker form of synchronization.
+
+When a field is declared volatile, the compiler and runtime
+are put on notice that this variable is shared and that operations on it should not
+be reordered with other memory operations. Volatile variables are not cached in
+registers or in caches where they are hidden from other processors, so a read of a
+volatile variable always returns the most recent write by any thread.
+
+When thread A writes to a volatile variable and subsequently
+thread B reads that same variable, the values of all variables that were
+visible to A prior to writing to the volatile variable become visible to B after
+reading the volatile variable.
+
+
+Publishing and escape :
+
+Publishing an object means making it available to code outside of its current scope,
+such as by storing a reference to it where other code can find it, returning it
+from a nonprivate method, or passing it to a method in another class.
+
+
+-->storing a refrence in public static field
+
+	public static Set<Secret> knownSecrets;
+	public void initialize() {
+		knownSecrets = new HashSet<Secret>();
+	}
+	
+	
+-->Returning a refrence from a non-private method
+
+	class UnsafeStates {
+		private String[] states = new String[] {
+			"AK", "AL" ...
+		};
+		public String[] getStates() { return states; }
+	}
+	
+-->Any fields of a nonprivate refrence are also considered as published
+
+-->overridable methods (neither private nor final)
+
+-->publish an inner class instance
+
+-->Avoid calling thread.start() method from inside the constructor
+
