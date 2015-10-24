@@ -1,0 +1,200 @@
+move code to data 
+
+The clients send only the MapReduce programs to be executed, and these programs are usually small (often in kilobytes).
+
+Scale-out  => many servers
+Scale-up   => single big server doing large computation
+(1)Scale out in hadoop
+(2)unstructured data in hadoop
+(3)key-value pair
+(4)Relational DB has declarative queries,
+which means query engine will handle the responsibility of executing query and giving back output.
+just like query execution plan.
+In Hadoop the internal processing of query engine has to be done explicitly.
+
+(5)write-once , read-many-times type of data store.
+
+=======>Map Reduce
+Pipeline
+Message Queues
+
+Data Processing Primitives:
+mappers
+reducers
+
+http://hadoop.apache.org/core/docs/current/mapred_tutorial.html
+
+word count example using hadoop :
+
+(1)divide the documents in various servers for processing and give output of processing to next stage
+(2)next stage will combine all output from first stage
+
+
+In the mapping phase, MapReduce takes the input
+data and feeds each data element to the mapper. In the reducing phase, the reducer
+processes all the outputs from the mapper and arrives at a fi nal result.
+
+the mapper is meant to fi lter and transform the input into something
+that the reducer can aggregate over.
+
+scalable distributed programs.
+
+Mapper-Reducer in Hadoop :
+
+{k1, v1}
+
+list(k2, v2)    || k2 is v1
+
+{k2, list(v2)}
+
+{k3,v3}
+
+step 1 and 2 are mapper
+step 3 and 4 are reducer
+
+eg: 
+{doc_no, doc_data}
+list(words from doc_data, freq as 1)
+{word,list of freq}
+{word,freq}
+
+Note:
+Mapper do not work on keys, it only works on values.
+Reducer applies an aggregate function
+
+==========================================================
+Hadoop installation :
+
+http://pingax.com/install-hadoop2-6-0-on-ubuntu/
+http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/
+http://pingax.com/install-apache-hadoop-ubuntu-cluster-setup/
+
+(1)install java
+(2)setup new user
+
+sudo groupadd hadoop
+sudo adduser --G hadoop hduser
+
+sudo passwd hduser
+
+(3)Configure ssh
+
+su - hduser
+ssh-keygen -t rsa -P ""
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+
+#make sure that authorized_keys has a permissions of 600
+
+# http://www.cyberciti.biz/faq/how-linux-file-permissions-work/
+
+(4)Download and extract hadoop 
+
+##switch to ec2-user
+cd /opt/
+sudo tar xzf hadoop-2.7.1.tar.gz
+sudo mv hadoop-2.7.1 hadoop
+sudo chown hduser:hadoop -R /opt/hadoop
+
+## Create Hadoop temp directories for Namenode and Datanode
+sudo mkdir hadoop_tmp
+cd hadoop_tmp
+sudo mkdir namenode
+sudo mkdir datanode
+
+## Again assign ownership of this Hadoop temp folder to Hadoop user
+sudo chown hduser:hadoop -R /opt/hadoop_tmp/
+
+(5)Set path for Java and Hadoop variables in .bashrc
+
+export JAVA_HOME=/opt/jdk1.7.0_75
+export HADOOP_HOME=/opt/hadoop
+export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+# User specific aliases and functions
+
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+
+(7)set JAVA_HOME path in $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+# The java implementation to use.
+export JAVA_HOME=${JAVA_HOME}
+
+export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"
+
+(8)add property tag to $HADOOP_HOME/etc/hadoop/core-site.xml
+
+<property>
+      <name>dfs.replication</name>
+      <value>1</value>
+ </property>
+ <property>
+      <name>dfs.namenode.name.dir</name>
+      <value>file:/opt/hadoop_tmp/hdfs/namenode</value>
+ </property>
+ <property>
+      <name>dfs.datanode.data.dir</name>
+      <value>file:/opt/hadoop_tmp/hdfs/datanode</value>
+ </property>
+ 
+(9)add property to  $HADOOP_HOME/etc/hadoop/yarn-site.xml 
+
+<property>
+      <name>yarn.nodemanager.aux-services</name>
+      <value>mapreduce_shuffle</value>
+</property>
+<property>
+      <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+      <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+</property>
+
+
+(10)create and edit $HADOOP_HOME/etc/hadoop/mapred-site.xml
+
+sudo cp mapred-site.xml.template mapred-site.xml
+sudo vim mapred-site.xml
+
+<property>
+      <name>mapreduce.framework.name</name>
+      <value>yarn</value>
+</property>
+
+(11)format file system via namenode
+
+cd $HADOOP_HOME
+bin/hdfs namenode -format
+
+(12)start all deamons
+
+cd $HADOOP_HOME/sbin/
+sh start-dfs.sh
+
+which: no start-dfs.sh in (/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/aws/bin:/opt/gradle/latest/bin:/home/hduser/bin)
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /opt/hadoop/logs/hadoop-hduser-namenode-ip-172-31-61-159.out
+localhost: starting datanode, logging to /opt/hadoop/logs/hadoop-hduser-datanode-ip-172-31-61-159.out
+Starting secondary namenodes [0.0.0.0]
+The authenticity of host '0.0.0.0 (0.0.0.0)' can't be established.
+ECDSA key fingerprint is 56:6a:a7:79:80:51:d6:0e:bd:a8:ea:94:c6:5a:ad:c2.
+Are you sure you want to continue connecting (yes/no)? yes
+0.0.0.0: Warning: Permanently added '0.0.0.0' (ECDSA) to the list of known hosts.
+0.0.0.0: starting secondarynamenode, logging to /opt/hadoop/logs/hadoop-hduser-secondarynamenode-ip-172-31-61-159.out
+
+(13)Start map reduce deamons
+
+cd $HADOOP_HOME/sbin/
+sh start-yarn.sh
+
+starting yarn daemons
+which: no start-yarn.sh in (/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/aws/bin:/opt/gradle/latest/bin:/home/hduser/bin)
+starting resourcemanager, logging to /opt/hadoop/logs/yarn-hduser-resourcemanager-ip-172-31-61-159.out
+localhost: starting nodemanager, logging to /opt/hadoop/logs/yarn-hduser-nodemanager-ip-172-31-61-159.out
+
+(14)
+localhost:8088
+localhost:50070
+
+http://54.172.152.112:8088
