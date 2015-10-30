@@ -166,6 +166,10 @@ export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"
       <name>dfs.datanode.data.dir</name>
       <value>file:/opt/hadoop_tmp/hdfs/datanode</value>
  </property>
+ <property>
+ 	<name>fs.defaultFS</name>
+ 	<value>hdfs://localhost/</value>
+ </property>
  
 (9)add property to  $HADOOP_HOME/etc/hadoop/yarn-site.xml 
 
@@ -232,7 +236,7 @@ localhost:50070
 
 http://54.172.152.112:8088
 
-
+http://52.91.246.222
 
 ========================
 
