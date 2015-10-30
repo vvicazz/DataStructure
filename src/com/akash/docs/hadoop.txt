@@ -65,25 +65,50 @@ Reducer applies an aggregate function
 ==========================================================
 Hadoop installation :
 
+http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf
+
 http://pingax.com/install-hadoop2-6-0-on-ubuntu/
 http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/
 http://pingax.com/install-apache-hadoop-ubuntu-cluster-setup/
 
 (1)install java
+wget http://download.oracle.com/otn-pub/java/jdk/7u79-b15/jdk-7u79-linux-x64.tar.gz?AuthParam=1445964072_596b10b75ffddd31ac4627a912d1c836
+mv http://download.oracle.com/otn-pub/java/jdk/7u79-b15/jdk-7u79-linux-x64.tar.gz?AuthParam=1445964072_596b10b75ffddd31ac4627a912d1c836 jdk-7u79-linux-x64.tar.gz
+cd /opt/
+sudo cp jdk-7u79-linux-x64.tar.gz /opt/
+sudo tar xzf jdk-7u79-linux-x64.tar.gz
+cd 
+sudo vim .bashrc
+
+export JAVA_HOME=/opt/jdk1.7.0_79
+export PATH=$JAVA_HOME/bin:$PATH
+
+source ~/.bashrc
+
+echo $JAVA_HOME
+
 (2)setup new user
 
 sudo groupadd hadoop
-sudo adduser --G hadoop hduser
+sudo useradd -G hadoop hduser
 
 sudo passwd hduser
 
 (3)Configure ssh
 
 su - hduser
+
+#NOTE : If you find no home directory for this user, then create its home directory like
+# mkdir /home/hduser
+# and make this folder as the owner of new folder
+# chown hduser:hduser /home/hduser
+
 ssh-keygen -t rsa -P ""
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 
 #make sure that authorized_keys has a permissions of 600
+
+ssh localhost
 
 # http://www.cyberciti.biz/faq/how-linux-file-permissions-work/
 
@@ -104,7 +129,8 @@ sudo mkdir datanode
 ## Again assign ownership of this Hadoop temp folder to Hadoop user
 sudo chown hduser:hadoop -R /opt/hadoop_tmp/
 
-(5)Set path for Java and Hadoop variables in .bashrc
+(5)Set path for Java and Hadoop variables in .bashrc (NOTE : also set these parameters for hduser)
+# also see http://stackoverflow.com/questions/19943766/hadoop-unable-to-load-native-hadoop-library-for-your-platform-warning
 
 export JAVA_HOME=/opt/jdk1.7.0_75
 export HADOOP_HOME=/opt/hadoop
@@ -117,6 +143,7 @@ export HADOOP_HDFS_HOME=$HADOOP_HOME
 export YARN_HOME=$HADOOP_HOME
 export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
 export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+
 
 (7)set JAVA_HOME path in $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
@@ -162,6 +189,12 @@ sudo vim mapred-site.xml
       <value>yarn</value>
 </property>
 
+# set property to yarn.nodemanager.vmem-check-enabled -> false  in yarn-site.xml file
+<property>
+	<name>yarn.nodemanager.vmem-check-enabled</name>
+	<value>false</value>
+</property>
+
 (11)format file system via namenode
 
 cd $HADOOP_HOME
@@ -198,3 +231,39 @@ localhost:8088
 localhost:50070
 
 http://54.172.152.112:8088
+
+
+
+========================
+
+http://hadoop.apache.org/docs/current2/hadoop-project-dist/hadoop-common/FileSystemShell.html
+
+
+
+# /tmp/test_page1.txt
+# /tmp/test_page2.txt
+
+## Copy files to /tmp folder
+cp *.txt /tmp 
+ 
+cd $HADOOP_HOME
+bin/hdfs dfs -mkdir /user
+bin/hdfs dfs -mkdir /user/hduser
+
+bin/hdfs dfs -mkdir /user/hduser/input
+bin/hdfs dfs -mkdir /user/hduser/output
+bin/hdfs dfs -ls /user/hduser
+Found 2 items
+drwxr-xr-x   - hduser supergroup          0 2015-10-25 08:46 /user/hduser/input
+drwxr-xr-x   - hduser supergroup          0 2015-10-25 08:46 /user/hduser/output
+
+
+## Copy files in input folder
+bin/hdfs dfs -copyFromLocal /tmp/test_page1.txt /user/hduser/input/test_page1.txt
+bin/hdfs dfs -copyFromLocal /tmp/test_page2.txt /user/hduser/input/test_page2.txt
+
+
+## execute jar with parameters
+bin/hadoop jar hadoop*examples*.jar wordcount /user/hduser/input /user/hduser/output
+
+bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar wordcount /user/hduser/input /user/hduser/output
