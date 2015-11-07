@@ -65,8 +65,11 @@ Reducer applies an aggregate function
 ==========================================================
 Hadoop installation :
 
-http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf
+***http://hadooptutorials.co.in/
+**https://cloudcelebrity.wordpress.com/2013/03/20/understanding-hdfs-cluster-fsimage-image-and-looking-its-contents/
+http://www.slideshare.net/EmilioCoppa/hadoop-internals
 
+http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf
 http://pingax.com/install-hadoop2-6-0-on-ubuntu/
 http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/
 http://pingax.com/install-apache-hadoop-ubuntu-cluster-setup/

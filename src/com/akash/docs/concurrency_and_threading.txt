@@ -433,7 +433,21 @@ from a nonprivate method, or passing it to a method in another class.
 
 -->overridable methods (neither private nor final)
 
+***IMP
 -->publish an inner class instance
+
+Do not allow the this reference to escape during construction.
+
+->Never create inner classes in the constructor, either anonymous, local, static or non-static
+->Avoid any transitive combination of the rules above, i.e. 
+don't create an anonymous inner class in a private or protected final method that is invoked from within the constructor
 
 -->Avoid calling thread.start() method from inside the constructor
 
+
+Never register any listener in constructor OR never start any thread execution in constructor.
+https://stackoverflow.com/questions/12467101/how-this-escapes-from-a-published-inner-class/12467202#12467202
+http://www.ibm.com/developerworks/java/library/j-jtp0618/index.html
+Problem with this approach is that, you can have a situation where inner class will use your class object
+ and your class object is still in construction. Same problem exists with starting thread from constructor.
+ 
