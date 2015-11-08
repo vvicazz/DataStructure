@@ -438,16 +438,190 @@ from a nonprivate method, or passing it to a method in another class.
 
 Do not allow the this reference to escape during construction.
 
-->Never create inner classes in the constructor, either anonymous, local, static or non-static
-->Avoid any transitive combination of the rules above, i.e. 
-don't create an anonymous inner class in a private or protected final method that is invoked from within the constructor
-
 -->Avoid calling thread.start() method from inside the constructor
 
-
-Never register any listener in constructor OR never start any thread execution in constructor.
 https://stackoverflow.com/questions/12467101/how-this-escapes-from-a-published-inner-class/12467202#12467202
 http://www.ibm.com/developerworks/java/library/j-jtp0618/index.html
 Problem with this approach is that, you can have a situation where inner class will use your class object
  and your class object is still in construction. Same problem exists with starting thread from constructor.
  
+class MyThread implements Runnable {
+	
+	private Thread thread;
+	
+	MyThread() {
+		thread = new Thread(this);	//creating a thread here and passing this is ok,
+		thread.start();				//but never start thread in constructor
+	}
+	
+	public void run() {
+		...
+	}
+}
+
+->Never create inner classes in the constructor, either anonymous, local, static or non-static
+->Avoid any transitive combination of the rules above, i.e. 
+don't create an anonymous inner class in a private or protected final method that is invoked from within the constructor
+->Exposing this reference from constructor :
+		->setting this in a static field
+		->adding this in a collection
+		->publishing this via non-static inner class
+		
+
+public class Safe { 
+
+  private Object me;
+  private Set set = new HashSet();
+  private Thread thread;
+
+  public Safe() { 
+    // Safe because "me" is not visible from any other thread
+    me = this;
+
+    // Safe because "set" is not visible from any other thread
+    set.add(this);
+
+    // Safe because MyThread won't start until construction is complete
+    // and the constructor doesn't publish the reference
+    thread = new MyThread(this);
+  }
+
+  public void start() {
+    thread.start();
+  }
+
+  private class MyThread(Object o) {
+    private Object theObject;
+
+    public MyThread(Object o) { 
+      this.theObject = o;
+    }
+
+    ...
+  }
+}
+
+public class Unsafe {
+  public static Unsafe anInstance;
+  public static Set set = new HashSet();
+  private Set mySet = new HashSet();
+
+  public Unsafe() {
+    // Unsafe because anInstance is globally visible
+    anInstance = this;
+
+    // Unsafe because SomeOtherClass.anInstance is globally visible
+    SomeOtherClass.anInstance = this;
+
+    // Unsafe because SomeOtherClass might save the "this" reference
+    // where another thread could see it
+    SomeOtherClass.registerObject(this);
+
+    // Unsafe because set is globally visible 
+    set.add(this);
+
+    // Unsafe because we are publishing a reference to mySet
+    mySet.add(this);
+    SomeOtherClass.someMethod(mySet);
+
+    // Unsafe because the "this" object will be visible from the new
+    // thread before the constructor completes
+    thread = new MyThread(this);
+    thread.start();
+  }
+
+  public Unsafe(Collection c) {
+    // Unsafe because "c" may be visible from other threads
+    c.add(this);
+  }
+}
+
+
+Thread Confinement :
+
+https://www.quora.com/Java-programming-language/What-are-some-tips-tricks-and-gotchas-when-using-ThreadLocal
+http://stackoverflow.com/questions/11283369/how-does-threadlocal-usage-reduce-reusability
+
+class Thread {
+	ThreadLocal.ThreadLocalMap threadLocals = null;
+}
+
+class ThreadLocal {
+
+	get() OR set() {
+	
+		Thread t = Thread.currentThread();
+		ThreadLocalMap map = t.threadLocals;
+		map.get() OR map.set()
+	}
+}
+
+It is easy to abuse ThreadLocal by treating its thread confinement property as
+a license to use global variables or as a means of creating “hidden” method arguments.
+Like global variables, thread-local variables can detract from reusability
+and introduce hidden couplings among classes, and should therefore be used
+with care.
+
+Immutable Objects :
+
+Immutable objects are always thread-safe.
+Their invariants are established by the constructor, 
+and if their state cannot be changed, these invariants always hold.
+
+Whenever a group of related data items must
+be acted on atomically, consider creating an immutable holder class for them,
+such as OneValueCache.
+
+@Immutable
+class OneValueCache {
+	private final BigInteger lastNumber;
+	private final BigInteger[] lastFactors;
+	public OneValueCache(BigInteger i,
+	BigInteger[] factors) {
+		lastNumber = i;
+		lastFactors = Arrays.copyOf(factors, factors.length);
+	}
+	public BigInteger[] getFactors(BigInteger i) {
+		if (lastNumber == null || !lastNumber.equals(i))
+			return null;
+		else
+			return Arrays.copyOf(lastFactors, lastFactors.length);
+	}
+}
+
+@ThreadSafe
+public class VolatileCachedFactorizer implements Servlet {
+	private volatile OneValueCache cache = new OneValueCache(null, null);
+	public void service(ServletRequest req, ServletResponse resp) {
+		BigInteger i = extractFromRequest(req);
+		BigInteger[] factors = cache.getFactors(i);
+			if (factors == null) {
+				factors = factor(i);
+				cache = new OneValueCache(i, factors);
+			}
+		encodeIntoResponse(resp, factors);
+	}
+}
+
+Immutable and Affectively immutable classes :
+
+http://stackoverflow.com/questions/16678416/different-between-immutable-and-effectively-immutable-objects
+
+Affectively Immutable class is when class has mutable instance variables but are not published as public.
+for eg , having a ArrayList in a class and returning its copy from getter method.
+Or having a mutable object with returning its copy from getter.
+
+Truly Immutable class is when all its instance variables are immutable.
+
+properties of Immutable class :
+->setting all instance variables in constructor
+->removing setters
+->passing copy of mutable object from getter method
+->making class final
+->hashcode of immutable objects must be cashed
+
+
+===================================================================================
+
+=====Chapter 4======
+
