@@ -1,69 +1,4 @@
-move code to data 
-
-The clients send only the MapReduce programs to be executed, and these programs are usually small (often in kilobytes).
-
-Scale-out  => many servers
-Scale-up   => single big server doing large computation
-(1)Scale out in hadoop
-(2)unstructured data in hadoop
-(3)key-value pair
-(4)Relational DB has declarative queries,
-which means query engine will handle the responsibility of executing query and giving back output.
-just like query execution plan.
-In Hadoop the internal processing of query engine has to be done explicitly.
-
-(5)write-once , read-many-times type of data store.
-
-=======>Map Reduce
-Pipeline
-Message Queues
-
-Data Processing Primitives:
-mappers
-reducers
-
-http://hadoop.apache.org/core/docs/current/mapred_tutorial.html
-
-word count example using hadoop :
-
-(1)divide the documents in various servers for processing and give output of processing to next stage
-(2)next stage will combine all output from first stage
-
-
-In the mapping phase, MapReduce takes the input
-data and feeds each data element to the mapper. In the reducing phase, the reducer
-processes all the outputs from the mapper and arrives at a fi nal result.
-
-the mapper is meant to fi lter and transform the input into something
-that the reducer can aggregate over.
-
-scalable distributed programs.
-
-Mapper-Reducer in Hadoop :
-
-{k1, v1}
-
-list(k2, v2)    || k2 is v1
-
-{k2, list(v2)}
-
-{k3,v3}
-
-step 1 and 2 are mapper
-step 3 and 4 are reducer
-
-eg: 
-{doc_no, doc_data}
-list(words from doc_data, freq as 1)
-{word,list of freq}
-{word,freq}
-
-Note:
-Mapper do not work on keys, it only works on values.
-Reducer applies an aggregate function
-
-==========================================================
-Hadoop installation :
+Hadoop installation on single node server :
 
 ***http://hadooptutorials.co.in/
 **https://cloudcelebrity.wordpress.com/2013/03/20/understanding-hdfs-cluster-fsimage-image-and-looking-its-contents/
@@ -274,3 +209,72 @@ bin/hdfs dfs -copyFromLocal /tmp/test_page2.txt /user/hduser/input/test_page2.tx
 bin/hadoop jar hadoop*examples*.jar wordcount /user/hduser/input /user/hduser/output
 
 bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar wordcount /user/hduser/input /user/hduser/output
+
+
+============================================================
+
+Extra Notes :
+
+move code to data 
+
+The clients send only the MapReduce programs to be executed, and these programs are usually small (often in kilobytes).
+
+Scale-out  => many servers
+Scale-up   => single big server doing large computation
+(1)Scale out in hadoop
+(2)unstructured data in hadoop
+(3)key-value pair
+(4)Relational DB has declarative queries,
+which means query engine will handle the responsibility of executing query and giving back output.
+just like query execution plan.
+In Hadoop the internal processing of query engine has to be done explicitly.
+
+(5)write-once , read-many-times type of data store.
+
+=======>Map Reduce
+Pipeline
+Message Queues
+
+Data Processing Primitives:
+mappers
+reducers
+
+http://hadoop.apache.org/core/docs/current/mapred_tutorial.html
+
+word count example using hadoop :
+
+(1)divide the documents in various servers for processing and give output of processing to next stage
+(2)next stage will combine all output from first stage
+
+
+In the mapping phase, MapReduce takes the input
+data and feeds each data element to the mapper. In the reducing phase, the reducer
+processes all the outputs from the mapper and arrives at a fi nal result.
+
+the mapper is meant to fi lter and transform the input into something
+that the reducer can aggregate over.
+
+scalable distributed programs.
+
+Mapper-Reducer in Hadoop :
+
+{k1, v1}
+
+list(k2, v2)    || k2 is v1
+
+{k2, list(v2)}
+
+{k3,v3}
+
+step 1 and 2 are mapper
+step 3 and 4 are reducer
+
+eg: 
+{doc_no, doc_data}
+list(words from doc_data, freq as 1)
+{word,list of freq}
+{word,freq}
+
+Note:
+Mapper do not work on keys, it only works on values.
+Reducer applies an aggregate function
