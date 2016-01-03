@@ -1,0 +1,63 @@
+(1)
+start Solr
+C:\solr\solr-5.2.1> bin\solr.cmd start
+
+localhost:8983
+
+ bin\solr.cmd stop
+ 
+ bin\solr.cmd status
+
+ 
+(2) create new core
+
+bin\solr create -c gettingStarted
+
+
+Creating new core 'gettingStarted' using command:
+http://localhost:8983/solr/admin/cores?action=CREATE&name=gettingStarted&instanceDir=gettingStarted
+
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":4994},
+  "core":"gettingStarted"}
+  
+(3)Posting Data in solr core
+
+post script file is only available for unix environment.
+for windows we can use jar files:
+
+C:\solr\solr-5.2.1>java -Dc=gettingStarted -jar example/exampledocs/post.jar example/exampledocs/*.xml
+
+
+(4)Search document with id
+http://localhost:8983/solr/gettingStarted/select?q=9885A004
+
+http://localhost:8983/solr/gettingStarted/select?q=id%3A9885A004&wt=json&indent=true
+
+
+-----------------
+
+solr.xml
+core_name/
+		core.properties
+		conf/
+			solrconfig.xml
+			schema.xml
+			
+SOLR_HOME\server\solr
+			
+=====================
+http://examples.javacodegeeks.com/enterprise-java/apache-solr/apache-solr-tutorial-beginners/
+http api for posting and updating data
+
+schema.xml
+
+=>field
+(1)indexed
+(2)stored
+(3)
+
+
+managed-schema is used instead of schema.xml file to specify the schema.
