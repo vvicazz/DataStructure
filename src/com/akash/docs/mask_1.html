@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+
+(function ( $ ) {
+ 
+    $.fn.hcmask = function(str) {
+	
+		// Establish our default settings
+        var settings = $.extend({
+            definitions: {
+				9: "[0-9]",
+				a: "[A-Za-z]",
+				"*": "[A-Za-z0-9]"
+			},
+			placeholder: "",
+			digit : "9",
+			character : "a",
+			allChar : "*"
+        });
+		var maskStr = str;
+		
+		//fill first non-definitions characters
+		function _fillInitialData(thisObj) {
+			var tempChar;
+			var tempCount=0;
+			for(var counter=0;counter<maskStr.length;counter++) {
+				tempChar = maskStr.charAt(counter);
+				if(tempChar!=settings.digit && tempChar!=settings.character && tempChar!=settings.allChar) {
+					tempCount=tempCount+1;
+				} else {
+					break;
+				}
+			}
+			if(tempCount>0) {
+				thisObj.val(maskStr.substring(0,tempCount));
+			}
+		}
+		
+		function _checkKeyCode(key, keyType) {
+			//return true for backspace and tab
+			if(key==8 || key==9) {
+				return true;
+			}
+			if(keyType==settings.digit) {
+				if(key >=48 && key <= 57) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if(keyType==settings.character) {
+				if(key >=65 && key <= 90) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if(keyType==settings.allChar) {
+				if((key >=65 && key <= 90) || (key >=48 && key <= 57)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		
+		$(this).keydown(function(e){
+		
+			//first validate entered value
+			var current = $(this);
+			var value = current.val();
+			var len = value.length;
+			maskStr.substring(len, len+1);
+			
+			//add any character if required
+			
+			//validate key code against definitions
+			var key = e.which;
+			return _checkKeyCode(e.which,settings.digit);
+		});
+		
+		$(this).blur(function(e){
+			if($(this).val().length != maskStr.length) {
+				$(this).val('');
+			}
+		});
+		
+		$(this).bind("paste",function(e) {
+			 e.preventDefault();
+		});
+		
+		$(this).bind("focusin",function(e) {
+			if($(this).val()=="") {
+				_fillInitialData($(this));
+			}
+		});
+		
+        return this;
+    };
+
+}( jQuery ));
+</script>
+<body>
+<script>
+    $(document).ready(function(){
+       $("input.mytag").hcmask("()@#aa");
+    });
+</script>
+aa
+<input type="text" id="myId" class="mytag">
+bb
+<input type="text" id="myId1" />
+</body>
+</head>
+
+</html>
