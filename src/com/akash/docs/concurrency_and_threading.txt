@@ -54,7 +54,6 @@ While one thread is iterating over set other thread may add new elements.
 
 
 ====================================
-
 @NotThreadSafe
 public class UnsafeSequence {
 	private int value;
@@ -109,6 +108,9 @@ public class UnsafeCountingFactorizer implements Servlet {
 	}
 }
 
+thread 1 : get count(0)		---		inc 0 to 1		----	set count(1)
+thread 2 : 							get count(0)	----	inc 0 to 1		---		set count(1)
+thread 3 : 													get count(1)	---		inc 1 to 2 		---		set count(2)
 
 it is not atomic, which
 means that it does not execute as a single, indivisible operation. Instead, it is a
@@ -405,6 +407,39 @@ visible to A prior to writing to the volatile variable become visible to B after
 reading the volatile variable.
 
 
+variables are copied from main memory to cpu cache and then processed by cpu registers.
+If we have more than 1 cpu,
+then 2 threads processed by different cpu, have different cpu cache for same variable.
+
+
+
+____________			_____________________
+|			|			|					|
+|	CPU	1	|			|	CPU 1 cache  	|
+|_Registers_|			|___________________|
+
+												-------------> Main Memory
+
+____________			_____________________
+|			|			|					|
+|	CPU	2	|			|	CPU 2 cache  	|
+|_Registers_|			|___________________|
+
+
+When not using volatile variable, we do not know when cpu cache value is written back to main memory.
+
+NOTE :
+Making a variable volatile is not enough.
+If a variable is read and written by many threads, then we may fall in a race condition.
+For example Read-Modify-Write scenario.
+
+To overcome this we have 2 solutions:
+(1)Use synchronized keyword
+(2)Use AtomicLong or AtomicRefrence  which are classes in java.util.concurrent package
+
+
+----------
+
 Publishing and escape :
 
 Publishing an object means making it available to code outside of its current scope,
@@ -442,6 +477,30 @@ Do not allow the this reference to escape during construction.
 
 https://stackoverflow.com/questions/12467101/how-this-escapes-from-a-published-inner-class/12467202#12467202
 http://www.ibm.com/developerworks/java/library/j-jtp0618/index.html
+
+
+public class ThisEscape {
+
+    public Integer i = 47;
+
+    public ThisEscape(EventSource source) {
+            source.registerListener(
+                    new EventListener() {
+                            ThisEscape outerRef = ThisEscape.this;//added by compiler
+                            public void onEvent(Event e) {
+                                    doSomething(e);
+                            }
+                    });
+    }
+}
+
+public class EventSource {
+    public void registerListener(EventListener listener) {
+        
+    }
+}
+
+
 Problem with this approach is that, you can have a situation where inner class will use your class object
  and your class object is still in construction. Same problem exists with starting thread from constructor.
  
@@ -546,6 +605,8 @@ class Thread {
 	ThreadLocal.ThreadLocalMap threadLocals = null;
 }
 
+//Every thread has its own map.
+
 class ThreadLocal {
 
 	get() OR set() {
@@ -621,7 +682,16 @@ properties of Immutable class :
 ->hashcode of immutable objects must be cashed
 
 
-===================================================================================
 
-=====Chapter 4======
+====================================================================================================
+
+Spring transactions
+Refrences in java
+
+============Chapter 4===========
+
+The design process for a thread-safe class should include these three basic elements:
+• Identify the variables that form the object’s state;
+• Identify the invariants that constrain the state variables;
+• Establish a policy for managing concurrent access to the object’s state.
 
