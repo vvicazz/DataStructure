@@ -1,38 +1,63 @@
-public class MyCallable implements Callable<String> {
-	
-	public String call() throws Exception {
-		...
-	}
-}
+Runnable - run()
+Callable - call()
 
+1. call() can return a value but run() cannot
+2. call() can throw exception but run() cannot
 
-(1)
-//ThreadPoolExecutor class instance for ExecutorService
+ExecutorService es = Executors.newFixedThreadPool(...);
 
-ExecutorService executor = Executors.newFixedThreadPool(10);
-List<Future<String>> list = new ArrayList<Future<String>>();
+		public static ExecutorService newFixedThreadPool(int nThreads) {
+			return new ThreadPoolExecutor(nThreads, nThreads,
+										  0L, TimeUnit.MILLISECONDS,
+										  new LinkedBlockingQueue<Runnable>());
+		}
 
-(2)
-Future<String> future = executor.submit(new Callable());
-
-==>ThreadPoolExecutor.submit()
-create new RunnableFuture
-execute RunnableFuture
-assign a thread from worker pool
-
-(3)
-  Future		(I)
+Executor.java (I) 			--> execute()
 	|
-RunnableFuture	(I)
+ExecutorService.java (I) 	--> submit(Callable) , submit(Runnable) , invokeAll(Collection<Callable>)
+	|
+ThreadPoolExecutor.java (C)
+
+		Future<T> submit(Callable<T> task) {
+			RunnableFuture<T> ftask = newTaskFor(task);
+			execute(ftask);
+			return ftask
+		}
+		
+		->create new RunnableFuture
+		->execute RunnableFuture
+		->assign a thread from worker pool
+
+
+
+Future		(I)			--> get() , cancel() , isDone() , isCancel()
+	|
+RunnableFuture	(I)		--> run()	//Runnable version of Future
 	|
 FutureTask		(C)
 
 
-future.get()	--> 	FutureTask.get() method is called
 
-->checks if this thread is completed
-->if no then this method goes for wait
-->if yes it returns the output
+	get() --> check if current thread is NEW or RUNNING
+				if yes then wait
+				if no then
+					if success return result
+					else if interrupted return InterruptedException
+					else return the actual exception occurred
+					
+	
+---------------	
+		
+**Example :
+					
+Class MyCallable implements Callable<String> {
+	public String call() {
+		return "hello";
+	}
+}		
+ExecutorService es = Executors.newFixedThreadPool(10);
+Future<String> fut = es.submit(new MyCallable());
+String result = fut.get();
 
 
 ================================================================
