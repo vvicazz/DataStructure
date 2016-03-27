@@ -16,7 +16,7 @@ For executing multiple statements, we have to call setAutoCommit(false)
 conn.commit();
 conn.rollback();
 
-SavePoint : points in transactions that can be commited or rollback separatly.
+SavePoint : points in transactions that can be committed or rollback separately.
 
 
 =======================================================
@@ -37,9 +37,15 @@ flush : transfer data to DB but do not commit
 commit : transfer data to DB and commit
 
 (Q)When flush() method is executed?
-flush() called
-commit called
-query executed, when any query(HQL,native,named,Criteria) executed session data is flush to avoid getting Stale objects.
+
+(1)flush() called
+(2)commit called
+(3)Before running a query, when any query(HQL,native,named,Criteria) executed session data is flush to avoid getting Stale objects.
+Only those dirty objects are flushed before running a query that are included in query.
+
+
+http://hedleyproctor.com/2014/08/understanding-hibernate-session-flushing/
+
 
 FlushMode : 
 Manual	: call manualy only
@@ -60,7 +66,7 @@ How Transactional works in Spring
 EntityManager proxy class which will operate jpa/hibernate operations.
 SharedEntityManagerInvocationHandler is the proxy class.
 
-class SharedEntityManagerInvocationHandler implements InvocationHandler
+class SharedEntityManagerInvocationHandler implements java.lang.reflect.InvocationHandler
 
 public Object invoke(Object proxy,Method method,Object[] arrgs) {
 ...
@@ -112,3 +118,7 @@ If a checked exception occurs inside a transaction method, it will never be roll
 (2)Control will go to line 5
 (3)control will go to line 6 -> which transfer control to SharedEntityManagerInvocationHandler.invoke
 
+
+@PersistenceContext
+
+http://tomee.apache.org/jpa-concepts.html

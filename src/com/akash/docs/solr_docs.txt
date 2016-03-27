@@ -61,3 +61,11 @@ schema.xml
 
 
 managed-schema is used instead of schema.xml file to specify the schema.
+
+
+
+
+=====================================================================================
+
+Installation and use of solr 5.4 on windows
+
