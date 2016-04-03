@@ -1,0 +1,153 @@
+Lambda expressions
+
+https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
+https://docs.oracle.com/javase/tutorial/collections/streams/index.html
+http://viralpatel.net/blogs/lambda-expressions-java-tutorial/
+
+pass functionality as an argument to another method
+pass code as data
+
+to use a lambda expression, you need to implement a functional interface.
+
+@FunctionalInterface
+ 
+function interface has exactly one abstract method.
+Note that instances of functional interfaces can be created with lambda expressions, method references, or constructor references.
+
+
+public static void printPersons(
+    List<Person> roster, CheckPerson tester) {
+    for (Person p : roster) {
+        if (tester.test(p)) {
+            p.printPerson();
+        }
+    }
+}
+
+
+(1)
+class implementing functional interface
+
+interface CheckPerson {
+    boolean test(Person p);
+}
+
+class CheckPersonEligibleForSelectiveService implements CheckPerson {
+    public boolean test(Person p) {
+        return p.gender == Person.Sex.MALE &&
+            p.getAge() >= 18 &&
+            p.getAge() <= 25;
+    }
+}
+
+printPersons(
+    roster, new CheckPersonEligibleForSelectiveService());
+	
+	
+(2)
+Anonymous class
+
+printPersons(
+    roster,
+    new CheckPerson() {
+        public boolean test(Person p) {
+            return p.getGender() == Person.Sex.MALE
+                && p.getAge() >= 18
+                && p.getAge() <= 25;
+        }
+    }
+);
+
+
+(3)
+Lambda expression
+
+printPersons(
+    roster,
+    (Person p) -> p.getGender() == Person.Sex.MALE
+        && p.getAge() >= 18
+        && p.getAge() <= 25
+);
+
+Lambda expression is passed as code implementation of CheckPerson interface.
+Java has defined various functional interfaces in java.util.function package
+
+printPersons() method definition can be changed to functional interface defined by java 
+
+eg:
+
+public static void printPersonsWithPredicate(
+    List<Person> roster, Predicate<Person> tester) {
+    for (Person p : roster) {
+        if (tester.test(p)) {
+            p.printPerson();
+        }
+    }
+}
+
+interface Predicate<T> {
+    boolean test(T t);
+}
+
+(4)
+Multiple functional interfaces in a single method 
+
+public static <X, Y> void processElements(
+    Iterable<X> source,
+    Predicate<X> tester,
+    Function <X, Y> mapper,
+    Consumer<Y> block) {
+    for (X p : source) {
+        if (tester.test(p)) {
+            Y data = mapper.apply(p);
+            block.accept(data);
+        }
+    }
+}
+
+processElements(
+    roster,
+    p -> p.getGender() == Person.Sex.MALE
+        && p.getAge() >= 18
+        && p.getAge() <= 25,
+    p -> p.getEmailAddress(),
+    email -> System.out.println(email)
+);
+
+
+(5) Using aggregate operations :
+
+roster
+    .stream()
+    .filter(
+        p -> p.getGender() == Person.Sex.MALE
+            && p.getAge() >= 18
+            && p.getAge() <= 25)
+    .map(p -> p.getEmailAddress())
+    .forEach(email -> System.out.println(email));
+
+
+operations filter, map, and forEach are aggregate operations. 
+Aggregate operations process elements from a stream
+
+======================================================================================
+
+java.util.stream framework :
+
+interface Collection {
+
+	default Stream<E> stream() {
+        return StreamSupport.stream(new IteratorSpliterator<>(this,0), false);
+    }
+}
+
+
+public final class StreamSupport {
+	public static <T> Stream<T> stream(Spliterator<T> spliterator, boolean parallel) {
+        Objects.requireNonNull(spliterator);
+        return new ReferencePipeline.Head<>(spliterator,
+                                            StreamOpFlag.fromCharacteristics(spliterator),
+                                            parallel);
+    }
+}
+
