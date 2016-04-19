@@ -4,7 +4,12 @@ public class BitOperation {
 
 	public static void main(String args[]) {
 		
+		//get negative of a number:
+		//1. find its one's complement by reversing all digits
+		//2. find its two's complement by adding 1 to it.
+		
 		int x=-1;
+		System.out.println(Integer.toBinaryString(x));
 		System.out.println(x>>5);	//-1
 		System.out.println(x<<31);	//-2147483648
 		System.out.println(x<<33);	//-1
