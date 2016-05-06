@@ -3,6 +3,9 @@ package com.akash.sorting.algo;
 import java.util.Arrays;
 
 /**
+ * http://courses.csail.mit.edu/6.006/fall07/handouts/H18-quiz2-practice-solutions.pdf
+ * 
+ * 
  * Heap is a complete binary tree implemented as array. <br>
  * Two types of heap : min heap , max heap. <br>
  * max heap --> A[parent] >= A[child] <br>
