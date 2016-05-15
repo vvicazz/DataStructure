@@ -1,0 +1,47 @@
+
+***http://kafka.apache.org/documentation.html#gettingStarted
+***https://www.quora.com/What-is-the-actual-role-of-ZooKeeper-in-Kafka
+**https://cwiki.apache.org/confluence/display/KAFKA/Kafka+data+structures+in+Zookeeper
+
+https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying
+
+
+https://www.youtube.com/watch?v=cCP7RGAhXos
+https://zookeeper.apache.org/doc/trunk/
+
+
+---------------------------------------
+
+
+1 topic has various partitions
+each partition can be replicated on various servers
+for a partition, one server can act as leader and other as follower
+If one leader fails, one of the follower will become leader
+
+producer decides which message is transferred to which partition of the topic
+
+queueing : message stores the info about which consumer they have to sent 
+
+publisher-subscriber : message is sent to all subscribers who are registered with a particular pipeline
+
+kafka : partition contains info about subscriber to which message to be sent,one topic may have various partitions
+
+ordering of messages is maintained per partition
+If we want a total ordering of messages,then this can be achieved by having one partition in a topic.
+
+
+----------------------
+
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+bin\windows\kafka-server-start.bat config\server.properties
+
+bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+
+bin\windows\kafka-topics.bat --list --zookeeper localhost:2181
+
+bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
+
+
+bin\windows\kafka-console-consumer.bat --zookeeper localhost:2181 --topic test --from-beginning
+
