@@ -29,11 +29,22 @@ remove()
 
 (Q)Difference b/w merge() and update() ?
 Ans : 
-update will fire only one sql for update
+-->update will fire only one sql for update
 merge will first fire select (if entity is not loaded) and then update
 
-update will throw exception if identifier not found
+-->update will throw Exception if identifier not found
 merge will add a new row if identifier not found
+
+-->Merge creates a new instance of your entity, copies the state from the supplied entity,
+ and makes the new copy managed.
+The instance you pass in will not be managed (any changes you make will not be part of the transaction
+ unless you call merge again).
+
+-->method signature
+public void update(Object object);
+public Object merge(Object object);
+
+
 
 (Q)Difference b/w get() and load() ?
 Ans :
@@ -44,6 +55,10 @@ load() will return a proxied object.
 
 get() can be used to check if entity exists in DB or not.
 It returns null if not found
+
+session.get(MyEntity.class, 1L);							//sql query is fired
+MyEntity objFromLoad = session.load(MyEntity.class, 1L);	//No sql query is fired
+objFromLoad.getName();										//Sql query is fired if object is not is session cache
 
 
 (Q)What is N+1 problem and how to resolve it ?
