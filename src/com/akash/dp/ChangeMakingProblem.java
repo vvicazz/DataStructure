@@ -1,4 +1,4 @@
-package com.akash.dp.coindenomination;
+package com.akash.dp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
