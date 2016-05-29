@@ -1,0 +1,45 @@
+mongodb course :
+
+http://stackoverflow.com/questions/3778428/best-way-to-store-date-time-in-mongodb
+
+data type defined by json spec :
+String,array,number,object
+
+communication bw mongodb driver and server of is done via BSON.
+BSON is binary format of JSON (javascript object notation).
+BSON is Lightweight and efficient.
+
+Date is not supported in BSON.
+javascript Date and ISODate are supported.
+
+
+Queries :
+
+help
+show dbs
+show collections
+use databaseName
+db.collectionName.insert({"name":"akash", "age":20});
+db.collectionName.insertOne({"name":"akash", "age":20});
+db.collectionName.insert({});
+db.collectionName.find()
+db.collectionName.find().pretty()
+db.collectionName.findOne()
+db.collectionName.find({"name":"akash"})
+
+find() method returns a cursor object.Which means we can iterate on the cursor to traverse each object.
+var cursor = db.collectionName.find();
+cursor.hasNext()
+cursor.next()
+
+(Q) To embed data in a single collection or create a seperate collection
+
+1 Post can have many tags
+1 post can have many comments
+authors can have seoerate collection 
+
+-->comments can be saved within post because comments cannot be used independently without post
+-->Size of a document limits to 16 MB.
+
+indexing is supported in sub-document and array elements.
+

@@ -1,0 +1,66 @@
+http://www.onjava.com/pub/a/onjava/2005/01/26/classloading.html
+http://stackoverflow.com/questions/6519003/what-is-the-purpose-of-the-java-class-loader
+http://www.javaworld.com/article/2077260/learn-java/learn-java-the-basics-of-java-class-loaders.html
+http://www.journaldev.com/349/java-interview-questions-understanding-and-extending-java-classloader
+
+
+java files are compiled by javac tool and converted to class files.
+JVM loads class files at runtime using ClassLoader.
+
+ClassLoader classLoader = ClassName.class.getClassLoader();
+
+if class is loaded by bootstrap then classLoader=null
+if class is loaded by Extension then classLoader=sun.misc.Launcher$ExtClassLoader@4e0e2f2a
+if class is loaded by Application then classLoader=sun.misc.Launcher$AppClassLoader@4e0e2f2b
+
+delegation
+uniqueness
+visibility
+
+Each and every class is loaded by some instance of a java.lang.ClassLoader
+Bootstrap classloader is implemented as native and different for different jvm environments.
+
+
+(Q) As an object is created for class sun.misc.Launcher$ExtClassLoader,which classLoader loaded this class?
+Ans : Bootstrap classloader
+
+(Q)Can one classloader have more than one child classloaders?
+
+(Q)Can two classes with same name and same package be loaded with different classLoaders?
+com.mypkg.MyClass - App classLoader
+com.mypkg.MyClass - Ext classLoader
+
+When a class is loaded by different classloaders result in two different objects that cannot be cast to each other.
+Target t1 = ... 	//loaded by one classLoader
+Target t2 = ... 	//loaded by second classLoader
+t1 = (Target) t2; 	//ClassCastException
+
+(Q)  How loadClass(String name, boolean resolve) method in ClassLoader works ?
+
+1. It applies a synchronized lock on a map
+2. Then it checks if Class class object has been already loaded by this class loader.
+    findLoadedClass(String) this method uses native method to check if loaded class already exist in bootstrap
+3. Check for loadClass() of parent.hence it goes recursively to loadClass() of each parent.
+4. If still it is not found call findClass(String name) method.
+	In AppClassLoader class, findClass() method reads byte array data from class file
+	URLClassLoader.findClass()
+				|
+				|
+	URLClassLoader.defineClass()
+				|
+				|
+	SecureClassLoader.defineClass()
+				|
+				|
+	ClassLoader.defineClass()
+				|
+				|
+	ClassLoader.defineClass1()    // it is a native method,which takes byte array of class file and returns Class class object.
+									// we also need to store these this Class class object against class name inside a map.
+									
+
+
+http://www.journaldev.com/349/java-interview-questions-understanding-and-extending-java-classloader
+
+(Q) Why to create custom classloader ?
+(Q) What is the need for classLoader in java ?
