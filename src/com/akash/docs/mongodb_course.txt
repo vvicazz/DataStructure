@@ -43,3 +43,165 @@ authors can have seoerate collection
 
 indexing is supported in sub-document and array elements.
 
+========================================================================================
+
+Week 2 :
+
+insertOne({})
+insertMany([ {},{} ] , { "ordered" : false });
+//by default ordered is true
+
+db.collectionName.drop();		//drop collection
+
+mongodb uses _id field in every collection as a primary index.
+
+===========================================================================================
+
+Equality matches documents :
+
+{"name" : "abc" , "stars" : ["abc","xyz"], "params" : { "rating" : 4 , "country" : ["India","Auz"] } }
+
+(1) Scalar search
+db.coll.find({ "name" : "abc" })
+
+(2)search for nested/embedded document === Dot notation
+db.coll.find({ "params.rating" : 5 })
+
+searching in an array :
+(1)exact match with array : elements and their order must have exact match
+(2)searching if element exist in array
+(3)searching if element exist in array at particular index
+(4) Array operator => $all , $size , $elemMatch
+	$all : checks if all specified elements present in any document
+	$size : checks if array has a size as specified
+	$elemMatch : when array contains document and we want to check against multiple fields in that document
+
+db.coll.find({ "params.country" : ["Auz","US"] })
+
+db.coll.find({ "params.country" : "India" })		//this is similar to selector to scalar values
+
+db.coll.find({ "params.country.0" : "India" })
+
+db.BCBS_configuration.find({"data.value.permissions" : { $all : ["AddRecurringInfo","AdminAddRecurringInfo"] } }).count();
+
+db.BCBS_configuration.find({"data.value.permissions" : { $size : 6 } }).count();
+
+
+
+=>Cursor and projection :
+
+Cursor returned from find are in batch.Batch is returned on the basis of max size of Bson document.
+Generally size of batch is 100.
+
+var cur = db.coll.find();
+var doc = function() { return cur.hasNext() ? cur.next() : null }
+cur.objsLeftInBatch();
+doc();
+
+projection is the second document specified in find query
+
+db.coll.find({ "name" : "abd" } , { stars:1, _id:0, params:1 })
+
+=============================================================================================
+
+comparison operators: 
+db.coll.find({ "params.rating" : {$gt : 5 , $lt : 10} , });
+
+$gt
+$gte
+$lt
+$lte
+$ne
+$in
+$nin
+
+
+(Q)find distinct data.type entries
+
+db.BCBS_configuration.find().count();
+282
+
+db.BCBS_configuration.distinct("data.type");
+[ "UI", "type1", "SYSTEM" ]
+
+db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"UI"}}] }).count();
+212
+
+db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"SYSTEM"}}] }).count();
+7
+
+db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"type1"}}] }).count();
+1
+
+Q)find all entries which have no data.type
+
+db.BCBS_configuration.find({ $and : [{"data.type" : {$ne:"UI"}},{"data.type" : {$ne:"SYSTEM"}},{"data.type":{$ne:"type1"}}] }).count();
+62
+
+
+=============================================================================================
+
+Element operators :
+
+$exists			-->  if field exists
+$type			-->  checks for type of a field
+
+db.BCBS_configuration.find({"data.type":{$exists:false} }).count();
+62
+
+db.BCBS_configuration.find({"data.type":{$type:"string"}}).count();
+220
+
+===========================================================================================
+
+logical operators :
+
+$or
+$and
+$nor
+$not
+
+
+=============================================================================================
+
+Array operators : 
+$all
+$size
+$elemMatch
+
+=============================================================================================
+
+Update documents :
+
+db.coll.updateOne({"name":"abc"} , { $set : {"feature" : "xyz"} });
+
+db.BCBS_configuration.updateOne( {"data.type":"UI"}, {$set : {"data.value":{"permissions": ["AddPI"] }}} );
+
+db.BCBS_configuration.updateOne( {"data.type":"UI"}, {$set : {"data.value.attr":"smart"}} );
+
+https://docs.mongodb.com/manual/reference/operator/update/ 
+
+update operators for fields:
+
+$set
+$inc
+$mul
+$reset
+$min
+$max
+$rename
+$currentDate 
+
+update operators for array:
+
+==========================================================
+
+mongorestore dump
+
+mongoimport -d students -c grades < grades.json
+
+db.grades.aggregate({'$group':{'_id':'$student_id', 'average':{$avg:'$score'}}}, {'$sort':{'average':-1}}, {'$limit':1})
+
+db.grades.find( {}, {} ).sort( { 'student_id' : 1, 'score' : 1, } ).limit( 5 )
+
+db.grades.aggregate([ {$sort:{student_id:1, score:1}} ]);
