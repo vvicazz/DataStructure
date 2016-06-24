@@ -1,0 +1,497 @@
+https://docs.oracle.com/cd/B19306_01/server.102/b14220/consist.htm
+
+(Q)How indexes increase performance in sorting?
+
+
+mongodb performance
+
+increase mongodb performance :
+1)create index
+2)sharding
+
+mongodb has its own storage engine for storing data on disk.
+
+pluggable storage engine = 3.0 version
+
+driver ----- server ----- storage engine ----- Disk
+									\          /
+									 \        /
+									   Memory
+									   
+
+
+Two types of storage engine :
+MMAP  		-> by mongodb -- default
+wired tiger -> 
+
+Storage engine do not impact
+1)server communication / cluster architecture
+2)data api driver
+
+Storage engine effects :
+1)Data stored on disk
+2)format of indexes
+
+Its task is fetch and retrieve data from disk in a fast manner.
+It uses virtual memory to make things faster.
+
+===================
+
+MMAP v1 
+
+It internally uses Mmap system call.
+
+Server  ==== virtual memory  ======   Disk 
+
+copy of some pages are stored in virtual memory for fast accessing.
+if page is not found in VM then it is fetched from disk.
+
+properties :
+1)Collection level locking
+2)page size is in the power of 2
+3)In place updates
+
+==========================
+
+Wired Tiger :
+
+1)Document level concurrency
+2)documents are not in power of 2
+3)No in place updates
+3)Compression of data and indexes
+
+mongod -dppath WT -storageEngine wiredtiger
+
+============================
+
+indexes :
+
+indexes are stored in BTREE data structure.
+
+data which is indexed are stored in different memory in sorted order and then it is easy to search it using binary search.
+
+==>indexes are created as
+(A,B,C)
+
+index will work if query would be in following manner :
+(A) , (A,B) , (A,B,C)
+
+Because the sorting of data in memory is according to the full index where ordering priority is given to first column
+
+index will not work on 
+(C) , (B,C)
+
+partial indexing will work on :
+(A,C)
+A will be searched in index and C will be searched full on A's result
+
+===>index created as
+(B)
+
+(B) will use indexing
+(A,B) will use partial indexing
+
+
+NOTE : writes slower , read faster.
+That is why all columns are not indexed.
+
+=================
+
+db.coll.createIndex({name:1, marks:-1});
+
+-->db.coll.explain().find({'name':'abc'});
+
+winningPlan.stage : COLLSCAN , IXSCAN
+winningPlan.isMultiKey
+indexName if exists
+
+
+-->db.coll.explain(true).find({'name':'abc'});
+
+explain with true actually executes the query
+executionStats.docsExamined  --> shows how many documents actually examined
+
+db.coll.getIndexes();
+
+By default _id field has index and we cannot delete it.
+
+db.coll.dropIndex({name:1});
+
+In previous version before 3.0 , separate collection was there to see indexes.
+That command will not work with wired tiger.
+
+====================
+
+multikey indexes : when compound index has one column as array
+
+{name:'abc', tags : ['A' , 'B'] , phone : ['C', 'D']}
+
+valid indexes : (tags) , (tags,name)
+invalid indexes : (tags,phone)
+
+Array elements in indexes have Cartesian product.
+compound index cannot contain more than one array elements.
+
+
+
+***
+{A:[1,2] , B:1}
+{A:2 , B:[2,4]}
+For above two documents an index of (A,B) is valid.
+
+If we try :
+
+{A:[] , B:[]}
+NOTE : cannot index parralel arrays.
+
+=======================
+
+dot notation for indexes : when array contains documents.
+
+{ scores : [ {score:20, sub:'A'} {score:21, sub:'B'}]}
+
+db.coll.createIndex({"scores.score":1});
+
+=====================
+
+covered queries :
+
+if documentExamined is zero, i.e. data is searched in index and returned from the index itself and not need to fetch the document.
+
+(a:1,b:1) is the index 
+
+db.coll.find({a:1},{_id:0,a:1,b:1});    will be
+
+db.coll.find({a:1},{_id:0});           will not be
+
+========================
+
+indexing in sorting :
+
+index = (a:1)
+sort = (a:1) , (a:-1)
+
+index = (a:1,b:1)
+sort = (a:1,b:1) , (b:1,a:1) , (a:-1,b:-1)
+
+index = (a:1,b:1,c:1)
+sort = (a:1) , (a:1,b:1) , (a:1,b:1,c:1)
+
+(Q) How indexing helps in sorting?
+http://stackoverflow.com/questions/36142299/how-does-sorting-with-an-index-work-in-mongodb
+
+When result of a query returned, mongodb operates in memory to sort these objects.
+When result of a query returned from indexes, then sorting logic can use the same index to sort but it depends on the query.
+
+If result of the query by indexes already sorts the required sorting logic then it is good , else it will go for in memory processing.
+
+db.coll.createIndex({a:1.b:1,c:1})
+
+db.coll.find({a:3}).sort({b:1});			//query use index , sort use index
+db.coll.find({a:10,b:20}).sort({c:1});		//query use index , sort use index
+db.coll.find({a:10}).sort({c:1});			//query use index , sort not use index
+db.coll.find({a : {$gt:20} }).sort({b:1});	//query use index , sort not use index
+
+==========================
+
+unique index : index that constraints that value must be unique and also must have a value i.e. must not be null
+
+db.coll.createIndex({a:1}, {unique:true});
+
+====================
+
+sparse index : index keys are missing in some documents
+
+applying unique on sparse index
+
+{a:1, b:2, c:3}
+
+{a:4,b:5}
+
+{unique:true,sparse:true}
+
+Note: sparse index uses COLLSCAN i.e. full collection scan
+It uses less memory
+Can store null values for indexes
+
+==========================
+
+foreground and background indexes
+
+BG : fast, blocks db queries
+
+FG : slow , do not block, add indexes in queue
+
+db.coll.createIndex({a:1}, {background:true});
+
+========================
+
+explain :
+
+var exp = db.example.explain(); exp.find( { a : 1, b : 2 } )
+db.example.explain().find( { a : 1, b : 2 } )
+curs = db.example.find( { a : 1, b : 2 } ); curs.explain()
+db.example.find( { a : 1, b : 2 } ).explain()
+db.example.explain().remove( { a : 1, b : 2 } )
+
+
+===========================
+
+queryPlanner
+executionStatus
+allPlansExecution
+
+verbosity increases as we go down.
+
+Rule : 
+All indexes must be used
+All queries must use index
+There must be a balance in both two.
+
+==============================
+
+mongodb analyse the query and checks which indexes can be used as candidate indexes.
+These indexes all run in parallel having their own queryplan.
+The thread that reach fastest goal state will be selected.
+A cache is used by mongodb , which stores queryplan for future use.
+when this cache is cleared:
+-mongod process restarted
+-index added or removed
+-after threshold writes
+-rebuild the index
+
+================================
+
+db.coll.stats();
+db.coll.totalIndexSize()
+
+wired tiger supports prefix compression : so it compresses index also.
+wiredtigerindexprefixcompression
+
+types of indexes :
+regular
+sparse
+multikey
+
+==========
+
+{name:'' , location : [20,20]}
+{name:'' , location : [10,-10]}
+
+db.coll.ensureIndex({'location':'2d' , type:1})
+
+db.coll.find({location : {$near : [50,50] } });
+
+
+
+==========================
+
+> db.tweets.explain("executionStats").find( { "user.followers_count" : { $gt : 1000 } } ).limit(10).skip(5000).sort( { created_at : 1 } )
+{
+    "queryPlanner" : {
+        "plannerVersion" : 1,
+        "namespace" : "twitter.tweets",
+        "indexFilterSet" : false,
+        "parsedQuery" : {
+            "user.followers_count" : {
+                "$gt" : 1000
+            }
+        },
+        "winningPlan" : {
+            "stage" : "LIMIT",
+            "limitAmount" : 0,
+            "inputStage" : {
+                "stage" : "SKIP",
+                "skipAmount" : 0,
+                "inputStage" : {
+                    "stage" : "FETCH",
+                    "filter" : {
+                        "user.followers_count" : {
+                            "$gt" : 1000
+                        }
+                    },
+                    "inputStage" : {
+                        "stage" : "IXSCAN",
+                        "keyPattern" : {
+                            "created_at" : -1
+                        },
+                        "indexName" : "created_at_-1",
+                        "isMultiKey" : false,
+                        "direction" : "backward",
+                        "indexBounds" : {
+                            "created_at" : [
+                                "[MinKey, MaxKey]"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "rejectedPlans" : [ ]
+    },
+    "executionStats" : {
+        "executionSuccess" : true,
+        "nReturned" : 10,
+        "executionTimeMillis" : 563,
+        "totalKeysExamined" : 251120,
+        "totalDocsExamined" : 251120,
+        "executionStages" : {
+            "stage" : "LIMIT",
+            "nReturned" : 10,
+            "executionTimeMillisEstimate" : 500,
+            "works" : 251121,
+            "advanced" : 10,
+            "needTime" : 251110,
+            "needFetch" : 0,
+            "saveState" : 1961,
+            "restoreState" : 1961,
+            "isEOF" : 1,
+            "invalidates" : 0,
+            "limitAmount" : 0,
+            "inputStage" : {
+                "stage" : "SKIP",
+                "nReturned" : 10,
+                "executionTimeMillisEstimate" : 500,
+                "works" : 251120,
+                "advanced" : 10,
+                "needTime" : 251110,
+                "needFetch" : 0,
+                "saveState" : 1961,
+                "restoreState" : 1961,
+                "isEOF" : 0,
+                "invalidates" : 0,
+                "skipAmount" : 0,
+                "inputStage" : {
+                    "stage" : "FETCH",
+                    "filter" : {
+                        "user.followers_count" : {
+                            "$gt" : 1000
+                        }
+                    },
+                    "nReturned" : 5010,
+                    "executionTimeMillisEstimate" : 490,
+                    "works" : 251120,
+                    "advanced" : 5010,
+                    "needTime" : 246110,
+                    "needFetch" : 0,
+                    "saveState" : 1961,
+                    "restoreState" : 1961,
+                    "isEOF" : 0,
+                    "invalidates" : 0,
+                    "docsExamined" : 251120,
+                    "alreadyHasObj" : 0,
+                    "inputStage" : {
+                        "stage" : "IXSCAN",
+                        "nReturned" : 251120,
+                        "executionTimeMillisEstimate" : 100,
+                        "works" : 251120,
+                        "advanced" : 251120,
+                        "needTime" : 0,
+                        "needFetch" : 0,
+                        "saveState" : 1961,
+                        "restoreState" : 1961,
+                        "isEOF" : 0,
+                        "invalidates" : 0,
+                        "keyPattern" : {
+                            "created_at" : -1
+                        },
+                        "indexName" : "created_at_-1",
+                        "isMultiKey" : false,
+                        "direction" : "backward",
+                        "indexBounds" : {
+                            "created_at" : [
+                                "[MinKey, MaxKey]"
+                            ]
+                        },
+                        "keysExamined" : 251120,
+                        "dupsTested" : 0,
+                        "dupsDropped" : 0,
+                        "seenInvalidated" : 0,
+                        "matchTested" : 0
+                    }
+                }
+            }
+        }
+    },
+    "serverInfo" : {
+        "host" : "generic-name.local",
+        "port" : 27017,
+        "version" : "3.0.1",
+        "gitVersion" : "534b5a3f9d10f00cd27737fbcd951032248b5952"
+    },
+    "ok" : 1
+}
+
+===================================================
+
+
+
+> db.products.getIndexes()
+[
+    {
+        "v" : 1,
+        "key" : {
+            "_id" : 1
+        },
+        "ns" : "store.products",
+        "name" : "_id_"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "sku" : 1
+        },
+                "unique" : true,
+        "ns" : "store.products",
+        "name" : "sku_1"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "price" : -1
+        },
+        "ns" : "store.products",
+        "name" : "price_-1"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "description" : 1
+        },
+        "ns" : "store.products",
+        "name" : "description_1"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "category" : 1,
+            "brand" : 1
+        },
+        "ns" : "store.products",
+        "name" : "category_1_brand_1"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "reviews.author" : 1
+        },
+        "ns" : "store.products",
+        "name" : "reviews.author_1"
+    }
+]
+
+==============================
+
+Now query the profile data, looking for all queries to the students collection in the database school2, sorted in order of decreasing latency. What is the latency of the longest running operation to the collection, in milliseconds?
+
+
+In this problem you will analyze a profile log taken from a mongoDB instance. Query the profile data, looking for all queries to the students collection in the database school2, sorted in order of decreasing latency. What is the latency of the longest running operation to the collection, in milliseconds?
+
+
+$ mongo
+> db.profile.find({ op:"query", ns:/school2.students/})
+            .sort({ millis: -1}).limit( 1)
+{ "_id" : ObjectId("531604231f113c79eae77957"), "ts" : ISODate("2012-11-20T20:09:49.862Z"), "op" : "query", "ns" : "school2.students", "query" : { "student_id" : 80 }, "ntoreturn" : 0, "ntoskip" : 0, "nscanned" : 10000000, "keyUpdates" : 0, "numYield" : 5, "lockStats" : { "timeLockedMicros" : { "r" : 19776550, "w" : 0 }, "timeAcquiringMicros" : { "r" : 4134067, "w" : 5 } }, "nreturned" : 10, "responseLength" : 2350, "millis" : 15820, "client" : "127.0.0.1", "user" : "" }
+
+
+db.profile.find({ op:"query", ns:/school2.students/}).sort({ millis: -1}).limit( 1)
