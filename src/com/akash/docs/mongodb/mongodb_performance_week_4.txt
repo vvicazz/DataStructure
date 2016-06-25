@@ -192,6 +192,8 @@ db.coll.find({a:10,b:20}).sort({c:1});		//query use index , sort use index
 db.coll.find({a:10}).sort({c:1});			//query use index , sort not use index
 db.coll.find({a : {$gt:20} }).sort({b:1});	//query use index , sort not use index
 
+NOTE : hint can be added to query for some other way of performing the query.
+
 ==========================
 
 unique index : index that constraints that value must be unique and also must have a value i.e. must not be null
@@ -275,16 +277,103 @@ multikey
 
 ==========
 
+***ensureIndex indexes field of type : 2d , 2dsphere , text
+
+
 {name:'' , location : [20,20]}
 {name:'' , location : [10,-10]}
 
+//creating index of type 2d
 db.coll.ensureIndex({'location':'2d' , type:1})
 
 db.coll.find({location : {$near : [50,50] } });
 
 
+========================
+
+GeoSpatial indexing
+
+type : 2Dsphere
+(longitude,latitude)
+
+(distance from line of greenwich , distance from equator)
+
+
+GeoJSON.org
+
+example :
+
+{ "_id" : { "$oid" : "535471aaf28b4d8ee1e1c86f" }, "store_id" : 8, "loc" : { "type" : "Point", "coordinates" : [ -37.47891236119904, 4.488667018711567 ] } }
+
+//creating index of type 2dsphere
+db.coll.ensureIndex({'loc' : '2dsphere'});
+
+db.stores.find({'loc' : {$near : {$geometry : { type:'Point' , coordinates : [-130,39] } , $maxDistance : 1000000 } } });
+
+=============================
+
+Full text search :
+
+//creating index of type text
+db.coll.ensureIndex({'words' : 'text'});
+
+db.coll.find({ $text : { $search : 'akash rahul' } });
+
+->putting a period , case of a character makes no difference.
+->some stop words makes no difference e.g: a the
+
+> db.movies.find( { $text : { $search : "Big Lebowski" } } )
+
+{ "title" : "The Big Lebowski" , star: "Jeff Bridges" }
+{ "title" : "Big" , star : "Tom Hanks" }
+{ "title" : "Big Fish" , star: "Ewan McGregor" }
+
+all are valid results
 
 ==========================
+
+profiling
+
+profile 0 --> no logging
+profile 1 --> queries having threashold timeAcquiringMicros
+profile 2 --> all queries
+
+
+db.system.profile.find();
+
+db.getProfilingLevel();
+
+db.getprofilingStatus();
+
+db.setProfilingLevel(1,4);
+db.setProfilingLevel(0);
+
+Write the query to look in the system profile collection for all queries that took longer than one second, ordered by timestamp descending.
+
+db.system.profile.find({'millis' : {$gt:1000}}).sort({ts:-1});
+
+
+=========================
+
+mongotop , mongostat
+
+Sharding
+
+data in collection is divided into different shards at different servers.
+Data in shards are divided on the basis of shard key
+shard key must be a unique key (single key or combination of keys)
+every insert must contain a unique shard key
+
+find , update , delete queries must contain shard key to minimize no of rows scanned.
+If shard key is not specified in find , delete, update then all shards are scanned.
+
+mongodb requires a routing server called mongos .
+
+Data at Shard server can be replicated in replica set for avoiding data loss at any failure.
+
+==========================
+
+HW
 
 > db.tweets.explain("executionStats").find( { "user.followers_count" : { $gt : 1000 } } ).limit(10).skip(5000).sort( { created_at : 1 } )
 {
