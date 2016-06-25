@@ -118,6 +118,26 @@ $nin
 
 (Q)find distinct data.type entries
 
+>db.BCBS_configuration.findOne();
+{
+        "_id" : ObjectId("55afafe1c4d02b1df44f27dc"),
+        "data" : {
+                "type" : "UI",
+                "value" : {
+                        "permissions" : [
+                                "AddPI"
+                        ],
+                        "attr" : "smart"
+                },
+                "role" : "individual",
+                "id" : 1,
+                "key" : "config",
+                "attr" : "smart"
+        },
+        "key" : "config"
+}
+
+
 db.BCBS_configuration.find().count();
 282
 
@@ -138,6 +158,15 @@ Q)find all entries which have no data.type
 db.BCBS_configuration.find({ $and : [{"data.type" : {$ne:"UI"}},{"data.type" : {$ne:"SYSTEM"}},{"data.type":{$ne:"type1"}}] }).count();
 62
 
+db.BCBS_configuration.find({"data.type":null}).count();
+16
+
+> db.BCBS_configuration.aggregate({$group:{_id:"$data.type"}});
+{ "_id" : "UI" }
+{ "_id" : "type1" }
+{ "_id" : [ ] }
+{ "_id" : "SYSTEM" }
+{ "_id" : null }
 
 =============================================================================================
 
