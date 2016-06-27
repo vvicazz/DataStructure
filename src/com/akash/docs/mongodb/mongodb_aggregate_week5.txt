@@ -1,0 +1,249 @@
+aggregate framework :
+
+db.products.aggregate([ {$group : {_id:"$category" , "num_products":{$sum:1}} } ]);
+
+aggregate framework works as a pipeline of various commands :
+
+$project  -- getting required fields out (reshape)  ---		1:1
+$match    -- filter									---		n:1
+$group    -- aggregate								---		n:1
+$skip     -- skips									---		n:1
+$sort     -- sort									--- 	1:1
+$limit    -- limits output							--- 	n:1
+$unwind   -- unwinds array elements to documents	---		1:n
+
+===================================================================
+
+(Q)
+> db.stuff.find()
+{ "_id" : ObjectId("50b26f9d80a78af03b5163c8"), "a" : 1, "b" : 1, "c" : 1 }
+{ "_id" : ObjectId("50b26fb480a78af03b5163c9"), "a" : 2, "b" : 2, "c" : 1 }
+{ "_id" : ObjectId("50b26fbf80a78af03b5163ca"), "a" : 3, "b" : 3, "c" : 1 }
+{ "_id" : ObjectId("50b26fcd80a78af03b5163cb"), "a" : 3, "b" : 3, "c" : 2 }
+{ "_id" : ObjectId("50b26fd380a78af03b5163cc"), "a" : 3, "b" : 5, "c" : 3 }
+
+db.stuff.aggregate([{$group:{_id:'$c'}}])
+
+Ans : no of documents returned : 3
+
+===================================================================
+
+Compound _id field
+
+(Q)
+> db.stuff.find()
+{ "_id" : ObjectId("50b26f9d80a78af03b5163c8"), "a" : 1, "b" : 1, "c" : 1 }
+{ "_id" : ObjectId("50b26fb480a78af03b5163c9"), "a" : 2, "b" : 2, "c" : 1 }
+{ "_id" : ObjectId("50b26fbf80a78af03b5163ca"), "a" : 3, "b" : 3, "c" : 1 }
+{ "_id" : ObjectId("50b26fcd80a78af03b5163cb"), "a" : 3, "b" : 3, "c" : 2 }
+{ "_id" : ObjectId("50b26fd380a78af03b5163cc"), "a" : 3, "b" : 5, "c" : 3 }
+{ "_id" : ObjectId("50b27f7080a78af03b5163cd"), "a" : 3, "b" : 3, "c" : 2 }
+
+
+db.stuff.aggregate( [ { $group: { _id: { 'moe':'$a', 'larry':'$b', 'curly':'$c' } } }])
+			
+Ans : no of documents returned : 5
+
+===================================================================
+
+aggregate exp used with $group 
+
+min
+max
+avg
+sum
+push		-- for arrays
+addToSet	-- for arrays
+first		-- used with sort
+last		-- used with sort
+
+
+db.zips.aggregate([ {$group : {_id:"$state","population" : {$sum : "$pop"} }} ]);
+
+db.zips.aggregate([ {$group : {_id:"$state","average_pop" : {$avg : "$pop"} }} ]);
+
+=====================================================================
+
+$addToSet
+
+> db.zips.find({state:"CA",city:"PALO ALTO"})
+{ "city" : "PALO ALTO", "loc" : [ -122.149685, 37.444324 ], "pop" : 15965, "state" : "CA", "_id" : "94301" }
+{ "city" : "PALO ALTO", "loc" : [ -122.184234, 37.433424 ], "pop" : 1835, "state" : "CA", "_id" : "94304" }
+{ "city" : "PALO ALTO", "loc" : [ -122.127375, 37.418009 ], "pop" : 24309, "state" : "CA", "_id" : "94306" }
+
+Write an aggregation query that will return the postal codes that cover each city.
+
+db.zips.aggregate( [ { $group : { _id: "$city" , postal_codes : {$addToSet : "$_id"} } }  ] );
+
+***
+push creates a list
+addToSet creates a set
+
+
+db.zips.aggregate( [ { $group : { _id: "$state" , pop : {$max : "$pop"} } }  ] );
+
+=========================================================================
+Double group stage
+
+> db.fun.find()
+{ "_id" : 0, "a" : 0, "b" : 0, "c" : 21 }
+{ "_id" : 1, "a" : 0, "b" : 0, "c" : 54 }
+{ "_id" : 2, "a" : 0, "b" : 1, "c" : 52 }
+{ "_id" : 3, "a" : 0, "b" : 1, "c" : 17 }
+{ "_id" : 4, "a" : 1, "b" : 0, "c" : 22 }
+{ "_id" : 5, "a" : 1, "b" : 0, "c" : 5 }
+{ "_id" : 6, "a" : 1, "b" : 1, "c" : 87 }
+{ "_id" : 7, "a" : 1, "b" : 1, "c" : 97 }
+And the following aggregation query
+
+db.fun.aggregate([{$group:{_id:{a:"$a", b:"$b"}, c:{$max:"$c"}}}, {$group:{_id:"$_id.a", c:{$min:"$c"}}}])
+What values are returned?
+
+52 and 22
+
+=========================================================================
+
+project :
+
+add keys
+remove keys
+reshape keys -- converting arrays to document
+functions :
+toUpper
+toLower
+add
+multiply
+
+db.coll.aggregate( [ { $project : { _id:0 , maker : {$toLower : "$manufacturer"} , "item" : "$name" , "details" : { "category" : "$category" } } } ] );
+
+(Q)
+
+{
+    "city" : "ACMAR",
+    "loc" : [
+        -86.51557,
+        33.584132
+    ],
+    "pop" : 6055,
+    "state" : "AL",
+    "_id" : "35004"
+}
+to documents in the result set that look like this:
+
+{
+    "city" : "acmar",
+    "pop" : 6055,
+    "state" : "AL",
+    "zip" : "35004"
+}
+
+db.zips.aggregate([ { $project : { "_id" : 0,  city : {$toLower : "$city" } , pop : 1 , state : 1 , zip : "$_id" } } ]);
+
+
+=============================================================
+
+{ $match: { <query> } }
+
+db.zips.aggregate([ {$match : {pop : {$gt:100000} } } ]);
+
+=====================================================
+
+sort in aggregation can work on memory or disk
+by default it works in memory.
+
+$sort : {<query>}
+
+db.zips.aggregate([ {$sort : {state:1,city:1} } ])
+
+=======================================================
+
+skip , limit
+
+both matters in sort or unsorted list
+skip after limit has no advantage
+
+
+Full example :
+
+db.zips.aggregate([
+    {$match:
+     {
+     state:"NY"
+     }
+    },
+    {$group:
+     {
+     _id: "$city",
+     population: {$sum:"$pop"},
+     }
+    },
+    {$project:
+     {
+     _id: 0,
+     city: "$_id",
+     population: 1,
+     }
+    },
+    {$sort:
+     {
+     population:-1
+     }
+    },
+	{$skip: 10},
+    {$limit: 5}
+
+])
+
+==============================================
+
+(Q)
+> db.fun.find()
+{ "_id" : 0, "a" : 0, "b" : 0, "c" : 21 }
+{ "_id" : 1, "a" : 0, "b" : 0, "c" : 54 }
+{ "_id" : 2, "a" : 0, "b" : 1, "c" : 52 }
+{ "_id" : 3, "a" : 0, "b" : 1, "c" : 17 }
+{ "_id" : 4, "a" : 1, "b" : 0, "c" : 22 }
+{ "_id" : 5, "a" : 1, "b" : 0, "c" : 5 }
+{ "_id" : 6, "a" : 1, "b" : 1, "c" : 87 }
+{ "_id" : 7, "a" : 1, "b" : 1, "c" : 97 }
+What would be the value of c in the result from this aggregation query
+
+db.fun.aggregate([
+    {$match:{a:0}},
+    {$sort:{c:-1}},
+    {$group:{_id:"$a", c:{$first:"$c"}}}
+])
+
+=======================================================
+
+Which grouping operator will enable to you to reverse the effects of an unwind?
+
+$push
+
+=======================
+(Q)Finding the most frequent author of comments on your blog
+
+mongoimport -d blog -c posts --drop posts.json -batchSize 1
+
+db.posts.aggregate([ { $unwind : "$comments" } , {$group : {"_id" : "$comments.author" , "count" : {$sum : 1} } } , {$sort : {count:-1}} ]);
+
+
+=====================================
+(Q) Please calculate the average population of cities in California (abbreviation CA) and New York (NY) (taken together) with populations over 25,000.
+
+db.zips.aggregate([ {$match : {$or : [{state:"CA"}, {state:"NY"}] }}, {$group : {_id:"$city", pop : {$sum : "$pop"} } } , {$match : {pop : {$gt:25000}}}, {$group : {_id:"",pop:{$avg:"$pop"} }} ]);
+
+
+=================================
+
+(Q)
+
+> db.grades.aggregate([ {$unwind:"$scores"} , {$match : { "scores.type" : {$ne:"quiz"} } } , {$group : { _id : {student:"$student_id", class:"$class_id"} , score : {$avg : "$scores.score"} }} , {$group : {_id : "$_id.class" , score : {$avg : "$score" } }}, {$sort: {score:1} } ]);
+
+=================================
+(Q)
+
+> db.zips.aggregate([ {$project: { first_char: {$substr : ["$city",0,1]} , pop:1} } , {$match : {first_char : {$regex : "^[0-9]$" }  } }, {$group :{_id:"",pop:{$sum:"$pop"}}} ]);
+
+{ "_id" : "", "pop" : 298015 }
+
