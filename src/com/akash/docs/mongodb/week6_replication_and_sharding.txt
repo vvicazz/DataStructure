@@ -1,0 +1,665 @@
+w=1 means wait for ACK
+J=true means journal are written to disk before ACK
+
+(Q)Provided you assume that the disk is persistent, what are the w and j settings required to guarantee that an insert or update has been written all the way to disk.
+
+w=1, j=1
+
+Types of mongod nodes for replication :
+			priority		participate in voting		can be primary
+Regular		1				yes							yes
+Arbitar		1				yes							yes
+Delay		0				yes							
+Hidden		0				yes							
+
+
+writes are done at primary
+By default reads are done at primary.
+when read is done from secondary (eventual existence)
+when read is done from primary (strong existence)
+
+(Q)What is the minimum original number of nodes needed to assure the election of a new Primary if a node goes down?
+3
+
+(Q)Which types of nodes can participate in elections of a new primary?
+Regular replica set members
+Hidden Members
+Arbiters
+
+(Q)During the time when failover is occurring, can writes successfully complete?
+No
+
+(Q)Which command, when issued from the mongo shell, will allow you to read from a secondary?
+rs.slaveOk();
+
+
+(Q)Which of the following statements are true about replication. Check all that apply.
+
+-Replication supports mixed-mode storage engines. For examples, a mmapv1 primary and wiredTiger secondary.
+-A copy of the oplog is kept on both the primary and secondary servers.
+-The oplog is implemented as a capped collection.
+
+==============================================================
+
+create replica set :
+
+Create three directories for the three mongod processes. On unix, this could be done as follows:
+
+mkdir -p /data/rs1 /data/rs2 /data/rs3
+or on Windows:
+
+mkdir \data\rs1 \data\rs2 \data\rs3
+Now start three mongo instances as follows. Note that are three commands. The browser is probably wrapping them visually.
+
+Linux and Mac users:
+
+mongod --replSet m101 --logpath "C:\data\rs1\1.log" --dbpath /data/rs1 --port 27017 --smallfiles --oplogSize 64 --fork
+
+mongod --replSet m101 --logpath "C:\data\rs2\2.log" --dbpath /data/rs2 --port 27018 --smallfiles --oplogSize 64 --fork
+
+mongod --replSet m101 --logpath "C:\data\rs3\3.log" --dbpath /data/rs3 --port 27019 --smallfiles --oplogSize 64 --fork
+Windows users:
+
+start mongod --replSet m101 --logpath 1.log --dbpath \data\rs1 --port 27017 --smallfiles --oplogSize 64
+start mongod --replSet m101 --logpath 2.log --dbpath \data\rs2 --port 27018 --smallfiles --oplogSize 64
+start mongod --replSet m101 --logpath 3.log --dbpath \data\rs3 --port 27019 --smallfiles --oplogSize 64
+Now connect to a mongo shell and make sure it comes up.
+
+mongo --port 27017
+Now you will create the replica set. Type the following commands into the mongo shell:
+
+config = { _id: "m101", members:[
+          { _id : 0, host : "localhost:27017"},
+          { _id : 1, host : "localhost:27018"},
+          { _id : 2, host : "localhost:27019"} ]
+};
+rs.initiate(config);
+At this point, the replica set should be coming up.
+NOTE : You cannot initialize replica set config from a host which cannot become primary.
+
+Now You can type:
+
+rs.status()
+to see the state of replication.
+
+To query from a secondary we have to use query :
+rs.slaveOk();
+
+========================================================
+m101:PRIMARY> use people
+m101:PRIMARY> db.human.insert({name:'akash'});
+
+
+m101:SECONDARY> use local
+m101:SECONDARY> db.oplog.rs.find().pretty();
+{
+        "ts" : Timestamp(1467398104, 1),
+        "h" : NumberLong("4788758730483652199"),
+        "v" : 2,
+        "op" : "n",
+        "ns" : "",
+        "o" : {
+                "msg" : "initiating set"
+        }
+}
+{
+        "ts" : Timestamp(1467398116, 2),
+        "t" : NumberLong(1),
+        "h" : NumberLong("848395203375743025"),
+        "v" : 2,
+        "op" : "n",
+        "ns" : "",
+        "o" : {
+                "msg" : "new primary"
+        }
+}
+{
+        "ts" : Timestamp(1467398259, 1),
+        "t" : NumberLong(1),
+        "h" : NumberLong("-6021006122398623406"),
+        "v" : 2,
+        "op" : "c",
+        "ns" : "people.$cmd",
+        "o" : {
+                "create" : "human"
+        }
+}
+{
+        "ts" : Timestamp(1467398259, 2),
+        "t" : NumberLong(1),
+        "h" : NumberLong("2941088389213343661"),
+        "v" : 2,
+        "op" : "i",
+        "ns" : "people.human",
+        "o" : {
+                "_id" : ObjectId("5776b873fb79ae9ad5cffdc3"),
+                "name" : "akash"
+        }
+}
+
+
+NOTE : oplog is a capped collection
+any operation on primary are stored in oplog of primary
+oplog of primary are copied to secondary
+
+local.oplog.rs collection
+
+All replica set ping each other.
+Each operation in oplog is idempotent.
+
+Advantages of oplog :
+(1)you can have mixed mode replica set , MMap and wired tiger
+(2)Size of oplog matters, if it filled up then secondary need to scan primary full DB.
+
+
+========================================================
+
+rs.status()
+rs.conf()
+rs.help()
+
+
+m101:SECONDARY> rs.status();
+{
+        "set" : "m101",
+        "date" : ISODate("2016-07-01T18:53:15.784Z"),
+        "myState" : 2,
+        "term" : NumberLong(1),
+        "syncingTo" : "localhost:27017",
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "localhost:27017",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 1090,
+                        "optime" : {
+                                "ts" : Timestamp(1467398259, 2),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2016-07-01T18:37:39Z"),
+                        "lastHeartbeat" : ISODate("2016-07-01T18:53:14.061Z"),
+                        "lastHeartbeatRecv" : ISODate("2016-07-01T18:53:14.797Z"),
+                        "pingMs" : NumberLong(0),
+                        "electionTime" : Timestamp(1467398116, 1),
+                        "electionDate" : ISODate("2016-07-01T18:35:16Z"),
+                        "configVersion" : 1
+                },
+                {
+                        "_id" : 1,
+                        "name" : "localhost:27018",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 1220,
+                        "optime" : {
+                                "ts" : Timestamp(1467398259, 2),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2016-07-01T18:37:39Z"),
+                        "syncingTo" : "localhost:27017",
+                        "configVersion" : 1,
+                        "self" : true
+                },
+                {
+                        "_id" : 2,
+                        "name" : "localhost:27019",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 1089,
+                        "optime" : {
+                                "ts" : Timestamp(1467398259, 2),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2016-07-01T18:37:39Z"),
+                        "lastHeartbeat" : ISODate("2016-07-01T18:53:14.061Z"),
+                        "lastHeartbeatRecv" : ISODate("2016-07-01T18:53:14.061Z"),
+                        "pingMs" : NumberLong(0),
+                        "syncingTo" : "localhost:27017",
+                        "configVersion" : 1
+                }
+        ],
+        "ok" : 1
+}
+m101:SECONDARY>
+
+
+==================================================================
+
+(Q)If you leave a replica set node out of the seedlist within the driver, what will happen?
+
+The missing node will be discovered as long as you list at least one valid node.
+
+================================================================
+
+
+{ w: <value>, j: <boolean>, wtimeout: <number> }
+
+wait until server send ACK
+w : 1  => only at primary
+w : 3
+w : "majority"
+
+
+Journal : every operation at DB are maintained as logs.These logs are maintained in memory.
+These logs are flushed to DB in two events :
+-->file size reaches a limit
+-->time reaches limit
+After this threashold , journal files are written to disk.
+If server gets down,and later becomes up, these journal files helps us to restore data.
+
+j = true  signifies that journal data has been written to disk
+
+
+wtimeout : time limit in ms to wait then timeout request
+works only when w > 1
+
+
+==>where these settings can be done :
+
+->collection
+->connection
+->replica set level
+
+
+==============================================================
+
+Read Concern :
+
+By default reads and writes are done ony from primary
+reads can be done from secondary
+
+
+Read preferences : 
+
+primary
+primary preferred
+secondary
+secondary preferred
+nearest
+
+secondary ==> Eventually consistent
+
+(Q)You can configure your applications via the drivers to read from secondary nodes within a replica set. What are the reasons that you might not want to do that? Check all that apply.
+
+->You may not read what you previously wrote to MongoDB on a secondary because it will lag behind by some amount.
+->If the secondary hardware has insufficient memory to keep the read working set in memory, directing reads to it will likely slow it down.
+->If your write traffic is great enough, and your secondary is less powerful than the primary, you may overwhelm the secondary, which must process all the writes as well as the reads. Replication lag can result.
+
+==========
+
+NOTE :
+If you set w to a number that is greater than the number of set members that hold data, MongoDB waits for the non-existent members to become available, which means MongoDB blocks indefinitely.
+
+If you set w=4 on a MongoClient and there are only three nodes in the replica set, how long will you wait in PyMongo for a response from an insert if you don't set a timeout?
+
+Ans : You will get an immediate error
+
+
+====================================================
+Sharding  ----> Scale out
+
+
+Range based approach
+Shard key
+
+APP  ---->  mongos  --->   S1 , S2 , S3
+
+Shard key must be included in an insert
+shard is at collection level
+
+break up collection on different servers on the basis of shard key
+If find/update query do not have shard key then it is a full collection scan
+
+In a sharded environment, clients connot connect directly to any mongod server.
+They are connected to a mongos server.
+mongos server can also be in replica set.
+
+(Q)If the shard key is not included in a find operation and there are 4 shards, each one a replica set with 3 nodes, how many nodes will see the find operation?
+Ans : 4
+
+===============================================
+
+Types of server in sharding
+
+Shard server
+mongos server
+config server -- generally 3
+
+types of sharding
+
+->range based
+->hash based 
+
+
+sh.status();
+
+index of sharded key is automatically created
+
+Notes :
+insert must contain shard key
+shard key is immutable
+index on shard key, can be a compound index but cannot be with mutikey
+find / update query do not include shard key then it is full collection scan
+No index can be created in sharded environment unless it is a part of shard key.
+
+====================
+
+(Q)Suppose you want to run multiple mongos routers for redundancy. What level of the stack will assure that you can failover to a different mongos from within your application?
+
+mongod
+mongos
+drivers						== correct answer
+sharding config servers
+
+
+How to choose shard key :
+(1)Sufficient cardinality
+(2)Hotspotting , monotonically increasing eg : BSON_id
+
+
+
+(Q)You are building a facebook competitor called footbook that will be a mobile social network of feet. You have decided that your primary data structure for posts to the wall will look like this:
+
+{'username':'toeguy',
+     'posttime':ISODate("2012-12-02T23:12:23Z"),
+     "randomthought": "I am looking at my feet right now",
+     'visible_to':['friends','family', 'walkers']}
+Thinking about the tradeoffs of shard key selection, select the true statements below.
+
+
+Choosing posttime as the shard key will cause hotspotting as time progresses.
+Choosing username as the shard key will distribute posts to the wall well across the shards.
+Choosing visible_to as a shard key is illegal.
+
+
+======================================================
+(Q)Which of the following statements are true about replication in MongoDB? Check all that apply.
+
+The minimum sensible number of voting nodes to a replica set is three.
+The oplog utilizes a capped collection.
+
+===========================================================
+
+(Q)Let's suppose you have a five member replica set and want to assure that writes are committed to the journal and are acknowledged by at least 3 nodes before you proceed forward. What would be the appropriate settings for w and j?
+
+w="majority", j=1
+
+===========================================================
+
+(Q)
+mongos> sh.status()
+--- Sharding Status ---
+  sharding version: {
+    "_id" : 1,
+    "minCompatibleVersion" : 5,
+    "currentVersion" : 6,
+    "clusterId" : ObjectId("5531512ac723271f602db407")
+}
+  shards:
+    {  "_id" : "s0",  "host" : "s0/localhost:37017,localhost:37018,localhost:37019" }
+    {  "_id" : "s1",  "host" : "s1/localhost:47017,localhost:47018,localhost:47019" }
+    {  "_id" : "s2",  "host" : "s2/localhost:57017,localhost:57018,localhost:57019" }
+  balancer:
+    Currently enabled:  yes
+    Currently running:  yes
+        Balancer lock taken at Fri Apr 17 2015 14:32:02 GMT-0400 (EDT) by education-iMac-2.local:27017:1429295401:16807:Balancer:1622650073
+    Collections with active migrations:
+        school.students started at Fri Apr 17 2015 14:32:03 GMT-0400 (EDT)
+    Failed balancer rounds in last 5 attempts:  0
+    Migration Results for the last 24 hours:
+        2 : Success
+        1 : Failed with error 'migration already in progress', from s0 to s1
+  databases:
+    {  "_id" : "admin",  "partitioned" : false,  "primary" : "config" }
+    {  "_id" : "school",  "partitioned" : true,  "primary" : "s0" }
+        school.students
+            shard key: { "student_id" : 1 }
+            chunks:
+                s0  1
+                s1  3
+                s2  1
+            { "student_id" : { "$minKey" : 1 } } -->> { "student_id" : 0 } on : s2 Timestamp(3, 0)
+            { "student_id" : 0 } -->> { "student_id" : 2 } on : s0 Timestamp(3, 1)
+            { "student_id" : 2 } -->> { "student_id" : 3497 } on : s1 Timestamp(3, 2)
+            { "student_id" : 3497 } -->> { "student_id" : 7778 } on : s1 Timestamp(3, 3)
+            { "student_id" : 7778 } -->> { "student_id" : { "$maxKey" : 1 } } on : s1 Timestamp(3, 4)
+If you ran the query
+
+use school
+db.students.find({'student_id':2000})
+Which shards would be involved in answering the query?
+
+Ans : S1
+
+===========================================================
+
+(Q)Which of the following statements are true about choosing and using a shard key?
+
+-->The shard key must be unique
+correct-->Any update that does not contain the shard key will be sent to all shards.
+correct-->There must be a index on the collection that starts with the shard key.
+correct-->MongoDB can not enforce unique indexes on a sharded collection other than the shard key itself, or indexes prefixed by the shard key.
+-->You can change the shard key on a collection if you desire.
+
+
+
+====================================================================
+
+Sharding steps WINDOWS :
+
+
+REM  Andrew Erlichson - Original author
+REM  Jai Hirsch       - Translated original .sh file to .bat   
+REM  10gen
+REM  script to start a sharded environment on localhost
+
+
+echo "del data files for a clean start"
+
+del /Q c:\data\config
+del /Q c:\data\shard0
+del /Q c:\data\shard1
+del /Q c:\data\shard2
+del /Q c:\data\config
+
+PING 1.1.1.1 -n 1 -w 5000 >NUL
+
+
+REM  start a replica set and tell it that it will be a shard0
+
+mkdir c:\data\shard0\rs0
+mkdir c:\data\shard0\rs1
+mkdir c:\data\shard0\rs2
+start mongod --replSet s0 --dbpath c:\data\shard0\rs0 --port 37017  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s0 --dbpath c:\data\shard0\rs1 --port 37018  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s0 --dbpath c:\data\shard0\rs2 --port 37019  --shardsvr --smallfiles --oplogSize 100
+
+PING 1.1.1.1 -n 1 -w 5000 >NUL
+
+REM  connect to one server and initiate the set
+start mongo --port 37017 --eval "config = { _id: 's0', members:[{ _id : 0, host : 'localhost:37017' },{ _id : 1, host : 'localhost:37018' },{ _id : 2, host : 'localhost:37019' }]};rs.initiate(config)"
+
+
+REM  start a replicate set and tell it that it will be a shard1
+mkdir c:\data\shard1\rs0
+mkdir c:\data\shard1\rs1
+mkdir c:\data\shard1\rs2
+
+
+start mongod --replSet s1 --dbpath c:\data\shard1\rs0 --port 47017  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s1 --dbpath c:\data\shard1\rs1 --port 47018  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s1 --dbpath c:\data\shard1\rs2 --port 47019  --shardsvr --smallfiles --oplogSize 100
+
+PING 1.1.1.1 -n 1 -w 5000 >NUL
+
+start mongo --port 47017 --eval "config = { _id: 's1', members:[{ _id : 0, host : 'localhost:47017' },{ _id : 1, host : 'localhost:47018' },{ _id : 2, host : 'localhost:47019' }]};rs.initiate(config);"
+
+
+REM  start a replicate set and tell it that it will be a shard2
+mkdir c:\data\shard2\rs0
+mkdir c:\data\shard2\rs1
+mkdir c:\data\shard2\rs2
+start mongod --replSet s2 --dbpath c:\data\shard2\rs0 --port 57017  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s2 --dbpath c:\data\shard2\rs1 --port 57018  --shardsvr --smallfiles --oplogSize 100
+start mongod --replSet s2 --dbpath c:\data\shard2\rs2 --port 57019  --shardsvr --smallfiles --oplogSize 100
+
+PING 1.1.1.1 -n 1 -w 5000 >NUL
+
+start mongo --port 57017 --eval "config = { _id: 's2', members:[{ _id : 0, host : 'localhost:57017' },{ _id : 1, host : 'localhost:57018' },{ _id : 2, host : 'localhost:57019' }]};rs.initiate(config)"
+
+
+
+REM  now start 3 config servers
+
+mkdir c:\data\config\config-a
+mkdir c:\data\config\config-b
+mkdir c:\data\config\config-c
+start mongod --dbpath c:\data\config\config-a --port 57040 --configsvr --smallfiles --oplogSize 100
+start mongod --dbpath c:\data\config\config-b --port 57041 --configsvr --smallfiles --oplogSize 100
+start mongod --dbpath c:\data\config\config-c --port 57042 --configsvr --smallfiles --oplogSize 100
+
+PING 1.1.1.1 -n 1 -w 5000 >NUL
+
+ECHO  now start the mongos on a standard port
+
+start mongos  --configdb localhost:57040,localhost:57041,localhost:57042 
+
+echo "Wait 60 seconds for the replica sets to fully come online"
+PING 1.1.1.1 -n 1 -w 60000 >NUL
+
+echo "Connnecting to mongos and enabling sharding"
+
+REM  add shards and enable sharding on the test db
+start  mongo  --eval "db.adminCommand( { addshard : 's0/'+'localhost:37017' } );db.adminCommand( { addshard : 's1/'+'localhost:47017' } );db.adminCommand( { addshard : 's2/'+'localhost:57017' } );db.adminCommand({enableSharding: 'school'});db.adminCommand({shardCollection: 'school.students', key: {student_id:1}});"
+
+
+
+====================================================================
+
+Sharding steps LINUX :
+
+
+
+# Andrew Erlichson
+# MongoDB
+# script to start a sharded environment on localhost
+
+# clean everything up
+echo "killing mongod and mongos"
+killall mongod
+killall mongos
+echo "removing data files"
+rm -rf /data/config
+rm -rf /data/shard*
+
+
+# start a replica set and tell it that it will be shard0
+echo "starting servers for shard 0"
+mkdir -p /data/shard0/rs0 /data/shard0/rs1 /data/shard0/rs2
+mongod --replSet s0 --logpath "s0-r0.log" --dbpath /data/shard0/rs0 --port 37017 --fork --shardsvr --smallfiles
+mongod --replSet s0 --logpath "s0-r1.log" --dbpath /data/shard0/rs1 --port 37018 --fork --shardsvr --smallfiles
+mongod --replSet s0 --logpath "s0-r2.log" --dbpath /data/shard0/rs2 --port 37019 --fork --shardsvr --smallfiles
+
+sleep 5
+# connect to one server and initiate the set
+echo "Configuring s0 replica set"
+mongo --port 37017 << 'EOF'
+config = { _id: "s0", members:[
+          { _id : 0, host : "localhost:37017" },
+          { _id : 1, host : "localhost:37018" },
+          { _id : 2, host : "localhost:37019" }]};
+rs.initiate(config)
+EOF
+
+# start a replicate set and tell it that it will be a shard1
+echo "starting servers for shard 1"
+mkdir -p /data/shard1/rs0 /data/shard1/rs1 /data/shard1/rs2
+mongod --replSet s1 --logpath "s1-r0.log" --dbpath /data/shard1/rs0 --port 47017 --fork --shardsvr --smallfiles
+mongod --replSet s1 --logpath "s1-r1.log" --dbpath /data/shard1/rs1 --port 47018 --fork --shardsvr --smallfiles
+mongod --replSet s1 --logpath "s1-r2.log" --dbpath /data/shard1/rs2 --port 47019 --fork --shardsvr --smallfiles
+
+sleep 5
+
+echo "Configuring s1 replica set"
+mongo --port 47017 << 'EOF'
+config = { _id: "s1", members:[
+          { _id : 0, host : "localhost:47017" },
+          { _id : 1, host : "localhost:47018" },
+          { _id : 2, host : "localhost:47019" }]};
+rs.initiate(config)
+EOF
+
+# start a replicate set and tell it that it will be a shard2
+echo "starting servers for shard 2"
+mkdir -p /data/shard2/rs0 /data/shard2/rs1 /data/shard2/rs2
+mongod --replSet s2 --logpath "s2-r0.log" --dbpath /data/shard2/rs0 --port 57017 --fork --shardsvr --smallfiles
+mongod --replSet s2 --logpath "s2-r1.log" --dbpath /data/shard2/rs1 --port 57018 --fork --shardsvr --smallfiles
+mongod --replSet s2 --logpath "s2-r2.log" --dbpath /data/shard2/rs2 --port 57019 --fork --shardsvr --smallfiles
+
+sleep 5
+
+echo "Configuring s2 replica set"
+mongo --port 57017 << 'EOF'
+config = { _id: "s2", members:[
+          { _id : 0, host : "localhost:57017" },
+          { _id : 1, host : "localhost:57018" },
+          { _id : 2, host : "localhost:57019" }]};
+rs.initiate(config)
+EOF
+
+
+# now start 3 config servers
+echo "Starting config servers"
+mkdir -p /data/config/config-a /data/config/config-b /data/config/config-c 
+mongod --logpath "cfg-a.log" --dbpath /data/config/config-a --port 57040 --fork --configsvr --smallfiles
+mongod --logpath "cfg-b.log" --dbpath /data/config/config-b --port 57041 --fork --configsvr --smallfiles
+mongod --logpath "cfg-c.log" --dbpath /data/config/config-c --port 57042 --fork --configsvr --smallfiles
+
+
+# now start the mongos on a standard port
+mongos --logpath "mongos-1.log" --configdb localhost:57040,localhost:57041,localhost:57042 --fork
+echo "Waiting 60 seconds for the replica sets to fully come online"
+sleep 60
+echo "Connnecting to mongos and enabling sharding"
+
+# add shards and enable sharding on the test db
+mongo <<'EOF'
+db.adminCommand( { addshard : "s0/"+"localhost:37017" } );
+db.adminCommand( { addshard : "s1/"+"localhost:47017" } );
+db.adminCommand( { addshard : "s2/"+"localhost:57017" } );
+db.adminCommand({enableSharding: "school"})
+db.adminCommand({shardCollection: "school.students", key: {student_id:1}});
+EOF
+
+
+
+=====================================================================
+
+
+db=db.getSiblingDB("school");
+types = ['exam', 'quiz', 'homework', 'homework'];
+// 10,000 students
+for (i = 0; i < 10000; i++) {
+
+    // take 10 classes
+    for (class_counter = 0; class_counter < 10; class_counter ++) {
+	scores = []
+	    // and each class has 4 grades
+	    for (j = 0; j < 4; j++) {
+		scores.push({'type':types[j],'score':Math.random()*100});
+	    }
+
+	// there are 500 different classes that they can take
+	class_id = Math.floor(Math.random()*501); // get a class id between 0 and 500
+
+	record = {'student_id':i, 'scores':scores, 'class_id':class_id};
+	db.students.insert(record);
+
+    }
+
+}
+	    
