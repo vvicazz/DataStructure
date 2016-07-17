@@ -1,0 +1,65 @@
+
+
+http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html
+
+https://blogs.oracle.com/optimizer/entry/displaying_and_reading_the_execution_plans_for_a_sql_statement
+
+
+select sql_id,sql_fulltext,rows_processed,elapsed_time from v$sql where sql_text like '%your sql query%' order by first_load_time desc;
+select * from v$sql_plan where sql_id='4f9qxf5ay2293';
+select * from V$SQLSTATS where sql_id='4f9qxf5ay2293';
+
+select plan_table_output from table(dbms_xplan.display_cursor('awm8k6j9bhhsp',null,'ALL'));
+
+Cross product
+-----------------------------------------------------------------------------------------------
+| Id  | Operation           | Name                    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT    |                         |       |       |     1 (100)|          |
+|*  1 |  FILTER             |                         |       |       |            |          |
+|*  2 |   HASH JOIN         |                         |   198 |   269K|     7  (15)| 00:00:01 |
+|*  3 |    TABLE ACCESS FULL| ASSISTER_CLIENT_MAPPING |     6 |  2250 |     3   (0)| 00:00:01 |
+|*  4 |    TABLE ACCESS FULL| ASSISTER                |    33 | 33594 |     3   (0)| 00:00:01 |
+-----------------------------------------------------------------------------------------------
+
+
+Inner join
+-------------------------------------------------------------------------------------------------
+| Id  | Operation             | Name                    | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT      |                         |       |       |     1 (100)|          |
+|*  1 |  FILTER               |                         |       |       |            |          |
+|   2 |   MERGE JOIN CARTESIAN|                         |   198 |   269K|    13   (0)| 00:00:01 |
+|*  3 |    TABLE ACCESS FULL  | ASSISTER_CLIENT_MAPPING |     6 |  2250 |     3   (0)| 00:00:01 |
+|   4 |    BUFFER SORT        |                         |    33 | 33594 |    10   (0)| 00:00:01 |
+|*  5 |     TABLE ACCESS FULL | ASSISTER                |    33 | 33594 |     2   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------
+
+
+select count(*) from elg_member where first_name='abc';
+--1263
+--8byg35d8jw66f
+
+select 1 from elg_member where first_name='abc' AND rownum=1;
+--66565
+--fanhvfa6s061z
+
+select count(*) from elg_member where middle_name is null;
+--1255
+--g5kujb1ugd74b
+
+select 1 from elg_member where middle_name is null AND rownum=1;
+--1067
+--48pmprhrwnzvt
+
+
+============================================
+
+
+(1)Avoid use of IN clause in HQL
+
+http://stackoverflow.com/questions/22797896/what-are-the-performance-implications-of-oracle-in-clause-with-no-joins
+disadvantages :
+	IN clause does hard parsing and compile query for every different list size
+	Maximum list size supported by oracle in IN clause = 1000 , for more than that it will throw runtime exception
+
