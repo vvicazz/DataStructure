@@ -4,22 +4,71 @@ http://www.javaworld.com/article/2077260/learn-java/learn-java-the-basics-of-jav
 http://www.journaldev.com/349/java-interview-questions-understanding-and-extending-java-classloader
 
 
+abstract class ClassLoader
+	|
+	|
+class SecureClassLoader
+	|
+	|
+class URLClassLoader
+	|_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+	|											|
+	|											|
+sun.misc.Launcher.ExtClassLoader  sun.misc.Launcher.AppClassLoader
+
+==================
+NOTE :
+App and Ext classloaders are child of URLClassLoader.
+Both of their parent classloaders are null.
+Classes loaded by Bootstrap , return null as their classLoader name.
+
+sun.misc.Launcher.ExtClassLoader and sun.misc.Launcher.AppClassLoader are static default classes, so we cannot inherit them.
+Hence while creating custom classloader we have to make a child class of URLClassLoader.
+
+parent property of ClassLoader signifies its actual parent.
+Both Ext and App classLoaders have parent as null.
+So If we have a hierarchy of classLoaders, then the topmost classLoader's parent property must be null and other child classes must have appropriate parent property.
+
+public class HelloCL {
+	public static void main(String args[]) {
+		
+		ClassLoader bootstrapCL = java.util.HashMap.class.getClassLoader();
+		ClassLoader extCL = sun.net.spi.nameservice.dns.ThreadContext.class.getClassLoader();
+        ClassLoader appCL = HelloCL.class.getClassLoader();
+        
+		System.out.println(bootstrapCL);		//null
+        System.out.println(extCL.isAssignableFrom(appCL.getClass()));	//false, sun.misc.Launcher.ExtClassLoader is not parent class of
+																		//sun.misc.Launcher.AppClassLoader
+        //extCL == appCL.parent				//parent is private field, result is true, can be checked from debugger
+		//extCL.parent == null				//true
+	}
+}
+
+==================
+
+
 java files are compiled by javac tool and converted to class files.
 JVM loads class files at runtime using ClassLoader.
 
 ClassLoader classLoader = ClassName.class.getClassLoader();
 
 if class is loaded by bootstrap then classLoader=null
-if class is loaded by Extension then classLoader=sun.misc.Launcher$ExtClassLoader@4e0e2f2a
-if class is loaded by Application then classLoader=sun.misc.Launcher$AppClassLoader@4e0e2f2b
+
+if class is loaded by Extension then classLoader=sun.misc.Launcher$ExtClassLoader@4e0e2f2a -- system property = java.ext.dirs == $JAVA_HOME/lib/ext directory
+
+if class is loaded by Application then classLoader=sun.misc.Launcher$AppClassLoader@4e0e2f2b -- system property = java.class.path ==  -cp or -classpath command line options
+
+properties of classloaders :
 
 delegation
 uniqueness
 visibility
 
+
 Each and every class is loaded by some instance of a java.lang.ClassLoader
 Bootstrap classloader is implemented as native and different for different jvm environments.
 
+(Q)If classes are loaded by classloaders , then who is responsible for loading classes of ClassLoader itself ?
 
 (Q) As an object is created for class sun.misc.Launcher$ExtClassLoader,which classLoader loaded this class?
 Ans : Bootstrap classloader
@@ -29,6 +78,9 @@ Ans : Bootstrap classloader
 (Q)Can two classes with same name and same package be loaded with different classLoaders?
 com.mypkg.MyClass - App classLoader
 com.mypkg.MyClass - Ext classLoader
+-yes
+
+(Q)Can Objects of same classes loaded by different classloaders be compared?
 
 When a class is loaded by different classloaders result in two different objects that cannot be cast to each other.
 Target t1 = ... 	//loaded by one classLoader
@@ -42,7 +94,10 @@ t1 = (Target) t2; 	//ClassCastException
     findLoadedClass(String) this method uses native method to check if loaded class already exist in bootstrap
 3. Check for loadClass() of parent.hence it goes recursively to loadClass() of each parent.
 4. If still it is not found call findClass(String name) method.
-	In AppClassLoader class, findClass() method reads byte array data from class file
+	
+	If file is not loaded till now, findClass() method compare the class file path with its classloader resource path.
+	If they match , class file is read as byte stream.If not then ClassNotFoundException is thrown.
+	
 	URLClassLoader.findClass()
 				|
 				|
@@ -56,7 +111,7 @@ t1 = (Target) t2; 	//ClassCastException
 				|
 				|
 	ClassLoader.defineClass1()    // it is a native method,which takes byte array of class file and returns Class class object.
-									// we also need to store these this Class class object against class name inside a map.
+									// we also need to store this Class class object against class name in a map.
 									
 
 
@@ -64,3 +119,75 @@ http://www.journaldev.com/349/java-interview-questions-understanding-and-extendi
 
 (Q) Why to create custom classloader ?
 (Q) What is the need for classLoader in java ?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+======================================
+BLOG content
+
+
+
+
+
+ClassLoader in Java
+
+
+For the past few weeks, many questions related to classloader were popping in my mind.Lets note down some questions that I will discuss in this blog.
+
+1.When do you need a custom classloader ?
+2.If classes are loaded by classloaders , then who is responsible for loading classes of ClassLoader itself ?
+3.Can two classes with same name and same package be loaded with different classLoaders?
+4.Can a single class be loaded with different classLoaders?
+5.Can Objects of same class loaded by different classloaders be compared?
+6.How loadClass(String) method in ClassLoader works ?
+
+Lets try to answer these and many other questions.
+
+First of all , javac tool compiles java files to class files.These class files are loaded by JVM as file , url or stream using classloader.Any class loader in java must follow three basic rules : 
+-uniqueness : A class must be loaded by one and only one ClassLoader.
+-delegation : ClassLoader must delegate the process of loading a class to its parent ClassLoader.If class cannot be loaded in its parent hierarchy then it can load this class itself.
+-visibility : A child ClassLoader can see all classes loaded by its parent classLoader.
+
+Java has provided 3 classLoaders in its library.
+-Bootstrap
+-Extension
+-Application
+
+1.If class is loaded by bootstrap then classLoader=null
+  For example : java.util.HashMap
+
+2.If class is loaded by Extension then classLoader=sun.misc.Launcher$ExtClassLoader@4e0e2f2a
+  All class files found in system property as "java.ext.dirs" or $JAVA_HOME/lib/ext directory are loaded by this classLoader.
+  For example : sun.net.spi.nameservice.dns.ThreadContext
+
+3.If class is loaded by Application then classLoader=sun.misc.Launcher$AppClassLoader@4e0e2f2b
+  All class files found in system property as "java.class.path" OR path specified as -cp or -classpath command line options.
+  For example : custom classes created by us.
+  
+How to get classLoader object from class :
+ClassLoader classLoader = ClassName.class.getClassLoader();
+OR
+ClassLoader classLoader = obj.getClass().getClassLoader();
+
+
+Diagram for class hierarchy
+Diagram for class loader object hierarchy
+
+understanding both concepts with code
+
+
+loadClass() and findClass() methods
+other questions
+
