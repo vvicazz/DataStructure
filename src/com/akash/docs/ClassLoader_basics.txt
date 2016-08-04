@@ -144,7 +144,7 @@ BLOG content
 ClassLoader in Java
 
 
-For the past few weeks, many questions related to classloader were popping in my mind.Lets note down some questions that I will discuss in this blog.
+For the past few weeks, many questions related to classloader were popping in my mind.Lets discuss these questions that I will try answer in this blog.
 
 1.When do you need a custom classloader ?
 2.If classes are loaded by classloaders , then who is responsible for loading classes of ClassLoader itself ?
@@ -155,18 +155,14 @@ For the past few weeks, many questions related to classloader were popping in my
 
 Lets try to answer these and many other questions.
 
-First of all , javac tool compiles java files to class files.These class files are loaded by JVM as file , url or stream using classloader.Any class loader in java must follow three basic rules : 
--uniqueness : A class must be loaded by one and only one ClassLoader.
--delegation : ClassLoader must delegate the process of loading a class to its parent ClassLoader.If class cannot be loaded in its parent hierarchy then it can load this class itself.
--visibility : A child ClassLoader can see all classes loaded by its parent classLoader.
-
+javac tool compiles java files to class files.These class files are loaded by JVM as file , url or stream using classloader.
 Java has provided 3 classLoaders in its library.
 -Bootstrap
 -Extension
 -Application
 
 1.If class is loaded by bootstrap then classLoader=null
-  For example : java.util.HashMap
+  For example : java.util.ArrayList
 
 2.If class is loaded by Extension then classLoader=sun.misc.Launcher$ExtClassLoader@4e0e2f2a
   All class files found in system property as "java.ext.dirs" or $JAVA_HOME/lib/ext directory are loaded by this classLoader.
@@ -175,19 +171,63 @@ Java has provided 3 classLoaders in its library.
 3.If class is loaded by Application then classLoader=sun.misc.Launcher$AppClassLoader@4e0e2f2b
   All class files found in system property as "java.class.path" OR path specified as -cp or -classpath command line options.
   For example : custom classes created by us.
-  
-How to get classLoader object from class :
-ClassLoader classLoader = ClassName.class.getClassLoader();
-OR
-ClassLoader classLoader = obj.getClass().getClassLoader();
+
+Now lets understand some basics about these classLoaders.
+When we run main method of a class, JVM internally loads bootstrap classLoader which is a native classLoader.It loads all classes in rt.jar file.
+Figure 1 , shows class hierarchy of classloaders.
+Figure 2 , shows objects of classloaders.
+
+figure 1
+figure 2
+
+Lets try to understand above images with some coding example :
+
+public class HelloCL {
+	public static void main(String args[]) {
+		
+		ClassLoader bootstrapCL = java.util.ArrayList.class.getClassLoader();
+		ClassLoader extCL = sun.net.spi.nameservice.dns.ThreadContext.class.getClassLoader();
+        ClassLoader appCL = HelloCL.class.getClassLoader();
+        
+		System.out.println(bootstrapCL);		//null
+		
+        System.out.println(extCL.isAssignableFrom(appCL.getClass()));
+		//false
+		//sun.misc.Launcher.ExtClassLoader is not parent class of sun.misc.Launcher.AppClassLoader
+		
+		//extCL.parent == null				//true
+		//appCL.parent == extCL				//true
+		//parent is private attribute of ClassLoader
+	}
+}
 
 
-Diagram for class hierarchy
-Diagram for class loader object hierarchy
+The above program shows that :
+-object of classLoader for java.lang.ArrayList is null
+-There is no direct relation between AppClassLoader and ExtClassLoader
+-parent attribute(see figure 2) of ExtClassLoader object is null
+-parent attribute(see figure 2) of AppClassLoader is object of ExtClassLoader
+-ExtClassLoader and AppClassLoader are child classes of UrlClassLoader.
 
-understanding both concepts with code
 
 
-loadClass() and findClass() methods
-other questions
+Any class loader in java must follow four basic rules : 
+-uniqueness : A class must be loaded by one and only one ClassLoader.
+-delegation : ClassLoader must delegate the process of loading a class to its parent(attribute) ClassLoader.If class cannot be loaded in its parent (attribute) hierarchy then it can load this class itself.
+-visibility : A child ClassLoader can see all classes loaded by its parent(attribute) classLoader.
+-Every loaded class in JVM is uniquely identified by combination of two things : 
+(1)fully qualified class name with package.
+(2)ClassLoader which loads this class.
 
+
+Now you will have some clear thoughts regarding ClassLoaders and you will be able to answer some of the questions asked.
+Lets discuss their answers one by one.
+
+
+
+
+
+
+
+
+ 
