@@ -1,0 +1,173 @@
+AbstractQueuedSynchronizer
+
+ReentrantLock
+Semaphore
+CountdownLatch
+ReentrantReadWriteLock
+FutureTask
+SynchronousQueue
+
+
+Exclusive Acquisition :
+tryAcquire()
+tryRelease()
+isHeldExclusively()
+
+
+shared Acquisition :
+tryAcquireShared()
+tryReleaseShared()
+
+http://www.javaworld.com/article/2077413/learn-java/semaphore.html
+
+==================================
+
+What are state dependent classes and how to create them?
+
+classes that helps threads to work or wait based on state of an object are state dependent classes.
+In java , multi threaded state dependent operations are done by : object intrinsic lock ,explicit condition queues and AbstractQueuedSynchronizer
+
+Initially java only followed simple concept of monitors and wait sets on objects.All other features like semaphore and latches are implemented over it.
+In java 1.5, it extended the feature of object wait sets and improved it to Condition objects.Before that condition predicates were used by programmers to implemented state based classes.These condition predicates were very fragile to maintain as their could be many code paths and many state based conditions to implement.
+
+
+Polling and seeking approach for making state based class :
+
+
+acquire lock on object state
+while (precondition does not hold) {
+	release lock
+	wait until precondition might hold
+	optionally fail if interrupted or timeout expires
+	reacquire lock
+}
+perform action
+release lock
+
+
+public V take() {
+	while (true) {
+		try {
+			synchronized(this) {
+				if (isEmpty())
+					throw new BufferEmptyException();
+				return doTake();
+			}
+		} catch (BufferEmptyException e) {
+			Thread.sleep(SLEEP_GRANULARITY);
+		}
+	}
+}
+
+problems :
+-unwanted sleep
+-cpu utilization
+
+
+Handling condition predicates at code level using wait-notify improved previous approach,but it was difficult to maintain if number of condition predicates becomes high.
+
+public synchronized V take() throws InterruptedException {
+	while (isEmpty())
+		wait();
+	V v = doTake();
+	notifyAll();
+	return v;
+}
+
+There are two kind of multiple threads requirement that can be considered here:
+-uniform waiter requirement : threads must be waiting uniformly based on their condition predicates.
+-one in one out requirement : after exiting one thread another single thread must be chance to execute.
+
+It is also difficult to maintain uniform waiters requirement using wait-notifyAll methods as all threads will be notified even if their conditions are not true.This also makes more CPU utilization and context switching.
+Also this code is fragile to maintain.Adding any other condition queue will change lot of code paths.
+
+
+Condition objects to the rescue :
+
+Lock class generalized intrinsic lock
+Condition class generalized condition queues
+
+So one Lock object can have multiple Condition objects.
+Each Condition object can have a queue of threads waiting for that condition predicate to be true.
+Basically , condition object is nothing but an intrinsic lock in java , but they maintain a fair or non-fair queue of waiting thread on these objects.
+Condition must be guarded by the same lock from which it was created.Also, Condition objects must be used inside lock() method of Lock.
+
+problems while creating state based synchronizer classes :
+-lack of documentation
+-handling inheritance issues
+-performance and cpu utilization factors
+
+AbstractQueuedSynchronizer to the rescue :
+
+basic operations and features of AQS :
+
+-It must have acquire and release features
+-manages state as integer field to determine state. methods are getState() setState() compareAndSetState()
+-they can also manage other state variables, like ReentrantLock manages current thread as a variable
+-Lock can be acquired either in shared or exclusive mode
+
+
+boolean acquire() throws InterruptedException {
+	while (state does not permit acquire) {
+		if (blocking acquisition requested) {
+			enqueue current thread if not already queued
+			block current thread
+		}
+		else
+			return failure
+	}
+	possibly update synchronization state
+	dequeue thread if it was queued
+	return success
+}
+
+void release() {
+	update synchronization state
+	if (new state may permit a blocked thread to acquire)
+		unblock one or more queued threads
+}
+
+
+Examples of state dependent classes in java :
+ReentrantLock
+Semaphore
+CountdownLatch
+ReentrantReadWriteLock
+FutureTask
+SynchronousQueue
+
+Methods of AQS class in java can be used in two ways : Shared or Exclusive mode acquisition.
+
+For Exclusive Acquisition , child class must implement following methods:
+tryAcquire()
+tryRelease()
+isHeldExclusively()
+
+
+For Shared Acquisition , child class must implement following methods:
+tryAcquireShared()
+tryReleaseShared()
+
+
+None of the synchronizers in java.util.concurrent extends AQS directly.They all delegate to private inner subclasses of AQS instead.
+
+
+tryAcquire() method for nonfair ReentrantLock : 
+
+protected boolean tryAcquire(int ignored) {
+	final Thread current = Thread.currentThread();
+	int c = getState();
+	if (c == 0) {
+		if (compareAndSetState(0, 1)) {
+			owner = current;
+			return true;
+		}
+	} else if (current == owner) {
+		setState(c+1);
+		return true;
+	}
+	return false;
+}
+
+
+
