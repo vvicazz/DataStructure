@@ -170,4 +170,15 @@ protected boolean tryAcquire(int ignored) {
 }
 
 
+==========================
+
+
+http://stackoverflow.com/questions/2664172/java-concurrency-cas-vs-locking
+
+http://stackoverflow.com/questions/34944212/unsafe-compareandswapint-vs-synchronize
+
+
+Difference b/w fair and non-fair sync is that :
+In non-fair sync , if a newly thread comes and asks for a resource and resource is available, then resource is provided to that thread, irrespective of the fact that any other has been waiting for this resource for long time.
+
 
