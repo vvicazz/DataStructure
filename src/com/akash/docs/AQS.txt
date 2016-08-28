@@ -172,7 +172,6 @@ protected boolean tryAcquire(int ignored) {
 
 ==========================
 
-
 How ReentrantLock works in java
 
 ***http://stackoverflow.com/questions/39183578/how-lock-method-works-in-reentrantlock-java
@@ -258,11 +257,17 @@ ReentrantLock methods :
 
 
 
-AQS methods : (data structure used by AQS)
+
+AQS methods :
 
 1.final boolean acquireQueued(final Node node, int arg)
 2.private void doAcquireInterruptibly(int arg) throws InterruptedException
 3.private boolean doAcquireNanos(int arg, long nanosTimeout) throws InterruptedException
+	Above three methods almost do the same logic.
+	They check two conditions in an infinite loop
+		-->If it can be allowed to execute tryAcquire() , then execute the thread
+		-->If its waitStatus is not SIGNAL, then make it SIGNAL and park the thread.
+
 
 4.private void doAcquireShared(int arg)
 5.private void doAcquireSharedInterruptibly(int arg) throws InterruptedException
@@ -271,7 +276,7 @@ AQS methods : (data structure used by AQS)
 
 
 
-ConditionObject methods : (Data structure used by Condition)
+ConditionObject methods :
 
 1.await()
 2.public final boolean await(long time, TimeUnit unit) throws InterruptedException
@@ -282,9 +287,53 @@ ConditionObject methods : (Data structure used by Condition)
 6.signal()
 7.signalAll()
 
+-->await() methods in ConditionObject, increases the state and park the thread.
+-->signal() methods decreases the state and unpark the firstWaiter.
+
+============================================================
+Data structure for AQS :
 
 
-============================================
+class AQS  {
+
+	private transient volatile Node head;
+	private transient volatile Node tail;
+	private volatile int state;
+	
+	static final class Node {
+		static final Node SHARED = new Node();
+		static final Node EXCLUSIVE = null;
+		static final int CANCELLED =  1;
+		
+		//Non-negative values mean that a node doesn't need to signal
+		static final int SIGNAL    = -1;
+		static final int PROPAGATE = -3;
+		
+		//Only used for Condition queues
+		static final int CONDITION = -2;
+		
+		volatile int waitStatus;
+		volatile Node prev;
+		volatile Node next;
+		volatile Thread thread;
+
+		//condition queues are accessed only when holding in exclusive mode
+		//In case of exclusive mode, threads for condition queue is saved
+		//In case of shared mode, empty Node object is saved.
+		Node nextWaiter;
+	}
+
+	public class ConditionObject {
+
+		private transient Node firstWaiter;
+		private transient Node lastWaiter;
+		//nextWaiter is used to hold next node of condition queue.
+	}
+}
+
+
+
+=============================================================
 
 
 
