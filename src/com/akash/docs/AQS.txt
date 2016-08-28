@@ -173,12 +173,149 @@ protected boolean tryAcquire(int ignored) {
 ==========================
 
 
+How ReentrantLock works in java
+
+***http://stackoverflow.com/questions/39183578/how-lock-method-works-in-reentrantlock-java
+**http://mishadoff.com/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/
+
 http://stackoverflow.com/questions/2664172/java-concurrency-cas-vs-locking
 
 http://stackoverflow.com/questions/34944212/unsafe-compareandswapint-vs-synchronize
 
+http://stackoverflow.com/questions/26534489/unsafe-park-vs-object-wait
+
+https://dzone.com/articles/interruptedexception-and
+
+
+========================================
 
 Difference b/w fair and non-fair sync is that :
 In non-fair sync , if a newly thread comes and asks for a resource and resource is available, then resource is provided to that thread, irrespective of the fact that any other has been waiting for this resource for long time.
 
+(Q)How lock() method works in reentrantlock java?
+http://stackoverflow.com/questions/39183578/how-lock-method-works-in-reentrantlock-java
 
+LockSupport.park() and LockSupport.unpark() are used
+
+class LockSupport {
+
+	UNSAFE = sun.misc.Unsafe.getUnsafe();
+	Class<?> tk = Thread.class;
+	parkBlockerOffset = UNSAFE.objectFieldOffset(tk.getDeclaredField("parkBlocker"));
+
+	//here arg is object of ReentrantLock
+	private static void setBlocker(Thread t, Object arg) {
+		// Even though volatile, hotspot doesn't need a write barrier here.
+		UNSAFE.putObject(t, parkBlockerOffset, arg);
+	}
+
+	public static void unpark(Thread thread) {
+		if (thread != null)
+			UNSAFE.unpark(thread);
+	}
+
+	public static void park(Object blocker) {
+		Thread t = Thread.currentThread();
+		setBlocker(t, blocker);
+		UNSAFE.park(false, 0L);
+		setBlocker(t, null);
+	}
+
+}
+
+
+https://dzone.com/articles/interruptedexception-and
+
+ReentrantLock methods :
+
+1.lock()
+	acquire(1) ---> acquireQueued() in exclusive mode ---> LockSupport.park(),
+	sleeps current thread until :
+		LockSupport.unpark() is called by other thread
+		interrupt() is called by other thread
+		
+2.lockInterruptibly() throws InterruptedException
+
+	It calls doAcquireInterruptibly() which is same as acquireQueued()
+	The difference is, when an interrupt occurs, it throws InterruptedException.
+	
+3.tryLock()
+	It calls tryAcquire() with nonFair version
+	If you want tryLock() with Fair version, call tryLock(timeout)
+	
+4.tryLock(long timeout, TimeUnit unit) throws InterruptedException
+
+	tryAcquireNanos(timeout) --->  doAcquireNanos(timeout)  --->   LockSupport.parkNanos(this, nanosTimeout)
+	Thread will sleep until :
+		timeout expires
+		an interrupt occurs in InterruptedException
+		
+5.unlock()
+	release(1)  --->  unparkSuccessor()  --->  LockSupport.unpark()
+	
+6.newCondition()
+	new ConditionObject()
+
+
+
+AQS methods : (data structure used by AQS)
+
+1.final boolean acquireQueued(final Node node, int arg)
+2.private void doAcquireInterruptibly(int arg) throws InterruptedException
+3.private boolean doAcquireNanos(int arg, long nanosTimeout) throws InterruptedException
+
+4.private void doAcquireShared(int arg)
+5.private void doAcquireSharedInterruptibly(int arg) throws InterruptedException
+6.private boolean doAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException
+
+
+
+
+ConditionObject methods : (Data structure used by Condition)
+
+1.await()
+2.public final boolean await(long time, TimeUnit unit) throws InterruptedException
+3.awaitUninterruptibly()
+4.public final long awaitNanos(long nanosTimeout) throws InterruptedException
+5.public final boolean awaitUntil(Date deadline) throws InterruptedException
+
+6.signal()
+7.signalAll()
+
+
+
+============================================
+
+
+
+AQS :
+semaphore
+latch
+ReentrantLock
+ReentrantReadWriteLock
+
+FutureTask  ----  ???
+
+
+
+(Q)How LockSupport works with UNSAFE api ?
+(Q)Understand all api methods of ReentrantLock
+
+(Q)How Condition works internally?
+(Q)How Condition and Lock works with each other?
+
+(Q)How ThreadPoolExecutor works?
+(Q)How FutureTask works?
+(Q)Functional interfaces and stream API ?
+
+Collection
+
+=======================
+
+interview questions :
+
+-how lock api is better then synchronized
+-how cas is better than monitor locking
+-create your own ThreadPoolExecutor
+-what is semaphore 
+-what is latch
