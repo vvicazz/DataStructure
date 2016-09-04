@@ -25,10 +25,15 @@ http://www.javaworld.com/article/2077413/learn-java/semaphore.html
 What are state dependent classes and how to create them?
 
 classes that helps threads to work or wait based on state of an object are state dependent classes.
-In java , multi threaded state dependent operations are done by : object intrinsic lock ,explicit condition queues and AbstractQueuedSynchronizer
+In java , multi threaded state dependent operations are done by : object intrinsic lock ,explicit condition queues
+ and AbstractQueuedSynchronizer
 
-Initially java only followed simple concept of monitors and wait sets on objects.All other features like semaphore and latches are implemented over it.
-In java 1.5, it extended the feature of object wait sets and improved it to Condition objects.Before that condition predicates were used by programmers to implemented state based classes.These condition predicates were very fragile to maintain as their could be many code paths and many state based conditions to implement.
+Initially java only followed simple concept of monitors and wait sets on objects.All other features
+ like semaphore and latches are implemented over it.
+In java 1.5, it extended the feature of object wait sets and improved it to Condition objects.
+Before that condition predicates were used by programmers to implemented state based classes.
+These condition predicates were very fragile to maintain as their could be many code paths and
+ many state based conditions to implement.
 
 
 Polling and seeking approach for making state based class :
@@ -45,6 +50,9 @@ perform action
 release lock
 
 
+
+=>example of take() method of a BoundedBuffer
+
 public V take() {
 	while (true) {
 		try {
@@ -60,11 +68,12 @@ public V take() {
 }
 
 problems :
--unwanted sleep
+-sleep time can be more or less,hence extra time wasted in sleep
 -cpu utilization
 
 
-Handling condition predicates at code level using wait-notify improved previous approach,but it was difficult to maintain if number of condition predicates becomes high.
+Handling condition predicates at code level using wait-notify improved previous approach,
+but it was difficult to maintain if number of condition predicates becomes high.
 
 public synchronized V take() throws InterruptedException {
 	while (isEmpty())
@@ -74,30 +83,36 @@ public synchronized V take() throws InterruptedException {
 	return v;
 }
 
-There are two kind of multiple threads requirement that can be considered here:
+There are two kind of threads requirement that can be considered in multi-threading :
 -uniform waiter requirement : threads must be waiting uniformly based on their condition predicates.
--one in one out requirement : after exiting one thread another single thread must be chance to execute.
+-one in one out requirement : after exiting one thread another single thread must be getting a chance to execute.
 
-It is also difficult to maintain uniform waiters requirement using wait-notifyAll methods as all threads will be notified even if their conditions are not true.This also makes more CPU utilization and context switching.
+It is also difficult to maintain uniform waiters requirement using wait-notifyAll methods as 
+all threads will be notified even if their conditions are not true.
+This also makes more CPU utilization and context switching 
+as threads having unwanted condition queues are woken up by notifyAll().
 Also this code is fragile to maintain.Adding any other condition queue will change lot of code paths.
 
 
-Condition objects to the rescue :
+=>Condition objects to the rescue :
 
 Lock class generalized intrinsic lock
 Condition class generalized condition queues
 
 So one Lock object can have multiple Condition objects.
 Each Condition object can have a queue of threads waiting for that condition predicate to be true.
-Basically , condition object is nothing but an intrinsic lock in java , but they maintain a fair or non-fair queue of waiting thread on these objects.
-Condition must be guarded by the same lock from which it was created.Also, Condition objects must be used inside lock() method of Lock.
+Basically , condition object is nothing but an intrinsic lock in java , 
+but they maintain a fair or non-fair queue of waiting thread on these objects.
+Condition must be guarded by the same lock from which it was created.
+Also, Condition objects must be used inside lock() method of Lock.
 
 problems while creating state based synchronizer classes :
 -lack of documentation
 -handling inheritance issues
 -performance and cpu utilization factors
 
-AbstractQueuedSynchronizer to the rescue :
+
+==>AbstractQueuedSynchronizer to the rescue :
 
 basic operations and features of AQS :
 
@@ -189,7 +204,9 @@ https://dzone.com/articles/interruptedexception-and
 ========================================
 
 Difference b/w fair and non-fair sync is that :
-In non-fair sync , if a newly thread comes and asks for a resource and resource is available, then resource is provided to that thread, irrespective of the fact that any other has been waiting for this resource for long time.
+In non-fair sync , if a newly thread comes and asks for a resource and resource is available,
+ then resource is provided to that thread, irrespective of the fact 
+ that any other thread has been waiting for this resource for long time.
 
 (Q)How lock() method works in reentrantlock java?
 http://stackoverflow.com/questions/39183578/how-lock-method-works-in-reentrantlock-java
@@ -290,6 +307,29 @@ ConditionObject methods :
 -->await() methods in ConditionObject, increases the state and park the thread.
 -->signal() methods decreases the state and unpark the firstWaiter.
 
+
+===============================
+
+Lock lock = new ReentrantLock();
+Condition condition1=lock.newCondition();
+
+void foo() {
+
+	lock.lock();
+	try {
+		while(..) {
+			condition1.await();
+		}
+		...
+		...
+		condition1.signal();
+	}
+	finally {
+		lock.unlock();
+	}
+}
+
+
 ============================================================
 Data structure for AQS :
 
@@ -368,3 +408,208 @@ interview questions :
 -create your own ThreadPoolExecutor
 -what is semaphore 
 -what is latch
+
+
+==================================
+
+
+http://stackoverflow.com/questions/11428151/why-is-the-class-called-runnablefuturet-instead-of-callablefuturet
+http://stackoverflow.com/questions/39309451/workercountof-method-in-threadpoolexecutor-java
+
+
+ExecutorService :
+
+AbstractExecutorService
+ThreadPoolExecutor
+ForkJoinPool
+FinalizableDelegatedExecutorService
+ScheduledThreadPoolExecutor
+DelegatedExecutorService
+DelegatedScheduledExecutorService
+
+
+ThreadFactory :
+
+DefaultThreadFactory
+PrivilegedThreadFactory
+
+
+
+**Worker class in ThreadPoolExecutor is child class of AQS and Runnable
+
+A new thread of Worker object is created for every task, which directly calls thread.run() method internally.
+
+addWorker() method adds new worker and creates new thread and start it.
+
+starting of worker thread is done inside a lock named , mainLock
+running thread.run() method inside runWorker() is also performed inside worker.lock()
+
+
+===========================
+
+(1)ExecutorService executor = Executors.newFixedThreadPool(10);
+
+(2)Future<String> future = executor.submit(callable);
+
+		new FutureTask<T>(callable);
+			this.callable = callable;
+			this.state = NEW;
+		execute(ftask);			//has 3 steps of checking
+			--->addWorker(ftask, true);
+					--->Worker w = new Worker(ftask)
+						--->Worker(Runnable firstTask) {
+								setState(-1); // inhibit interrupts until runWorker
+								this.firstTask = firstTask;
+								this.thread = getThreadFactory().newThread(this);		//new thread is created
+							}
+					--->workers.add(w);
+					--->w.thread.start();		//inside this.mainLock.lock() and this.mainLock.unlock()
+						--->public void run() {
+								runWorker(this);
+							}
+							
+							runWorker(Worker w) {
+								w.unlock(); // allow interrupts
+								...
+								w.lock();
+									w.firstTask.run();
+										--->FutureTask.run();
+												V result = callable.call();
+												state=COMPLETING;
+												outcome = result;
+								w.unlock();
+								...
+							}
+					
+
+(3)String output = future.get();
+
+
+================================
+
+public class ThreadPoolExecutor extends AbstractExecutorService {
+
+	// http://stackoverflow.com/questions/39309451/workercountof-method-in-threadpoolexecutor-java
+	//ctl variable holds data for two conditions : 
+	//workerCount = no of worker threads running , lower order 29 bits represents this count
+	//run_state = running state of executor , higher order 3 bits represents this state
+	
+	private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+	private static final int COUNT_BITS = Integer.SIZE - 3;			//29
+	private static final int CAPACITY   = (1 << COUNT_BITS) - 1;	//536870911		00011111111111111111111111111111
+
+	// RUN_STATE is stored in the high-order bits
+	private static final int RUNNING    = -1 << COUNT_BITS;			//-536870912	11100000000000000000000000000000
+	private static final int SHUTDOWN   =  0 << COUNT_BITS;			//0				00000000000000000000000000000000
+	private static final int STOP       =  1 << COUNT_BITS;			//536870912		00100000000000000000000000000000
+	private static final int TIDYING    =  2 << COUNT_BITS;			//1073741824	01000000000000000000000000000000
+	private static final int TERMINATED =  3 << COUNT_BITS;			//1610612736	01100000000000000000000000000000
+
+	private static int runStateOf(int c)     { return c & ~CAPACITY; }	// RUN_STATE & ~CAPACITY = RUN_STATE
+	private static int workerCountOf(int c)  { return c & CAPACITY; }	// RUN_STATE & CAPACITY = 0
+	private static int ctlOf(int rs, int wc) { return rs | wc; }
+	
+	
+	
+	//Each task execution is implemented via this class
+	private final class Worker
+        extends AbstractQueuedSynchronizer
+        implements Runnable
+    {
+		//A new thread is created for every task, t.start() is called from addWorker() method for each task.
+        final Thread thread;
+		
+        //Actual runnable task which is directly called as firstTask.run() from runWorker()
+        Runnable firstTask;
+		
+        //
+        volatile long completedTasks;
+	}
+	
+	//threads that are waiting in queue to get a chance to execute
+    private final BlockingQueue<Runnable> workQueue;
+
+	//operations on worker thread is done inside this lock
+    private final ReentrantLock mainLock = new ReentrantLock();
+
+	//It maintains set of workers running
+    private final HashSet<Worker> workers = new HashSet<Worker>();
+
+    private final Condition termination = mainLock.newCondition();
+
+	//largest pool size reached till now
+    private int largestPoolSize;
+
+    private long completedTaskCount;
+    
+    private volatile ThreadFactory threadFactory;
+
+    private volatile RejectedExecutionHandler handler;
+
+    private volatile long keepAliveTime;
+
+    private volatile boolean allowCoreThreadTimeOut;
+
+    private volatile int corePoolSize;
+
+    private volatile int maximumPoolSize;
+
+}
+
+=================================
+
+public class FutureTask<V> implements RunnableFuture<V> {
+
+	private volatile int state;
+    private static final int NEW          = 0;
+    private static final int COMPLETING   = 1;
+    private static final int NORMAL       = 2;
+    private static final int EXCEPTIONAL  = 3;
+    private static final int CANCELLED    = 4;
+    private static final int INTERRUPTING = 5;
+    private static final int INTERRUPTED  = 6;
+
+
+    //In case of Runnable, RunnableAdapter is used
+    private Callable<V> callable;
+	
+    //result for Callable
+    private Object outcome; 
+	
+    //
+    private volatile Thread runner;
+	
+    //
+    private volatile WaitNode waiters;
+
+    //for UNSAFE use
+	private static final long stateOffset;
+    private static final long runnerOffset;
+    private static final long waitersOffset;
+
+
+	static final class WaitNode {
+        volatile Thread thread;
+        volatile WaitNode next;
+        WaitNode() { thread = Thread.currentThread(); }
+    }
+}
+
+
+===============================
+
+Rules of ThreadPoolExecutor :
+
+(1)When a new task is submitted in method execute(Runnable), and fewer than corePoolSize threads are running, a new thread is created to handle the request, even if other worker threads are idle. 
+(2)If there are more than corePoolSize but less than maximumPoolSize threads running, a new thread will be created only if the queue is full.
+(3)even core threads are initially created and started only when new tasks arrive, but this can be overridden dynamically using method prestartCoreThread or prestartAllCoreThreads
+
+(4) a Executors.defaultThreadFactory is used, that creates threads to all be in the same ThreadGroup and with the same NORM_PRIORITY priority and non-daemon status. 
+
+(5)If the pool currently has more than corePoolSize threads, excess threads will be terminated if they have been idle for more than the keepAliveTime (see getKeepAliveTime(TimeUnit)). 
+
+(6) The use of this queue interacts with pool sizing: 
+If fewer than corePoolSize threads are running, the Executor always prefers adding a new thread rather than queuing. 
+If corePoolSize or more threads are running, the Executor always prefers queuing a request rather than adding a new thread. 
+If a request cannot be queued, a new thread is created unless this would exceed maximumPoolSize, in which case, the task will be rejected. 
+
