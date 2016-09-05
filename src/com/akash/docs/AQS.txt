@@ -416,6 +416,7 @@ interview questions :
 http://stackoverflow.com/questions/11428151/why-is-the-class-called-runnablefuturet-instead-of-callablefuturet
 http://stackoverflow.com/questions/39309451/workercountof-method-in-threadpoolexecutor-java
 
+***http://stackoverflow.com/questions/28810474/use-futuretask-for-concurrency
 
 ExecutorService :
 
@@ -444,6 +445,11 @@ addWorker() method adds new worker and creates new thread and start it.
 starting of worker thread is done inside a lock named , mainLock
 running thread.run() method inside runWorker() is also performed inside worker.lock()
 
+===============
+
+(Q)Why ThreadPoolExecutor.Worker class implemented AQS ?
+
+Ans : Whenever you need state dependent operations on the object of your class, you need to implement AQS.
 
 ===========================
 
@@ -579,7 +585,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
     //
     private volatile Thread runner;
 	
-    //
+    //Treiber stack : scalable lock-free stack utilizing the fine-grained concurrency primitive Compare-and-swap
     private volatile WaitNode waiters;
 
     //for UNSAFE use
@@ -588,6 +594,9 @@ public class FutureTask<V> implements RunnableFuture<V> {
     private static final long waitersOffset;
 
 
+	//The main thread that calls future.get() method, will be tracked in WaitNode.
+	//There could be multiple waitNodes depending upon if , multiple threads are trying to fetch output of same future object.
+	//list of waitNodes are stored as stack or Treiber stack
 	static final class WaitNode {
         volatile Thread thread;
         volatile WaitNode next;
