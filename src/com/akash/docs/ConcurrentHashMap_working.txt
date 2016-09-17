@@ -1,0 +1,140 @@
+
+int HASH_BITS = 0x7fffffff;
+
+(h ^ (h >>> 16)) & HASH_BITS
+
+
+Class<?> ak = Node[].class;
+ABASE = U.arrayBaseOffset(ak);						//base offset of array
+int scale = U.arrayIndexScale(ak);					//size of element
+ASHIFT = 31 - Integer.numberOfLeadingZeros(scale);	//number of shifts to get next object in array
+
+U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+
+
+
+tabAt(tab, i = (n - 1) & hash)
+
+
+static class Node<K,V> implements Map.Entry<K,V> {
+        final int hash;
+        final K key;
+        volatile V val;
+        volatile Node<K,V> next;
+}
+
+
+========================
+		
+
+(Q)What can be the size of Node here?	//size=16
+(Q)As   floor(log2(x)) = 31 - Integer.numberOfLeadingZeros(x) 
+   why log of size of Node object is taken for hashcode ?
+Ans:
+As unsafe volatile operations are implemented , length of each Node and start of Node array is taken for Unsafe operations.
+
+
+NOTE :   
+Length of table of hashmap is always a power of 2
+why ?
+Ans :
+It improves performance like , finding index of table for a hash = (n-1) & hash
+
+
+NOTE :
+floor(log2(x)) = 31 - Integer.numberOfLeadingZeros(x)
+
+
+(Q)How spread() method works in ConcurrentHashMap ?
+
+int HASH_BITS = 0x7fffffff;
+static final int spread(int h) {
+	return (h ^ (h >>> 16)) & HASH_BITS;
+}
+
+
+(Q) How put() method works in ConcurrentHashMap ?
+
+It uses Unsafe methods of java to add element in Node[] array in a volatile manner.
+If two elements having same hash goes for same bucket, it uses synchronized keyword on top element of bucket.
+If bucket of any index increase to 8 , then a RB tree is created for that.
+
+Unsafe methods used are :
+
+	static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
+        return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+    }
+
+    static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i,
+                                        Node<K,V> c, Node<K,V> v) {
+        return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
+    }
+
+    static final <K,V> void setTabAt(Node<K,V>[] tab, int i, Node<K,V> v) {
+        U.putObjectVolatile(tab, ((long)i << ASHIFT) + ABASE, v);
+    }
+
+	
+
+NOTE :
+In java 8, Segment class in ConcurrentHashMap is Stripped-down.
+
+====================================================================================
+
+HashMap :
+
+Map<String,String> map = new HashMap<String,String>(1,2);
+map.put("A", "A");
+map.put("B", "B");
+System.out.println(map);
+
+//Above program have same bucket for two different keys having different hashcode.
+
+====================
+
+How to calculate hashcode : HashMap.hash() method 
+String key = "A";
+int h;
+System.out.println((key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16));
+
+for A -->  65
+for B -->  66
+for C  ->  67 
+
+
+===============
+Both A and B have different hashcode, but will lie in same bucket.
+Can be checked via debugger.
+
+table[0]
+                (java.util.HashMap$Node<K,V>) A=A
+table[0].next
+                (java.util.HashMap$Node<K,V>) B=B
+                
+=============
+
+How to calculate bucket number of array in map for a particular object:
+
+(n - 1) & hash, 
+
+where n is length of the array in hashtable
+hash is the value returned by HashMap.hash() method  for any object
+
+
+===============
+
+Map<String,String> map = new HashMap<String,String>(2,2);
+map.put("A", "A");
+map.put("C", "C");
+System.out.println(map);
+
+Above program also have same bucket for two different keys having different hashcode.
+
+
+Hence, two different objects having  different hashCode, can have same bucket number, 
+depending upon following parameters :
+-logic of hashcode
+-logic for calculating bucket number
+-size of array in hashtable
+-load factor
+
