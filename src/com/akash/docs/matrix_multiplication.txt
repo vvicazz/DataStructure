@@ -1,0 +1,16 @@
+matrix multiplication:
+
+A[n x m] X B [m x p]  = C[n x p]
+
+Why matrix multiplication is done in this way?
+What is the advantage of matrix multiplication?
+What is the meaning of determinant of a matrix?
+What is the meaning of tranpose of a matrix?
+
+
+https://www.khanacademy.org/math/precalculus/precalc-matrices/matrices-as-transformations/v/transforming-position-vector
+
+https://www.khanacademy.org/math/precalculus/precalc-matrices/matrices-as-transformations/a/matrices-as-transformations
+
+http://programmers.stackexchange.com/questions/300113/what-are-the-advantages-of-matrix-multiplication-over-individual-variables-grap
+
