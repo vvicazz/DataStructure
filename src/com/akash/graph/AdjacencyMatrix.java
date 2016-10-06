@@ -19,6 +19,21 @@ public class AdjacencyMatrix<N> {
 	private Set<Node<N>> vertices = new HashSet<Node<N>>();
 	private int numberOfEdges;
 
+	public boolean removeNode(N nodeData) {
+		Node<N> nodeToRemove = new Node<N>(nodeData);
+		if (vertices.contains(nodeToRemove)) {
+			vertices.stream().forEach(node -> {
+				if (node.findEdge(nodeToRemove).isPresent()) {
+					node.removeEdge(nodeToRemove);
+					numberOfEdges--;
+				}
+			});
+			vertices.remove(nodeToRemove);
+			return true;
+		}
+		return false;
+	}
+
 	public boolean addEdge(N startNode, N endNode) {
 		Node<N> start = new Node<N>(startNode);
 		Node<N> end = new Node<N>(endNode);
@@ -61,11 +76,11 @@ public class AdjacencyMatrix<N> {
 			this.node = node;
 		}
 
-		public N getNode() {
+		N getNode() {
 			return node;
 		}
 
-		public Set<Edge<N>> getEdges() {
+		Set<Edge<N>> getEdges() {
 			return edges;
 		}
 
