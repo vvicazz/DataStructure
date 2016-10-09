@@ -93,8 +93,6 @@ Solution : This can be possible if each vertex have an even degree.
 
 Depth First Search(DFS) :
 
-Depth First Search(DFS) :
-
 DFS can be done on any path of the graph.
 There can be many DFS tree possibilities from a single node.
 There can be a possibilities that, DFS tree has a longer path bw two nodes as compared to its shortest path.
@@ -112,6 +110,7 @@ DFS has only two types of nodes : tree edge and back edge.
 
 
 DFS Algo :
+DFS can be implemented by using recursion or by stack.
 
 We will use three properties for a node in DFS:
 boolean visited		v
@@ -130,4 +129,44 @@ DFS(node) {
 	node.d=tme++;
 }
 
+time complexity = O(E)
+
+property of a DFS :
+arr[u] < arr[v]
+dep[u] > dep[v]
+
+
+=======
+
+2 Edge Connected :
+A graph is 2 edge connected if and only if, you remove an edge from graph and it is still connected.
+
+bridge edge : an which if removed, then the graph is not a connected.
+We just need to find out if there is any bridge edge in a graph
+
+solution 1 : remove each edge and perform BFS and check if graph is connected.
+
+solution 2 :
+
+When backtracking from a node v, 
+We need to ensure that there is a back edge from some descendent of v to some ancestor of v.
+descendent of v also includes v itself.
+
+There can be many back edges from descendent of v to ancestor of v, but we should be interested in Deepest back edge.
+Deepest Back Edge : A back edge whose ancestor arrival time is minimum (i.e. edge goes top of the tree).
+
+variable used in algo :
+dbe = deepest back edge
+
+
+
+
+(Q)Given a graph G, is G a planar graph?
+
+Planar graph : a graph whose vertices and edges are on same plan and no two edge intersect each other.
+
+Complete graph on 5 vertices, is not a planar graph.
+
+(Q)2 Vertex connected graph :
+If we remove a vertex from a graph, the graph must be connected.
 
