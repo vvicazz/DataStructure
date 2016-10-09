@@ -192,3 +192,42 @@ Complete graph on 5 vertices, is not a planar graph.
 
 (Q)2 Vertex connected graph :
 If we remove a vertex from a graph, the graph must be connected.
+
+===============================
+
+DFS for Directed Graph :
+
+Types of edges :
+Forward
+Back
+Tree
+Cross
+
+For cross edge (u,v) :  	arr[u] < dep[u] < arr[v] < dep[v]
+
+For Forward edge (u,v) : 	arr[u] < arr[v]
+							dep[u] > dep[v]
+								OR
+							arr[u] < arr[v] < dep[v] < dep[u]
+							
+For Back edge (u,v) :		arr[u] > arr[v]
+							dep[u] < dep[v]
+								OR
+							arr[v] < arr[u] < dep[u] < dep[v]
+							
+For Tree edge (u,v) :		arr[u] < arr[v]
+							dep[u] > dep[v]
+								OR
+							arr[u] < arr[v] < dep[v] < dep[u] (similar to Forward Edge)
+
+Topological sort : sorting vertices on the basis of departure timestamp 
+	(this can be done while performing DFS just to avoid complexity of sorting)
+
+A directed graph is cyclic only if it has a back edge :
+	
+
+DAG : Directed Acyclic Graph
+
+Strongly connected graph
+
+Weakly connected graph
