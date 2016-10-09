@@ -278,3 +278,100 @@ list(words from doc_data, freq as 1)
 Note:
 Mapper do not work on keys, it only works on values.
 Reducer applies an aggregate function
+
+
+===============================
+
+what is namenode and datanode?
+what are their significance?
+
+Every map reduce program must have a job.
+This job specifies mapper and reducer program
+
+we implement Mapper and Reducer classes.
+
+public class Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT>{
+
+	
+}
+
+public class Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
+	
+}
+
+How wordCount program runs :
+
+	Job job = new Job(conf, "word count");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    for (int i = 0; i < otherArgs.length - 1; i++) {
+      FileInputFormat.addInputPath(job, new Path(otherArgs[i]));
+    }
+    FileOutputFormat.setOutputPath(job, new Path(otherArgs[(otherArgs.length - 1)]));
+    
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+    
+===================================
+API
+
+org.apache.hadoop.mapreduce.Job
+public class Job  extends JobContextImpl  implements JobContext
+
+org.apache.hadoop.mapreduce.Reducer
+
+org.apache.hadoop.mapreduce.Mapper
+
+======================================
+    
+We have to specify configuration for each job :
+
+code in Job class :
+
+   public void setInputFormatClass(Class<? extends InputFormat> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.inputformat.class", cls, InputFormat.class);
+  }
+  
+  public void setOutputFormatClass(Class<? extends OutputFormat> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.outputformat.class", cls, OutputFormat.class);
+  }
+  
+  public void setMapperClass(Class<? extends Mapper> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.map.class", cls, Mapper.class);
+  }
+  
+  public void setCombinerClass(Class<? extends Reducer> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.combine.class", cls, Reducer.class);
+  }
+  
+  public void setReducerClass(Class<? extends Reducer> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.reduce.class", cls, Reducer.class);
+  }
+  
+  public void setPartitionerClass(Class<? extends Partitioner> cls)
+    throws IllegalStateException
+  {
+    ensureState(JobState.DEFINE);
+    this.conf.setClass("mapreduce.job.partitioner.class", cls, Partitioner.class);
+  }
+
+===========================
+

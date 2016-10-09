@@ -92,3 +92,42 @@ Solution : This can be possible if each vertex have an even degree.
 ===========================
 
 Depth First Search(DFS) :
+
+Depth First Search(DFS) :
+
+DFS can be done on any path of the graph.
+There can be many DFS tree possibilities from a single node.
+There can be a possibilities that, DFS tree has a longer path bw two nodes as compared to its shortest path.
+We store a timestamp of every node.
+Every node has two timestamp stored :
+	->start_timestamp = time at which node was monitored first.
+	->end_timestamp = time at which no further route was found and backtracked.
+Stack is used to implement DFS.
+Path formed by DFS is called DFS tree.
+Two types of edges in DFS tree :
+	->tree edges
+	->back edges : An edge from a node to its ancestor
+A back edge can have a shorter path bw two nodes as compared to tree edges.
+DFS has only two types of nodes : tree edge and back edge.
+
+
+DFS Algo :
+
+We will use three properties for a node in DFS:
+boolean visited		v
+int arrival_time	a
+int departure_time	d
+
+time=0;
+DFS(node) {
+	node.v=true;
+	node.a=time++;
+	for all w adjacent to node {
+		If (!w.v) {
+			DFS(w);
+		}
+	}
+	node.d=tme++;
+}
+
+

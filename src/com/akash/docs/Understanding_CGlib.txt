@@ -10,7 +10,81 @@ http://zeroturnaround.com/rebellabs/java-bytecode-fundamentals-using-objects-and
 
 CGLIB is a byte code generation library which creates and link proxy classes at runtime.As java classes can be dynamically linked (http://slurp.doc.ic.ac.uk/pubs/observing/linking.html) , we can add new classes in running java program.It simply creates a subclass of your class or interface by reading its byte code.Under the hood it uses ASM which is a byte code manipulation framework.ASM helps CGLIB to generate java byte code at runtime.Frameworks like spring, hibernate, mockito uses CGLIB. Spring AOP uses proxy-based Aspect Oriented Programming which has a feature of method interception.Hibernate implemented a feature of returning proxy of an object of entity graph from database where child entities are fetched from database when required.Hibernate uses CGLIB for this feature.
 
+Lets start with some coding examples.CGLIB has a class named net.sf.cglib.proxy.Enhancer which helps us to create proxy class for classes that does not implement any interface.
 
+public class FirstCGLIBProgram {
+
+	public static void main(String[] args) throws Exception {
+
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(DemoClass.class);
+		
+		//here we have to specify object a class that implements Callback interface
+		enhancer.setCallback(new FixedValueProxy());
+		
+		//Generate proxy class and its object and uses the no-arg constructor of the superclass
+		DemoClass proxy = (DemoClass) enhancer.create();
+		
+		System.out.println(proxy.test1(null));
+		System.out.println(proxy.test2(null));
+		System.out.println(proxy.test3(null));
+		System.out.println(proxy.test5(null));
+	}
+}
+
+class MethodInterceptorProxy implements MethodInterceptor {
+
+	public Object intercept(Object obj, Method method, Object[] args,
+			MethodProxy proxy) throws Throwable {
+
+		System.out.println("intercept");
+		if (method.getDeclaringClass() != Object.class
+				&& method.getReturnType() == String.class) {
+
+			proxy.invokeSuper(obj, args);
+			return "Hello cglib";
+
+		} else {
+			return proxy.invokeSuper(obj, args);
+		}
+	}
+}
+
+class FixedValueProxy implements FixedValue {
+
+	@Override
+    public Object loadObject() throws Exception {
+      return "Hello cglib!";
+    }
+}
+
+class DemoClass {
+
+	public String test1(String input) {
+		System.out.println("public method");
+		return "test-1";
+	}
+
+	protected String test2(String input) {
+		System.out.println("protected method");
+		return "test-2";
+	}
+
+	String test3(String input) {
+		System.out.println("default method");
+		return "test-3";
+	}
+
+	private String test4(String input) {
+		System.out.println("private method");
+		return "test-4";
+	}
+	
+	public static String test5(String input) {
+		System.out.println("static method");
+		return "test-5";
+	}
+}
 
 
 

@@ -110,14 +110,18 @@ If a checked exception occurs inside a transaction method, it will never be roll
 5.		Person p = new Person();
 6.		entityManager.persist(p);
 7.	}
-8.}
+8.} 
 
 ********NOTE*********
+
+***NOTE : new transaction is not created when method is called from same class.***
 
 (1)Control will go to TransactionInterceptor.invoke
 (2)Control will go to line 5
 (3)control will go to line 6 -> which transfer control to SharedEntityManagerInvocationHandler.invoke
 
+if exception occurs :
+TransactionAspectSupport.invokeWithinTransaction() will catch exception
 
 @PersistenceContext
 
