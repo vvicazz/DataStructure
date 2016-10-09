@@ -1,0 +1,94 @@
+Graph_notes
+
+https://www.arangodb.com/2016/04/index-free-adjacency-hybrid-indexes-graph-databases/
+https://www.quora.com/What-is-the-internal-architecture-of-graph-databases-such-as-Titan-or-Neo4j
+http://stackoverflow.com/questions/5604338/how-graph-databases-store-data-to-a-persistent-storage
+
+undirected graph terminologies :
+
+=>adjacent vertices : vertices joined by an edge
+=>degree : no of edges connected to a vertex
+=>sum of degree of all vertices = 2 * (no. of edges)
+=>Path : a sequence of vertices v1,v2,...vn where vi and vi+1 has an edge
+=>simple path, cyclic path
+=>connected graph : every two vertices must have a path
+=>Subgraph : a grapgh subset of vertices and subset of edges
+=>Maximum connected subgrapgh : a subgrapgh, in which if u add a vertex , u cannot get a connected subgraph
+=>Tree (free tree) : connected graph without cycles, different from Tree DS as they have no root node.
+=>Forest : collection of trees
+=>Complete graph : there is an edge bw every pair of vertices
+	How many edges in a complete graph : nC2 = n*(n-1)/2
+	How many edges in a complete directed graph : 2 * nC2 = n*(n-1)
+=>Minimum no of edges required to make a graph connected = n-1
+=>Spanning tree : subgraph which is a tree and contains all vertices
+
+Data structures for graphs :
+
+1) Edge list
+unordered list of vertices and edges
+simple to implement
+inefficient when finding an edge bw two given vertices
+
+2) Traditional Adjacency list :
+vertices are kept in an array.
+vertices point to a linked list of vertices that they are edged with.
+
+3)Modern adjacency list :
+its a combination of above 2 approaches
+Vertices contain a list of IN and OUT going edges
+
+4)Matrix representation:
+creating a new vertex is costly, as 2D matrix is stored in a linear way in computer memory,
+so we need to copy and create a new one
+
+
+
+
+BFS :
+
+If graph is considered as tree (root node is considered as starting point node), then bfs:
+->traverses over each level of tree one by one (nodes at same level)
+->nodes at a distance of 1 edge distance are covered first
+->BFS can be implemented as Queue
+->The result of BFS is a spanning tree started from node S, such that
+spanning tree has minimum path length from node S to any other node.
+
+BFS requires that each node must have 3 more properties other that a normal graph vertex:
+1)color		: discovered with processed,undiscovered,discovered with unprocessed
+2)parent	: backtrack and get path from any node to S
+3)distance	: determines minimum distance from source to any node
+
+Time complexity for BFS = O(V+E)
+
+Breadth First Tree
+
+Applications of BFS :
+1)Get no of connected components
+2)Bipartite graph :
+
+Every edge has one vertex in set U and other vertex in set W, such that 
+U union W = Vertices
+U intersection W = nil
+
+Go for a BFS, For a connected graph, graph has no edge in same level during BFS.
+If a graph has an edge then it has an odd cycle.
+If a graph has an odd cycle, then it is not bipartite.
+
+=>Diameter of BFS = maximum distance bw two vertices in G
+=>Distance bw two vertices = length of shortest path bw two vertices
+
+If we want to determine exact diameter of a graph, then we need to perform BFS from every node.
+time complexity for this = O(E*V)
+
+Diameter(G) <= 2*(max level no in any BFS)
+
+
+(Q)seven bridges of konigsberg problem :
+If there is a graph G(V,E) , and a user must travel to all nodes without using any edge more than once.
+
+Solution : This can be possible if each vertex have an even degree.
+
+
+===========================
+
+Depth First Search(DFS) :
