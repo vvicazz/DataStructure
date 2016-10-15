@@ -220,15 +220,29 @@ For Tree edge (u,v) :		arr[u] < arr[v]
 							dep[u] > dep[v]
 								OR
 							arr[u] < arr[v] < dep[v] < dep[u] (similar to Forward Edge)
+							
+(Q)If there is no back edge in DFS of a directed graph G,
+   does that mean it is acyclic ?
+   
+No Back Edge === No Cycle
 
+Ans: 
+1)Do a DFS
+2)Order vertices of graph in departure time
+
+All edges except back edge will be moving from lower value to higher value in dep time.
+This ordering is also called as topological sort.  
+
+Statement :
+Given an acyclic graph G, ordering of vertices in their departure time is called Topological sort.   
+ 
 Topological sort : sorting vertices on the basis of departure timestamp 
 	(this can be done while performing DFS just to avoid complexity of sorting)
-
-A directed graph is cyclic only if it has a back edge :
 	
-
 DAG : Directed Acyclic Graph
 
-Strongly connected graph
+Strongly connected Directed graph:
+	There is a path from every vertex to every other vertex
 
-Weakly connected graph
+Weakly connected Directed graph:
+	There is a path between every two vertices either in one or in both directions.
