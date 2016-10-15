@@ -241,8 +241,118 @@ Topological sort : sorting vertices on the basis of departure timestamp
 	
 DAG : Directed Acyclic Graph
 
-Strongly connected Directed graph:
-	There is a path from every vertex to every other vertex
+=>In undirected Graph : 
+Connected Graph = There is a path bw every pair of vertices.
 
-Weakly connected Directed graph:
+=>In Directed Graph:
+Strongly Connected Graph = There is a path bw every ordered pair of vertices.
+
+for a strongly connected graph , no of edges = 2 * nC2 = n(n-1) 
+
+=>Weakly connected Directed graph:
 	There is a path between every two vertices either in one or in both directions.
+	
+(Q)Given a directed Graph G, is G a strongly connected graph?
+
+solution1=>
+Do DFS from every vertex and it should cover all the vertices in every DFS.
+
+complexity = O(m*n)
+
+solution2=>
+
+statement1 : From DFS we deduce that there exists a path from vertex V to every other vertex.
+statement2 : There exists a path from every other vertex to V.
+
+If both statement1 and statement2 are correct than, graph is strongly connected.
+
+path from V --> X
+path from V --> Y
+
+path from X --> V
+path from Y --> V
+
+hence
+path from X --> Y
+path from Y --> X
+
+1. Do DFS on arbitrary vertex V
+2. Do reverse edges in G 
+3. Do DFS from V in reversed G (DFS on reversed G can also be done by doing DFS on InAdjacency edges)
+4. If all vertices are connected in both DFS, then graph is strongly connected
+
+Solution3=>
+
+Lets try to solve this problem with only one DFS.
+
+For a directed graph, if a subtree has an out edge, either back edge or cross edge,
+then this subtree has some path from which it can go outside.
+
+The necessary and sufficient condition for a subtree to be strongly connected is 
+they must have an edge going out of that subtree.
+
+Arrival time of cross edge or back edge is small at destination vertex.
+
+We need to modify our DFS as in case of 2EC.
+Every DFS program will return minimum arrival time value to which its descendent are reachable.
+
+time=0;
+SC(node) {
+	arr[node]=time++;
+	visited[node]=1;
+	minArrTime=arr[node];
+	for w adjacent to node do {
+		if(!visited[w]) {
+			minArrTime = min(minArrTime,SC(w));
+		} else {
+			minArrTime=min(minArrTime,arr[w]);
+		}
+	}
+	if(minArrTime==arr[node]) {
+		if(not the root vertex of graph) {
+			STOP
+			Graph is not strongly connected
+		}
+	}
+}
+
+
+Applications of BFS :
+1.Connected Components
+2.Bipartite graph
+
+Applications of DFS in undirected graph :
+1. Two Edge Connected
+2. Planar graph
+3. Vertex connected
+
+Applications of DFS in Directed graph :
+1. Strongly Connected graph
+2. Acyclic
+3. Topological sort
+
+All above applications have linear time complexity.
+
+===============================================
+
+
+Minimum spanning tree :
+
+tree = Connected subgraph WITHOUT CYCLES
+spanning = it should cover all vertices
+
+MST = a spanning tree which has minimum length or weight
+
+Kruskal MST :
+
+1. sort edges on the basis of their length
+2. take empty tree T
+3. for every edge from the sorted list
+	if this edge do not make a cycle in T then add this edge to T
+	
+(Q)How to check if tree has a cycle while adding an edge ?
+Ans : 
+make set of all connected components
+when you add an edge without creating a cycle, then no of components get reduced by 1.
+i.e. Union of edge and set of edges in a component must reduce final set of components by 1.
+
