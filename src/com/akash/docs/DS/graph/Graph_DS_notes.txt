@@ -12,8 +12,8 @@ undirected graph terminologies :
 =>Path : a sequence of vertices v1,v2,...vn where vi and vi+1 has an edge
 =>simple path, cyclic path
 =>connected graph : every two vertices must have a path
-=>Subgraph : a grapgh subset of vertices and subset of edges
-=>Maximum connected subgrapgh : a subgrapgh, in which if u add a vertex , u cannot get a connected subgraph
+=>Subgraph : a graph having subset of vertices and subset of edges
+=>Maximum connected subgraph : a subgraph, in which if u add a vertex , u cannot get a connected subgraph
 =>Tree (free tree) : connected graph without cycles, different from Tree DS as they have no root node.
 =>Forest : collection of trees
 =>Complete graph : there is an edge bw every pair of vertices
@@ -100,13 +100,12 @@ We store a timestamp of every node.
 Every node has two timestamp stored :
 	->start_timestamp = time at which node was monitored first.
 	->end_timestamp = time at which no further route was found and backtracked.
-Stack is used to implement DFS.
+Stack or Recursion is used to implement DFS.
 Path formed by DFS is called DFS tree.
-Two types of edges in DFS tree :
+There are only two types of edges in DFS undirected graphs :
 	->tree edges
 	->back edges : An edge from a node to its ancestor
 A back edge can have a shorter path bw two nodes as compared to tree edges.
-DFS has only two types of nodes : tree edge and back edge.
 
 
 DFS Algo :
@@ -126,12 +125,12 @@ DFS(node) {
 			DFS(w);
 		}
 	}
-	node.d=tme++;
+	node.d=time++;
 }
 
 time complexity = O(E)
 
-property of a DFS :
+property of a DFS in undirected graph :
 arr[u] < arr[v]
 dep[u] > dep[v]
 
@@ -152,8 +151,10 @@ When backtracking from a node v,
 We need to ensure that there is a back edge from some descendent of v to some ancestor of v.
 descendent of v also includes v itself.
 
-There can be many back edges from descendent of v to ancestor of v, but we should be interested in Deepest back edge.
-Deepest Back Edge : A back edge whose ancestor arrival time is minimum (i.e. edge goes top of the tree).
+There can be many back edges from descendent of v to ancestor of v, 
+but we should be interested in Deepest back edge.
+Deepest Back Edge : 
+A back edge whose ancestor arrival time is minimum (i.e. edge goes top of the tree).
 
 variable used in algo :
 dbe = deepest back edge
