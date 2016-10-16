@@ -34,13 +34,13 @@ Cycle_In_Graph(NODE) {
 	}
 	NODE.dep = time++;
 }
-
-
-
+	
+	
+	
 (Q)Clone an Undirected Graph
-(Q)Find all reachable nodes from every node present in a given set
-	-->connected components in an undirected graph
-(Q)Topological Sort of a graph using departure time of vertex
+(Q)Find all reachable nodes from every node present in a given set  --- connected components	//BFS
+(Q)Check whether a given graph is Bipartite or not	//BFS
+(Q)Topological Sort of a graph using departure time of vertex	//DFS
+
 (Q)Finding minimum vertex cover size of a graph using binary search
 (Q)Longest Path in a Directed Acyclic Graph 
-
