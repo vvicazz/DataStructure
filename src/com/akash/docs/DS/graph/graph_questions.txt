@@ -1,0 +1,43 @@
+Q)Detect Cycle in a Directed Graph
+Q)Detect Cycle in a an Undirected Graph
+
+Ans : perform a DFS in directed or undirected graph. During scanning of each edge, if we encounter any back edge then there is a cycle.
+if an edge goes from u -> v
+=>back edge in directed graph has two properties : 
+	departure[u] < departure[v]
+	vertex u goes to a vertex v, and visited[v]=true
+
+=>back edge in undirected graph has a properties : 
+	vertex u goes to a vertex v, and visited[v]=true
+
+time=0;
+detect_Cycle_In_Graph() {
+	for all vertices w in graph G {
+		w.arr = -1;
+		w.dep = -1;
+		w.visited = false;
+	}
+	Cycle_In_Graph(any_arbitrary_node);
+}
+
+Cycle_In_Graph(NODE) {
+	NODE.arr = time++;
+	NODE.visited = true;
+	
+	For all w adjacent to NODE do {
+		if(!w.visited) {
+			Cycle_In_Graph(w);
+		} else if(w.dep == -1) {
+			//ABORT PROGRAM
+			//this is a back edge, cycle found
+		}
+	}
+	NODE.dep = time++;
+}
+	
+	
+	
+(Q)Clone an Undirected Graph
+(Q)Find all reachable nodes from every node present in a given set
+(Q)Topological Sort of a graph using departure time of vertex
+(Q)Finding minimum vertex cover size of a graph using binary search
