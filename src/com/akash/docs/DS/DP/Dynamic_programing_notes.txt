@@ -1,4 +1,9 @@
-Dynamic_programing_notes :
+Links :
+https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-006-introduction-to-algorithms-fall-2011/lecture-videos/
+https://www.youtube.com/watch?v=OQ5jsbhAv_M&list=PLfMspJ0TLR5HRFu2kLh3U4mvStMO8QURm
+
+
+Dynamic Programming :
 
 Careful brute force = execute all scenarios carefully
 Exhaustive search in a clever way
