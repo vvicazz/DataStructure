@@ -1,0 +1,27 @@
+Dynamic_programing_notes :
+
+Careful brute force = execute all scenarios carefully
+Exhaustive search in a clever way
+subproblems + reuse
+
+(Q)How DP is related to divide and conquer :
+
+Divide and Conquer algorithms partition the problem into DISJOINT subproblems.
+i.e. no subproblem overlaps.
+
+DP is applied when subproblems overlaps,
+i.e. two or more subproblems share same subsubproblems.
+
+It computes a subproblem just once and stores it in an answer table.
+By this it avoids the cost recomputing the same subproblem.
+
+properties of Dynamic programming :
+
+=>Overlapping subproblems :
+When subproblems of a problem are not disjoint
+i.e. subproblem share subsubproblems
+solutions to these subproblems are stored and reused further
+
+=>Optimal Substructure : 
+Optimal solutions to a problem incorporate optimal solutions to its related subproblems, which may be solved independently.
+
