@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 public class GenericGraph<N, E> implements Graph<N, E> {
 
 	private Set<Node<N, E>> vertices;
 	private boolean isDirected;
+	volatile private int numOfEdges = 0;
 
 	private static final Integer DEFAULT_VERTICES_SIZE = 16;
 
@@ -30,6 +32,25 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		this.isDirected = isDirected;
 	}
 
+	public GenericGraph(Graph<N, E> graph) {
+
+		this(graph.getNumOfVertices(), graph.isDirected());
+		Set<N> vertices = graph.getAllVertices();
+		vertices.forEach(nodeData -> {
+			this.addNode(nodeData);
+		});
+		for (N tempNodeOuter : vertices) {
+			for (N tempNodeInner : vertices) {
+				if (!tempNodeOuter.equals(tempNodeInner)) {
+					E edgeData = this.findEdge(tempNodeOuter, tempNodeInner);
+					if (edgeData != null) {
+						this.createEdge(tempNodeOuter, tempNodeInner, edgeData);
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void createEdge(N srcData, N destData, E edgeData) {
 		Node<N, E> srcNode = createNode(srcData);
@@ -40,6 +61,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 			Edge<N, E> reverseEdge = new Edge<>(edgeData, destNode, srcNode, this.isDirected);
 			destNode.addEdge(reverseEdge);
 		}
+		numOfEdges++;
 	}
 
 	@Override
@@ -85,12 +107,29 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		if (edge != null) {
 			edge.remove();
 			srcNode.getAdjacencyList().remove(edge);
+			numOfEdges--;
 		}
 	}
 
 	@Override
-	public boolean removeNode(N nodeData) {
-		return false;
+	public void removeNode(N nodeData) {
+		removeNode(createNode(nodeData));
+	}
+
+	@Override
+	public void removeGraph() {
+		for (Node<N, E> node : this.vertices) {
+			removeNode(node);
+		}
+	}
+
+	void removeNode(Node<N, E> node) {
+		// TODO : different implementations for directed and undirected
+	}
+
+	@Override
+	public Set<N> getAllVertices() {
+		return vertices.stream().map(node -> node.getNode()).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -130,6 +169,16 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		}
 		adjacentNodes.remove(null);
 		return adjacentNodes;
+	}
+
+	@Override
+	public int getNumOfVertices() {
+		return vertices.size();
+	}
+
+	@Override
+	public int getNumOfEdges() {
+		return numOfEdges;
 	}
 
 	@Override
@@ -179,7 +228,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		return node;
 	}
 
-	private static class Node<N, E> {
+	static class Node<N, E> {
 
 		private N node;
 		volatile private Set<Edge<N, E>> adjacencyList;
@@ -199,7 +248,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 			return node;
 		}
 
-		public Set<Edge<N, E>> getAdjacencyList() {
+		synchronized Set<Edge<N, E>> getAdjacencyList() {
 			if (adjacencyList == null) {
 				return Collections.emptySet();
 			}
@@ -228,7 +277,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		}
 	}
 
-	private static class Edge<N, E> {
+	static class Edge<N, E> {
 
 		private E edgeData;
 		private Node<N, E> src;
