@@ -28,7 +28,7 @@ public interface Graph<N, E> {
 
 	boolean isCyclic();
 
-	boolean isConnected();
+	boolean isStronglyConnected();
 
 	boolean isComplete();
 

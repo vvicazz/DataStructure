@@ -188,22 +188,27 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public boolean isCyclic() {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean isConnected() {
-		return false;
+	public boolean isStronglyConnected() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean isComplete() {
-		return false;
+		int numOfVertices = getNumOfVertices();
+		if (!isDirected()) {
+			return getNumOfEdges() == (numOfVertices * (numOfVertices - 1) / 2);
+		} else {
+			return getNumOfEdges() == (numOfVertices * (numOfVertices - 1));
+		}
 	}
 
 	@Override
 	public boolean isDirected() {
-		return isDirected;
+		return Boolean.TRUE.equals(isDirected);
 	}
 
 	private Node<N, E> findNode(N nodeData) {
