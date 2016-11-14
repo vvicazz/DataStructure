@@ -54,8 +54,8 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 					for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
 						if (tempNode.getColor() == NodeColor.WHITE) {
 							tempNode.setColor(NodeColor.GRAY);
-							tempNode.setDistance(tempNode.getDistance() + 1);
-							tempNode.setParent(tempNode);
+							tempNode.setDistance(bfsNode.getDistance() + 1);
+							tempNode.setParent(bfsNode);
 							queue.offer(tempNode);
 						}
 					}
@@ -68,6 +68,9 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 	@Override
 	public boolean existPath(N src, N dest) {
 
+		if(Objects.equals(src, dest)) {
+			return true;
+		}
 		Queue<BfsNode<N, E>> queue = new LinkedList<>();
 		BfsNode<N, E> srcNode = findNode(src);
 		if (srcNode != null) {
@@ -84,8 +87,8 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 						}
 						if (tempNode.getColor() == NodeColor.WHITE) {
 							tempNode.setColor(NodeColor.GRAY);
-							tempNode.setDistance(tempNode.getDistance() + 1);
-							tempNode.setParent(tempNode);
+							tempNode.setDistance(bfsNode.getDistance() + 1);
+							tempNode.setParent(bfsNode);
 							queue.offer(tempNode);
 						}
 					}
