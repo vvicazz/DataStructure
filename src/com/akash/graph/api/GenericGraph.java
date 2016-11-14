@@ -13,7 +13,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 	private boolean isDirected;
 	volatile private int numOfEdges = 0;
 
-	private static final Integer DEFAULT_VERTICES_SIZE = 16;
+	public static final Integer DEFAULT_VERTICES_SIZE = 16;
 
 	public GenericGraph() {
 		this(DEFAULT_VERTICES_SIZE, Boolean.FALSE);
@@ -129,7 +129,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public Set<N> getAllVertices() {
-		return vertices.stream().map(node -> node.getNode()).collect(Collectors.toSet());
+		return getAllNodes().stream().map(node -> node.getNode()).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -175,6 +175,14 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 	public int getNumOfVertices() {
 		return vertices.size();
 	}
+	
+	protected void addNodeToVertices(Node<N,E> node) {
+		vertices.add(node);
+	}
+	
+	protected Set<? extends Node<N,E>> getAllNodes() {
+		return vertices;
+	}
 
 	@Override
 	public int getNumOfEdges() {
@@ -210,11 +218,21 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 	public boolean isDirected() {
 		return Boolean.TRUE.equals(isDirected);
 	}
+	
+	@Override
+	public boolean Bipartite() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public int getNumberOfConnectedComponents() {
+		throw new UnsupportedOperationException();
+	}
 
 	Node<N, E> findNode(N nodeData) {
 		Node<N, E> node = doCreateNode(nodeData);
-		if (vertices.contains(node)) {
-			for (Node<N, E> tempNode : vertices) {
+		if (getAllNodes().contains(node)) {
+			for (Node<N, E> tempNode : getAllNodes()) {
 				if (Objects.equals(tempNode, node)) {
 					node = tempNode;
 					return node;
@@ -224,16 +242,16 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		return null;
 	}
 
-	Node<N, E> createNode(N nodeData) {
+	protected Node<N, E> createNode(N nodeData) {
 		Node<N, E> node = findNode(nodeData);
 		if (node == null) {
 			node = doCreateNode(nodeData);
-			vertices.add(node);
+			addNodeToVertices(node);
 		}
 		return node;
 	}
 
-	Node<N, E> doCreateNode(N nodeData) {
+	protected Node<N, E> doCreateNode(N nodeData) {
 		return new Node<>(nodeData);
 	}
 

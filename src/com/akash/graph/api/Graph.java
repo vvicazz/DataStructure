@@ -33,4 +33,8 @@ public interface Graph<N, E> {
 	boolean isComplete();
 
 	boolean isDirected();
+	
+	boolean Bipartite();
+	
+	int getNumberOfConnectedComponents();
 }

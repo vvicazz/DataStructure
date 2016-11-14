@@ -10,16 +10,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BfsGraph<N, E> extends GenericGraph<N, E> {
 
+	private Set<BfsNode<N, E>> vertices;
+
 	private enum NodeColor {
 		WHITE, GRAY, BLACK;
 	}
 
 	public BfsGraph() {
-		super();
+		this(GenericGraph.DEFAULT_VERTICES_SIZE, Boolean.FALSE);
 	}
 
 	public BfsGraph(boolean isDirected) {
-		super(isDirected);
+		this(GenericGraph.DEFAULT_VERTICES_SIZE, isDirected);
 	}
 
 	public BfsGraph(Graph<N, E> graph) {
@@ -32,12 +34,12 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 
 	public BfsGraph(Integer numOfVertices, boolean isDirected) {
 		super(numOfVertices, isDirected);
+		this.vertices = new HashSet<>(GenericGraph.DEFAULT_VERTICES_SIZE);
 	}
-
-	private Queue<BfsNode<N, E>> queue = new LinkedList<>();
 
 	public void executeBfs(N src) {
 
+		Queue<BfsNode<N, E>> queue = new LinkedList<>();
 		BfsNode<N, E> srcNode = createNode(src);
 		srcNode.setColor(NodeColor.GRAY);
 		srcNode.setDistance(0);
@@ -54,8 +56,53 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 						queue.offer(tempNode);
 					}
 				}
+				bfsNode.setColor(NodeColor.BLACK);
 			}
 		}
+	}
+
+	@Override
+	public boolean existPath(N src, N dest) {
+
+		Queue<BfsNode<N, E>> queue = new LinkedList<>();
+		BfsNode<N, E> srcNode = createNode(src);
+		srcNode.setColor(NodeColor.GRAY);
+		srcNode.setDistance(0);
+		srcNode.setParent(null);
+		queue.offer(srcNode);
+		while (!queue.isEmpty()) {
+			BfsNode<N, E> bfsNode = queue.poll();
+			if (bfsNode != null) {
+				for (BfsNode<N, E> tempNode : findBfsAdjacentNodes(bfsNode)) {
+					if (Objects.equals(tempNode.getNode(), dest)) {
+						return true;
+					}
+					if (tempNode.getColor() == NodeColor.WHITE) {
+						tempNode.setColor(NodeColor.GRAY);
+						tempNode.setDistance(tempNode.getDistance() + 1);
+						tempNode.setParent(tempNode);
+						queue.offer(tempNode);
+					}
+				}
+				bfsNode.setColor(NodeColor.BLACK);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int getNumberOfConnectedComponents() {
+
+		return 0;
+	}
+
+	protected void addNodeToVertices(Node<N, E> node) {
+		BfsNode<N,E> obj = (BfsNode<N,E>) node;
+		vertices.add(obj);
+	}
+
+	protected Set<? extends Node<N, E>> getAllNodes() {
+		return vertices;
 	}
 
 	Set<BfsNode<N, E>> findBfsAdjacentNodes(BfsNode<N, E> srcNode) {
@@ -70,11 +117,11 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 		return adjacentNodes;
 	}
 
-	BfsNode<N, E> createNode(N nodeData) {
+	protected BfsNode<N, E> createNode(N nodeData) {
 		return (BfsNode<N, E>) super.createNode(nodeData);
 	}
 
-	BfsNode<N, E> doCreateNode(N nodeData) {
+	protected BfsNode<N, E> doCreateNode(N nodeData) {
 		return new BfsNode<>(nodeData);
 	}
 
