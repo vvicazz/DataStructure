@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class GenericGraph<N, E> implements Graph<N, E> {
@@ -211,8 +211,8 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		return Boolean.TRUE.equals(isDirected);
 	}
 
-	private Node<N, E> findNode(N nodeData) {
-		Node<N, E> node = new Node<>(nodeData);
+	Node<N, E> findNode(N nodeData) {
+		Node<N, E> node = doCreateNode(nodeData);
 		if (vertices.contains(node)) {
 			for (Node<N, E> tempNode : vertices) {
 				if (Objects.equals(tempNode, node)) {
@@ -224,13 +224,22 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		return null;
 	}
 
-	private Node<N, E> createNode(N nodeData) {
+	Node<N, E> createNode(N nodeData) {
 		Node<N, E> node = findNode(nodeData);
 		if (node == null) {
-			node = new Node<>(nodeData);
+			node = doCreateNode(nodeData);
 			vertices.add(node);
 		}
 		return node;
+	}
+
+	Node<N, E> doCreateNode(N nodeData) {
+		return new Node<>(nodeData);
+	}
+
+	@Override
+	public String toString() {
+		return "" + getAllVertices() + " , isDirected : " + isDirected();
 	}
 
 	static class Node<N, E> {
@@ -239,18 +248,24 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		volatile private Set<Edge<N, E>> adjacencyList;
 
 		Node(N node) {
+			if (node == null)
+				throw new NullPointerException();
+			this.node = node;
+		}
+
+		public N getNode() {
+			return node;
+		}
+
+		public void setNode(N node) {
 			this.node = node;
 		}
 
 		synchronized void addEdge(Edge<N, E> edge) {
 			if (adjacencyList == null) {
-				adjacencyList = new ConcurrentSkipListSet<>();
+				adjacencyList = Collections.newSetFromMap(new ConcurrentHashMap<>());
 			}
 			adjacencyList.add(edge);
-		}
-
-		public N getNode() {
-			return node;
 		}
 
 		synchronized Set<Edge<N, E>> getAdjacencyList() {
@@ -264,7 +279,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((node == null) ? 0 : node.hashCode());
+			result = prime * result + ((getNode() == null) ? 0 : getNode().hashCode());
 			return result;
 		}
 
@@ -278,7 +293,12 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 			if (getClass() != obj.getClass())
 				return false;
 			Node<N, E> other = (Node<N, E>) obj;
-			return Objects.equals(node, other.node);
+			return Objects.equals(getNode(), other.getNode());
+		}
+
+		@Override
+		public String toString() {
+			return "{node : " + getNode().toString() + "}";
 		}
 	}
 
@@ -290,28 +310,50 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		private boolean isDirected;
 
 		Edge(E edgeData, Node<N, E> src, Node<N, E> dest, boolean isDirected) {
+			if (edgeData == null || src == null || dest == null)
+				throw new NullPointerException();
 			this.edgeData = edgeData;
 			this.dest = dest;
 			this.src = src;
-			this.isDirected = isDirected;
-		}
-
-		public Node<N, E> getSrc() {
-			return src;
+			this.isDirected = (Boolean.TRUE == isDirected);
 		}
 
 		public E getEdgeData() {
 			return edgeData;
 		}
 
+		public void setEdgeData(E edgeData) {
+			this.edgeData = edgeData;
+		}
+
+		public Node<N, E> getSrc() {
+			return src;
+		}
+
+		public void setSrc(Node<N, E> src) {
+			this.src = src;
+		}
+
 		public Node<N, E> getDest() {
 			return dest;
 		}
 
+		public void setDest(Node<N, E> dest) {
+			this.dest = dest;
+		}
+
+		public boolean isDirected() {
+			return isDirected;
+		}
+
+		public void setDirected(boolean isDirected) {
+			this.isDirected = isDirected;
+		}
+
 		public void remove() {
-			this.edgeData = null;
-			this.src = null;
-			this.dest = null;
+			setEdgeData(null);
+			setSrc(null);
+			setDest(null);
 		}
 
 		@Override
@@ -319,9 +361,9 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((edgeData == null) ? 0 : edgeData.hashCode());
-			result = prime * result + ((src == null) ? 0 : src.hashCode());
-			result = prime * result + ((dest == null) ? 0 : dest.hashCode());
+			result = prime * result + ((getEdgeData() == null) ? 0 : getEdgeData().hashCode());
+			result = prime * result + ((getSrc() == null) ? 0 : getSrc().hashCode());
+			result = prime * result + ((getDest() == null) ? 0 : getDest().hashCode());
 			return result;
 		}
 
@@ -336,13 +378,20 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 			if (getClass() != obj.getClass())
 				return false;
 			Edge<N, E> other = (Edge<N, E>) obj;
-			if (isDirected) {
-				return Objects.equals(src, other.src) && Objects.equals(dest, other.dest)
-						&& Objects.equals(edgeData, other.edgeData);
+			if (isDirected()) {
+				return Objects.equals(getSrc(), other.getSrc()) && Objects.equals(getDest(), other.getDest())
+						&& Objects.equals(getEdgeData(), other.getEdgeData());
 			} else {
-				return ((Objects.equals(src, other.src) && Objects.equals(dest, other.dest)) || (Objects.equals(src,
-						other.dest) && Objects.equals(dest, other.src))) && Objects.equals(edgeData, other.edgeData);
+				return ((Objects.equals(getSrc(), other.getSrc()) && Objects.equals(getDest(), other.getDest())) || (Objects
+						.equals(getSrc(), other.getDest()) && Objects.equals(getDest(), other.getSrc())))
+						&& Objects.equals(getEdgeData(), other.getEdgeData());
 			}
+		}
+
+		@Override
+		public String toString() {
+			return "{ edge : " + getEdgeData().toString() + " , src : " + getSrc().toString() + " , dest : "
+					+ getDest().toString() + " , isDirected : " + isDirected() + " }";
 		}
 	}
 }
