@@ -48,7 +48,7 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 		while (!queue.isEmpty()) {
 			BfsNode<N, E> bfsNode = queue.poll();
 			if (bfsNode != null) {
-				for (BfsNode<N, E> tempNode : findBfsAdjacentNodes(bfsNode)) {
+				for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
 					if (tempNode.getColor() == NodeColor.WHITE) {
 						tempNode.setColor(NodeColor.GRAY);
 						tempNode.setDistance(tempNode.getDistance() + 1);
@@ -73,7 +73,7 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 		while (!queue.isEmpty()) {
 			BfsNode<N, E> bfsNode = queue.poll();
 			if (bfsNode != null) {
-				for (BfsNode<N, E> tempNode : findBfsAdjacentNodes(bfsNode)) {
+				for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
 					if (Objects.equals(tempNode.getNode(), dest)) {
 						return true;
 					}
@@ -92,42 +92,47 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 
 	@Override
 	public int getNumberOfConnectedComponents() {
-
+		// TODO :
 		return 0;
 	}
 
+	@Override
 	protected void addNodeToVertices(Node<N, E> node) {
-		BfsNode<N,E> obj = (BfsNode<N,E>) node;
+		BfsNode<N, E> obj = (BfsNode<N, E>) node;
 		vertices.add(obj);
 	}
 
+	@Override
 	protected Set<? extends Node<N, E>> getAllNodes() {
 		return vertices;
 	}
 
-	Set<BfsNode<N, E>> findBfsAdjacentNodes(BfsNode<N, E> srcNode) {
-
-		Set<BfsNode<N, E>> adjacentNodes = new HashSet<>();
-		if (srcNode != null) {
-			for (BfsEdge<N, E> edge : srcNode.getBfsAdjacencyList()) {
-				adjacentNodes.add(edge.getDest());
-			}
-			adjacentNodes.remove(null);
-		}
-		return adjacentNodes;
-	}
-
+	@Override
 	protected BfsNode<N, E> createNode(N nodeData) {
 		return (BfsNode<N, E>) super.createNode(nodeData);
 	}
 
+	@Override
+	protected BfsEdge<N, E> doCreateEdge(E edgeData, Node<N, E> src, Node<N, E> dest, boolean isDirected) {
+		BfsNode<N, E> destObj = (BfsNode<N, E>) dest;
+		BfsNode<N, E> srcObj = (BfsNode<N, E>) src;
+		return new BfsEdge<>(edgeData, srcObj, destObj, isDirected);
+	}
+
+	@Override
 	protected BfsNode<N, E> doCreateNode(N nodeData) {
 		return new BfsNode<>(nodeData);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	protected Set<BfsNode<N, E>> findAdjacentNodes(Node<N, E> srcNode) {
+		return (Set<BfsNode<N, E>>) super.findAdjacentNodes(srcNode);
+	}
+
 	@Override
 	public String toString() {
-		return "" + getAllVertices() + " , isDirected : " + isDirected();
+		return super.toString();
 	}
 
 	static class BfsNode<N, E> extends GenericGraph.Node<N, E> {
@@ -141,39 +146,19 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 			super(node);
 		}
 
-		synchronized void addEdge(BfsEdge<N, E> edge) {
+		protected void doAddEdge(Edge<N, E> edge) {
 			if (bfsAdjacencyList == null) {
 				bfsAdjacencyList = Collections.newSetFromMap(new ConcurrentHashMap<>());
 			}
-			bfsAdjacencyList.add(edge);
+			BfsEdge<N, E> bfsEdge = (BfsEdge<N, E>) edge;
+			bfsAdjacencyList.add(bfsEdge);
 		}
 
-		synchronized Set<BfsEdge<N, E>> getBfsAdjacencyList() {
+		protected Set<? extends Edge<N, E>> doGetAdjacencyList() {
 			if (bfsAdjacencyList == null) {
 				return Collections.emptySet();
 			}
 			return bfsAdjacencyList;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((getNode() == null) ? 0 : getNode().hashCode());
-			return result;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Node<N, E> other = (Node<N, E>) obj;
-			return Objects.equals(getNode(), other.getNode());
 		}
 
 		public NodeColor getColor() {
@@ -201,8 +186,18 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 		}
 
 		@Override
+		public int hashCode() {
+			return super.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return super.equals(obj);
+		}
+
+		@Override
 		public String toString() {
-			return "{node : " + getNode().toString() + "}";
+			return super.toString();
 		}
 	}
 
@@ -212,7 +207,7 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 		private BfsNode<N, E> dest;
 
 		BfsEdge(E edgeData, BfsNode<N, E> src, BfsNode<N, E> dest, boolean isDirected) {
-			super(edgeData, src, dest, isDirected);
+			super(edgeData, null, null, isDirected);
 			this.setSrc(src);
 			this.setDest(dest);
 		}
@@ -233,48 +228,19 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 			this.dest = dest;
 		}
 
-		public void remove() {
-			setEdgeData(null);
-			setSrc(null);
-			setDest(null);
-		}
-
 		@Override
 		public int hashCode() {
-
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((getEdgeData() == null) ? 0 : getEdgeData().hashCode());
-			result = prime * result + ((getSrc() == null) ? 0 : getSrc().hashCode());
-			result = prime * result + ((getDest() == null) ? 0 : getDest().hashCode());
-			return result;
+			return super.hashCode();
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Edge<N, E> other = (Edge<N, E>) obj;
-			if (isDirected()) {
-				return Objects.equals(getSrc(), other.getSrc()) && Objects.equals(getDest(), other.getDest())
-						&& Objects.equals(getEdgeData(), other.getEdgeData());
-			} else {
-				return ((Objects.equals(getSrc(), other.getSrc()) && Objects.equals(getDest(), other.getDest())) || (Objects
-						.equals(getSrc(), other.getDest()) && Objects.equals(getDest(), other.getSrc())))
-						&& Objects.equals(getEdgeData(), other.getEdgeData());
-			}
+			return super.equals(obj);
 		}
 
 		@Override
 		public String toString() {
-			return "edge = " + getEdgeData().toString() + " , src = " + getSrc().toString() + " , dest = "
-					+ getDest().toString() + " , isDirected = " + isDirected();
+			return super.toString();
 		}
 	}
 }

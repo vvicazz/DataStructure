@@ -4,7 +4,7 @@ import java.util.Set;
 
 public interface Graph<N, E> {
 
-	void createEdge(N srcData, N destData, E edgeData);
+	void addEdge(N srcData, N destData, E edgeData);
 
 	void addNode(N nodeData);
 

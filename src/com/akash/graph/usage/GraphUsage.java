@@ -10,9 +10,9 @@ public class GraphUsage {
 		graph.addNode("delhi");
 		graph.addNode("goa");
 		graph.addNode("kashmir");
-		graph.createEdge("delhi", "goa", 12);
-		graph.createEdge("delhi", "kashmir", 20);
-		graph.createEdge("goa", "kashmir", 20);
+		graph.addEdge("delhi", "goa", 12);
+		graph.addEdge("delhi", "kashmir", 20);
+		graph.addEdge("goa", "kashmir", 20);
 		System.out.println(graph);
 		graph.executeBfs("delhi");
 		System.out.println(graph);
