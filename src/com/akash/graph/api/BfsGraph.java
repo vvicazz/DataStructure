@@ -33,30 +33,34 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 	}
 
 	public BfsGraph(Integer numOfVertices, boolean isDirected) {
-		super(numOfVertices, isDirected);
-		this.vertices = new HashSet<>(GenericGraph.DEFAULT_VERTICES_SIZE);
+		super(0, isDirected);
+		this.vertices = new HashSet<>(numOfVertices);
 	}
 
 	public void executeBfs(N src) {
 
+		if (src == null)
+			throw new NullPointerException();
 		Queue<BfsNode<N, E>> queue = new LinkedList<>();
-		BfsNode<N, E> srcNode = createNode(src);
-		srcNode.setColor(NodeColor.GRAY);
-		srcNode.setDistance(0);
-		srcNode.setParent(null);
-		queue.offer(srcNode);
-		while (!queue.isEmpty()) {
-			BfsNode<N, E> bfsNode = queue.poll();
-			if (bfsNode != null) {
-				for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
-					if (tempNode.getColor() == NodeColor.WHITE) {
-						tempNode.setColor(NodeColor.GRAY);
-						tempNode.setDistance(tempNode.getDistance() + 1);
-						tempNode.setParent(tempNode);
-						queue.offer(tempNode);
+		BfsNode<N, E> srcNode = findNode(src);
+		if (srcNode != null) {
+			srcNode.setColor(NodeColor.GRAY);
+			srcNode.setDistance(0);
+			srcNode.setParent(null);
+			queue.offer(srcNode);
+			while (!queue.isEmpty()) {
+				BfsNode<N, E> bfsNode = queue.poll();
+				if (bfsNode != null) {
+					for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
+						if (tempNode.getColor() == NodeColor.WHITE) {
+							tempNode.setColor(NodeColor.GRAY);
+							tempNode.setDistance(tempNode.getDistance() + 1);
+							tempNode.setParent(tempNode);
+							queue.offer(tempNode);
+						}
 					}
+					bfsNode.setColor(NodeColor.BLACK);
 				}
-				bfsNode.setColor(NodeColor.BLACK);
 			}
 		}
 	}
@@ -65,26 +69,28 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 	public boolean existPath(N src, N dest) {
 
 		Queue<BfsNode<N, E>> queue = new LinkedList<>();
-		BfsNode<N, E> srcNode = createNode(src);
-		srcNode.setColor(NodeColor.GRAY);
-		srcNode.setDistance(0);
-		srcNode.setParent(null);
-		queue.offer(srcNode);
-		while (!queue.isEmpty()) {
-			BfsNode<N, E> bfsNode = queue.poll();
-			if (bfsNode != null) {
-				for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
-					if (Objects.equals(tempNode.getNode(), dest)) {
-						return true;
+		BfsNode<N, E> srcNode = findNode(src);
+		if (srcNode != null) {
+			srcNode.setColor(NodeColor.GRAY);
+			srcNode.setDistance(0);
+			srcNode.setParent(null);
+			queue.offer(srcNode);
+			while (!queue.isEmpty()) {
+				BfsNode<N, E> bfsNode = queue.poll();
+				if (bfsNode != null) {
+					for (BfsNode<N, E> tempNode : findAdjacentNodes(bfsNode)) {
+						if (Objects.equals(tempNode.getNode(), dest)) {
+							return true;
+						}
+						if (tempNode.getColor() == NodeColor.WHITE) {
+							tempNode.setColor(NodeColor.GRAY);
+							tempNode.setDistance(tempNode.getDistance() + 1);
+							tempNode.setParent(tempNode);
+							queue.offer(tempNode);
+						}
 					}
-					if (tempNode.getColor() == NodeColor.WHITE) {
-						tempNode.setColor(NodeColor.GRAY);
-						tempNode.setDistance(tempNode.getDistance() + 1);
-						tempNode.setParent(tempNode);
-						queue.offer(tempNode);
-					}
+					bfsNode.setColor(NodeColor.BLACK);
 				}
-				bfsNode.setColor(NodeColor.BLACK);
 			}
 		}
 		return false;
@@ -108,8 +114,8 @@ public class BfsGraph<N, E> extends GenericGraph<N, E> {
 	}
 
 	@Override
-	protected BfsNode<N, E> createNode(N nodeData) {
-		return (BfsNode<N, E>) super.createNode(nodeData);
+	protected BfsNode<N, E> findNode(N nodeData) {
+		return (BfsNode<N, E>) super.findNode(nodeData);
 	}
 
 	@Override

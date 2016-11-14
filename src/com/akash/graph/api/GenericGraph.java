@@ -28,12 +28,13 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 	}
 
 	public GenericGraph(Integer numOfVertices, boolean isDirected) {
-		this.vertices = new HashSet<>(numOfVertices);
+		if (numOfVertices > 0) {
+			this.vertices = new HashSet<>(numOfVertices);
+		}
 		this.isDirected = isDirected;
 	}
 
 	public GenericGraph(Graph<N, E> graph) {
-
 		this(graph.getNumOfVertices(), graph.isDirected());
 		Set<N> vertices = graph.getAllVertices();
 		vertices.forEach(nodeData -> {
@@ -71,9 +72,8 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public void removeEdge(N src, N dest) {
-
 		Edge<N, E> edge = null;
-		Node<N, E> srcNode = createNode(src);
+		Node<N, E> srcNode = findNode(src);
 		if (isDirected()) {
 			for (Edge<N, E> tempEdge : srcNode.getAdjacencyList()) {
 				if (tempEdge.getDest() != null && Objects.equals(tempEdge.getDest().getNode(), dest)) {
@@ -113,12 +113,12 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public void removeNode(N nodeData) {
-		removeNode(createNode(nodeData));
+		removeNode(findNode(nodeData));
 	}
 
 	@Override
 	public void removeGraph() {
-		for (Node<N, E> node : this.vertices) {
+		for (Node<N, E> node : getAllNodes()) {
 			removeNode(node);
 		}
 	}
@@ -130,9 +130,8 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public E findEdge(N src, N dest) {
-
 		E edgeData = null;
-		Node<N, E> srcNode = createNode(src);
+		Node<N, E> srcNode = findNode(src);
 		for (Edge<N, E> edge : srcNode.getAdjacencyList()) {
 			if (edge.getDest() != null && Objects.equals(edge.getDest().getNode(), dest)) {
 				edgeData = edge.getEdgeData();
@@ -144,9 +143,8 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public Set<N> findAdjacentVertices(N nodeData) {
-
 		Set<N> adjacentNodes = new HashSet<>();
-		Node<N, E> srcNode = createNode(nodeData);
+		Node<N, E> srcNode = findNode(nodeData);
 		for (Edge<N, E> edge : srcNode.getAdjacencyList()) {
 			if (edge.getDest() != null) {
 				adjacentNodes.add(edge.getDest().getNode());
@@ -158,7 +156,7 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 
 	@Override
 	public int getNumOfVertices() {
-		return vertices.size();
+		return getAllNodes().size();
 	}
 
 	@Override
@@ -206,21 +204,17 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 		throw new UnsupportedOperationException();
 	}
 
-	private Node<N, E> findNode(N nodeData) {
-		Node<N, E> node = doCreateNode(nodeData);
-		if (getAllNodes().contains(node)) {
-			for (Node<N, E> tempNode : getAllNodes()) {
-				if (Objects.equals(tempNode, node)) {
-					node = tempNode;
-					return node;
-				}
+	private void removeNode(Node<N, E> node) {
+		// TODO : different implementations for directed and undirected
+	}
+
+	protected Node<N, E> findNode(N nodeData) {
+		for (Node<N, E> tempNode : getAllNodes()) {
+			if (tempNode != null && Objects.equals(tempNode.getNode(), nodeData)) {
+				return tempNode;
 			}
 		}
 		return null;
-	}
-
-	private void removeNode(Node<N, E> node) {
-		// TODO : different implementations for directed and undirected
 	}
 
 	protected Node<N, E> createNode(N nodeData) {
@@ -249,7 +243,6 @@ public class GenericGraph<N, E> implements Graph<N, E> {
 	}
 
 	protected Set<? extends Node<N, E>> findAdjacentNodes(Node<N, E> srcNode) {
-
 		Set<Node<N, E>> adjacentNodes = new HashSet<>();
 		for (Edge<N, E> edge : srcNode.getAdjacencyList()) {
 			adjacentNodes.add(edge.getDest());
