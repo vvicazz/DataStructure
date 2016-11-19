@@ -2,7 +2,7 @@ package com.akash.graph.api;
 
 import java.util.Set;
 
-public interface Graph<N, E> {
+public interface Graph<N, E extends Comparable<E>> {
 
 	void addEdge(N srcData, N destData, E edgeData);
 

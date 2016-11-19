@@ -8,7 +8,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BfsGraph<N, E> extends GenericGraph<N, E> {
+public class BfsGraph<N, E extends Comparable<E>> extends GenericGraph<N, E> {
 
 	private Set<BfsNode<N, E>> vertices;
 
