@@ -94,9 +94,7 @@ Applications of BFS :
 
 	Solution 1 :
 	Do BFS from each node and mark them with a component number.
-	Either create an array of nodes with type boolean to check if they are marked.(like hashmap in java)
-	OR
-	create this flag in node object itself.
+	color can be used to check if they are marked or not.
 	
 	Solution 2 :
 	Do DFS on graph
@@ -171,6 +169,12 @@ Level of node can be calculated from distance parameter of node.
 =>Diameter of BFS = maximum distance bw two vertices in G
 =>Distance bw two vertices = length of shortest path bw two vertices
 
+	get Diameter for one BFS result :
+	Do BFS
+	get max level value in graph, say n
+	now get max level value in graph less than n, say m
+	diamter = n+m
+
 If we want to determine exact diameter of a graph, then we need to perform BFS from every node.
 time complexity for this = O(E*V)
 
@@ -237,10 +241,10 @@ A graph is 2 edge connected if and only if, you remove an edge from graph and it
 bridge edge : an edge which if removed, then the graph is not a connected.
 We just need to find out if there is any bridge edge in a graph
 
-solution 1 : remove each edge and perform BFS and check if graph is connected.
+solution 1 : 
+remove each edge and perform BFS and check if graph is connected.
 
 solution 2 :
-
 When backtracking from a node v, 
 We need to ensure that there is a back edge from some descendent of v to some ancestor of v.
 descendent of v also includes v itself.

@@ -42,6 +42,7 @@ Cycle_In_Graph(NODE) {
 (Q)Check whether a given graph is Bipartite or not	//BFS
 (Q)Topological Sort of a graph using departure time of vertex	//DFS
 
+(Q)Find the number of islands | using DFS | using disjoint sets
 (Q)Finding minimum vertex cover size of a graph using binary search
 (Q)Longest Path in a Directed Acyclic Graph 
 (Q)Minimize Cash Flow among a given set of friends who have borrowed money from each other
