@@ -40,6 +40,7 @@ vertices point to a linked list of vertices that they are edged with.
 3)Modern adjacency list :
 its a combination of above 2 approaches
 Vertices contain a list of IN and OUT going edges
+There is also a list of edges, and the adjacency list of vertex point to edge in edge list.
 
 4)Matrix representation:
 creating a new vertex is costly, as 2D matrix is stored in a linear way in computer memory,
@@ -61,6 +62,27 @@ BFS requires that each node must have 3 more properties other that a normal grap
 1)color		: discovered with processed,undiscovered,discovered with unprocessed
 2)parent	: backtrack and get path from any node to S
 3)distance	: determines minimum distance from source to any node
+
+Algo :
+
+BFS(node src) {
+	src.color = GRAY
+	src.parent = nil
+	src.distance = 0
+	Q <= src
+	While(Q is not empty) {
+		qNode <= Q
+		for all tempNode adjacent to qNode {
+			if(tempNode.color == WHITE) {
+				tempNode.color = GRAY
+				tempNode.parent = qNode
+				tempNode.distance = qNode.distance+1
+				Q <= tempNode
+			}
+		}
+		qNode.color = BLACK
+	}
+}
 
 Time complexity for BFS = O(V+E)
 
