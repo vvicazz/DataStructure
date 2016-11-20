@@ -64,7 +64,7 @@ BFS requires that each node must have 3 more properties other that a normal grap
 
 Algo :
 
-	BFS(node src) {
+	BFS(src) {
 		src.color = GRAY
 		src.parent = nil
 		src.distance = 0
@@ -128,6 +128,45 @@ Go for a BFS, For a connected graph, graph has no edge in same level during BFS.
 If a graph has an edge then it has an odd cycle.
 If a graph has an odd cycle, then it is not bipartite.
 Level of node can be calculated from distance parameter of node.
+
+	
+	isBipartiteGraph() {
+		nodeList = getAllNodes();
+		for all tempNode in nodeList {
+			tempNode.distance=0
+		}
+		for all tempNode in nodeList {
+			if(tempNode.distance==0) {
+				if( !isBipartite(tempNode) ) {
+					return false
+				}
+			}
+		}
+		return true
+	}
+
+	isBipartite(src) {
+		src.color = GRAY
+		src.distance = 0
+		Q <= src
+		While(Q is not empty) {
+			qNode <= Q
+			for all tempNode adjacent to qNode {
+				if(tempNode.distance==qNode.distance) {
+					return false
+				}
+				if(tempNode.color == WHITE) {
+					tempNode.color = GRAY
+					tempNode.distance = qNode.distance+1
+					Q <= tempNode
+				}
+			}
+			qNode.color = BLACK
+		}
+		return true
+	}
+
+
 
 =>Diameter of BFS = maximum distance bw two vertices in G
 =>Distance bw two vertices = length of shortest path bw two vertices
