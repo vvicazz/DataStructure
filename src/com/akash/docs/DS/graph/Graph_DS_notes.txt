@@ -16,7 +16,7 @@ undirected graph terminologies :
 =>simple path, cyclic path
 =>connected graph : every two vertices must have a path
 =>Subgraph : a graph having subset of vertices and subset of edges
-=>Maximum connected subgraph : a subgraph, in which if u add a vertex , u cannot get a connected subgraph
+=>Maximum connected subgraph : a subgraph, in which if you add a vertex , you cannot get a connected subgraph
 =>Tree (free tree) : connected subgraph without cycles, different from Tree DS as they have no root node.
 =>Forest : collection of trees
 =>Complete graph : there is an edge bw every pair of vertices
