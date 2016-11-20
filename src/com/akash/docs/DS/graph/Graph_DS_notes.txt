@@ -17,13 +17,14 @@ undirected graph terminologies :
 =>connected graph : every two vertices must have a path
 =>Subgraph : a graph having subset of vertices and subset of edges
 =>Maximum connected subgraph : a subgraph, in which if u add a vertex , u cannot get a connected subgraph
-=>Tree (free tree) : connected graph without cycles, different from Tree DS as they have no root node.
+=>Tree (free tree) : connected subgraph without cycles, different from Tree DS as they have no root node.
 =>Forest : collection of trees
 =>Complete graph : there is an edge bw every pair of vertices
 	How many edges in a complete graph : nC2 = n*(n-1)/2
 	How many edges in a complete directed graph : 2 * nC2 = n*(n-1)
 =>Minimum no of edges required to make a graph connected = n-1
-=>Spanning tree : subgraph which is a tree and contains all vertices
+=>Spanning tree : Tree that contains all vertices
+				i.e. Connected subgraph that contains all vertices without cycle
 
 Data structures for graphs :
 
