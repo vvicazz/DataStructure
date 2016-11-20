@@ -64,24 +64,24 @@ BFS requires that each node must have 3 more properties other that a normal grap
 
 Algo :
 
-BFS(node src) {
-	src.color = GRAY
-	src.parent = nil
-	src.distance = 0
-	Q <= src
-	While(Q is not empty) {
-		qNode <= Q
-		for all tempNode adjacent to qNode {
-			if(tempNode.color == WHITE) {
-				tempNode.color = GRAY
-				tempNode.parent = qNode
-				tempNode.distance = qNode.distance+1
-				Q <= tempNode
+	BFS(node src) {
+		src.color = GRAY
+		src.parent = nil
+		src.distance = 0
+		Q <= src
+		While(Q is not empty) {
+			qNode <= Q
+			for all tempNode adjacent to qNode {
+				if(tempNode.color == WHITE) {
+					tempNode.color = GRAY
+					tempNode.parent = qNode
+					tempNode.distance = qNode.distance+1
+					Q <= tempNode
+				}
 			}
+			qNode.color = BLACK
 		}
-		qNode.color = BLACK
 	}
-}
 
 Time complexity for BFS = O(V+E)
 for a Connected graph, E >= V-1 , then it is equivalent to O(E)
@@ -92,10 +92,30 @@ Breadth First Tree
 Applications of BFS :
 1)Get no of connected components
 
-Do BFS from each node and mark them with a component number.
-Either create an array of nodes with type boolean to check if they are marked.
-OR
-create this flag in node object itself.
+	Solution 1 :
+	Do BFS from each node and mark them with a component number.
+	Either create an array of nodes with type boolean to check if they are marked.(like hashmap in java)
+	OR
+	create this flag in node object itself.
+	
+	Solution 2 :
+	Do DFS on graph
+	No need to take extra flag, as DFS already uses visited flag for each node.
+	
+		GetConnectedComponents() {
+			connectedComponents = 0
+			nodeList = getAllNodes();
+			for all tempNode in nodeList {
+				if(!tempNode.visited) {
+					connectedComponents++
+					DFS(tempNode)
+				}
+			}
+			return connectedComponents;
+		}
+		
+	time complexity = O(V+E)
+
 
 2)Bipartite graph :
 
@@ -151,19 +171,19 @@ boolean visited		v
 int arrival_time	a
 int departure_time	d
 
-time=0;
-DFS(node) {
-	node.v=true;
-	node.a=time++;
-	for all w adjacent to node {
-		If (!w.v) {
-			DFS(w);
+	time=0;
+	DFS(node) {
+		node.v=true;
+		node.a=time++;
+		for all w adjacent to node {
+			If (!w.v) {
+				DFS(w);
+			}
 		}
+		node.d=time++;
 	}
-	node.d=time++;
-}
-
-time complexity = O(E)
+	
+	time complexity = O(V+E)
 
 property of a DFS in undirected graph :
 arr[u] < arr[v]
@@ -196,24 +216,24 @@ dbe = deepest back edge
 
 Algo :
 
-time=0;
-2EC(node) {
-	arr[node]=time++;
-	visited[node]=true;
-	dbe=arr[node];
-	For all w adjacent to node do {
-		if(!visited[w]) {
-			dbe = min(dbe, 2EC(w));
-		} else {
-			dbe = min(dbe, arr[w]);
+	time=0;
+	2EC(node) {
+		arr[node]=time++;
+		visited[node]=true;
+		dbe=arr[node];
+		For all w adjacent to node do {
+			if(!visited[w]) {
+				dbe = min(dbe, 2EC(w));
+			} else {
+				dbe = min(dbe, arr[w]);
+			}
 		}
+		if(dbe == arr[node]) {
+			//graph is not 2 Edge Connected
+			Abort;
+		}
+		return dbe;
 	}
-	if(dbe == arr[node]) {
-		//graph is not 2 Edge Connected
-		Abort;
-	}
-	return dbe;
-}
 
 Two errors in this algo:
 ->We must not consider dbe for tree edge of node variable.
@@ -331,25 +351,25 @@ Arrival time of cross edge or back edge is small at destination vertex.
 We need to modify our DFS as in case of 2EC.
 Every DFS program will return minimum arrival time value to which its descendent are reachable.
 
-time=0;
-SC(node) {
-	arr[node]=time++;
-	visited[node]=1;
-	minArrTime=arr[node];
-	for w adjacent to node do {
-		if(!visited[w]) {
-			minArrTime = min(minArrTime,SC(w));
-		} else {
-			minArrTime=min(minArrTime,arr[w]);
+	time=0;
+	SC(node) {
+		arr[node]=time++;
+		visited[node]=1;
+		minArrTime=arr[node];
+		for w adjacent to node do {
+			if(!visited[w]) {
+				minArrTime = min(minArrTime,SC(w));
+			} else {
+				minArrTime=min(minArrTime,arr[w]);
+			}
+		}
+		if(minArrTime==arr[node]) {
+			if(not the root vertex of graph) {
+				STOP
+				Graph is not strongly connected
+			}
 		}
 	}
-	if(minArrTime==arr[node]) {
-		if(not the root vertex of graph) {
-			STOP
-			Graph is not strongly connected
-		}
-	}
-}
 
 
 Applications of BFS :
