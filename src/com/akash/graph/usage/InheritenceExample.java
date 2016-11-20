@@ -1,4 +1,4 @@
-package com.akash.graph.api;
+package com.akash.graph.usage;
 
 import java.util.HashSet;
 import java.util.Set;
