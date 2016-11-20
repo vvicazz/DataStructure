@@ -4,6 +4,9 @@ https://www.arangodb.com/2016/04/index-free-adjacency-hybrid-indexes-graph-datab
 https://www.quora.com/What-is-the-internal-architecture-of-graph-databases-such-as-Titan-or-Neo4j
 http://stackoverflow.com/questions/5604338/how-graph-databases-store-data-to-a-persistent-storage
 
+=>guava api for graph
+https://github.com/google/guava/tree/master/guava/src/com/google/common/graph
+
 undirected graph terminologies :
 
 =>adjacent vertices : vertices joined by an edge
@@ -140,7 +143,7 @@ dep[u] > dep[v]
 2 Edge Connected :
 A graph is 2 edge connected if and only if, you remove an edge from graph and it is still connected.
 
-bridge edge : an which if removed, then the graph is not a connected.
+bridge edge : an edge which if removed, then the graph is not a connected.
 We just need to find out if there is any bridge edge in a graph
 
 solution 1 : remove each edge and perform BFS and check if graph is connected.
