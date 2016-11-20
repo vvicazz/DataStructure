@@ -1,11 +1,10 @@
 Graph_notes
 
-https://www.arangodb.com/2016/04/index-free-adjacency-hybrid-indexes-graph-databases/
-https://www.quora.com/What-is-the-internal-architecture-of-graph-databases-such-as-Titan-or-Neo4j
-http://stackoverflow.com/questions/5604338/how-graph-databases-store-data-to-a-persistent-storage
-
-=>guava api for graph
+Important links :
+https://www.quora.com/Why-are-Depth-First-Search-and-Breadth-First-Search-called-so
+http://stackoverflow.com/questions/11468621/why-is-the-time-complexity-of-both-dfs-and-bfs-o-v-e
 https://github.com/google/guava/tree/master/guava/src/com/google/common/graph
+
 
 undirected graph terminologies :
 
@@ -85,13 +84,22 @@ BFS(node src) {
 }
 
 Time complexity for BFS = O(V+E)
+for a Connected graph, E >= V-1 , then it is equivalent to O(E)
+http://stackoverflow.com/questions/11468621/why-is-the-time-complexity-of-both-dfs-and-bfs-o-v-e
 
 Breadth First Tree
 
 Applications of BFS :
 1)Get no of connected components
+
+Do BFS from each node and mark them with a component number.
+Either create an array of nodes with type boolean to check if they are marked.
+OR
+create this flag in node object itself.
+
 2)Bipartite graph :
 
+A graph is Bipartite if,
 Every edge has one vertex in set U and other vertex in set W, such that 
 U union W = Vertices
 U intersection W = nil
@@ -99,6 +107,7 @@ U intersection W = nil
 Go for a BFS, For a connected graph, graph has no edge in same level during BFS.
 If a graph has an edge then it has an odd cycle.
 If a graph has an odd cycle, then it is not bipartite.
+Level of node can be calculated from distance parameter of node.
 
 =>Diameter of BFS = maximum distance bw two vertices in G
 =>Distance bw two vertices = length of shortest path bw two vertices
