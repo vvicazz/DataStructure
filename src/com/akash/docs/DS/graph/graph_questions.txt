@@ -19,7 +19,7 @@ detect_Cycle_In_Graph() {
 	}
 	Cycle_In_Graph(any_arbitrary_node);
 }
-
+	
 Cycle_In_Graph(NODE) {
 	NODE.arr = time++;
 	NODE.visited = true;

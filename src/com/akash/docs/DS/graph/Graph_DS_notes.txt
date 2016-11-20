@@ -144,7 +144,7 @@ Level of node can be calculated from distance parameter of node.
 		}
 		return true
 	}
-	
+
 	isBipartite(src) {
 		src.color = GRAY
 		src.distance = 0
