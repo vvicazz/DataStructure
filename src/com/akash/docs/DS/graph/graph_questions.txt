@@ -38,7 +38,7 @@ Cycle_In_Graph(NODE) {
 	
 	
 (Q)Clone an Undirected Graph
-(Q)Find all reachable nodes from every node present in a given set  --- connected components	//BFS
+(Q)Find all reachable nodes from every node present in a given set  --- connected components	//DFS or BFS 
 (Q)Check whether a given graph is Bipartite or not	//BFS
 (Q)Topological Sort of a graph using departure time of vertex	//DFS
 
