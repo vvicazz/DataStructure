@@ -341,7 +341,7 @@ Algo :
 	}
 
 Two errors in this algo:
-->We must not consider dbe for tree edge of node variable.
+->We must not consider dbe for Tree edge (in case of undirected graph, u --> v and v --> u both are same)
 ->The node from which DFS will start, will have a dbe = arr of that node.
 
 
@@ -351,8 +351,17 @@ Planar graph : a graph whose vertices and edges are on same plane and no two edg
 
 Complete graph on 5 vertices, is not a planar graph.
 
+Theorem 1 : |V| >= 3 and |E| > 3|V| - 6
+			G is not planar
+Theorem 2 : G has no circuit of length 3
+			|E| > 2|V| - 4
+			G is not planar
+
 (Q)2 Vertex connected graph :
 If we remove a vertex from a graph, the graph must be connected.
+
+=>K vertex connected
+=>K edge connected
 
 ===============================
 
@@ -426,55 +435,56 @@ statement2 : There exists a path from every other vertex to V.
 
 If both statement1 and statement2 are correct than, graph is strongly connected.
 
-path from V --> X
-path from V --> Y
+	path from V --> X
+	path from V --> Y
+	
+	path from X --> V
+	path from Y --> V
+	
+	hence
+	path from X --> Y
+	path from Y --> X
 
-path from X --> V
-path from Y --> V
-
-hence
-path from X --> Y
-path from Y --> X
-
-1. Do DFS on arbitrary vertex V
-2. Do reverse edges in G 
-3. Do DFS from V in reversed G (DFS on reversed G can also be done by doing DFS on InAdjacency edges)
-4. If all vertices are connected in both DFS, then graph is strongly connected
+		1. Do DFS on arbitrary vertex V
+		2. Do reverse edges in G 
+		3. Do DFS from V in reversed G (DFS on reversed G can also be done by doing DFS on InAdjacency edges)
+		4. If all vertices are connected in both DFS, then graph is strongly connected
 
 Solution3=>
 
-Lets try to solve this problem with only one DFS.
+	Lets try to solve this problem with only one DFS.
+	
+	For a directed graph, if a subtree has an out edge, either back edge or cross edge,
+	then this subtree has some path from which it can go outside.
+	
+	The necessary and sufficient condition for a subtree to be strongly connected is 
+	they must have an edge going out of that subtree.
+	(for a subtree if no edge goes out, then edges are only incoming and no outgoing path available)
+	
+	Arrival time of cross edge or back edge is small at destination vertex.
+	
+	We need to modify our DFS as in case of 2EC.
+	Every DFS program will return minimum arrival time value to which its descendent are reachable.
 
-For a directed graph, if a subtree has an out edge, either back edge or cross edge,
-then this subtree has some path from which it can go outside.
-
-The necessary and sufficient condition for a subtree to be strongly connected is 
-they must have an edge going out of that subtree.
-
-Arrival time of cross edge or back edge is small at destination vertex.
-
-We need to modify our DFS as in case of 2EC.
-Every DFS program will return minimum arrival time value to which its descendent are reachable.
-
-	time=0;
-	SC(node) {
-		arr[node]=time++;
-		visited[node]=1;
-		minArrTime=arr[node];
-		for w adjacent to node do {
-			if(!visited[w]) {
-				minArrTime = min(minArrTime,SC(w));
-			} else {
-				minArrTime=min(minArrTime,arr[w]);
+		time=0;
+		SC(node) {
+			arr[node]=time++;
+			visited[node]=1;
+			minArrTime=arr[node];
+			for w adjacent to node do {
+				if(!visited[w]) {
+					minArrTime = min(minArrTime,SC(w));
+				} else {
+					minArrTime=min(minArrTime,arr[w]);
+				}
+			}
+			if(minArrTime==arr[node]) {
+				if(not the root vertex of graph) {
+					STOP
+					Graph is not strongly connected
+				}
 			}
 		}
-		if(minArrTime==arr[node]) {
-			if(not the root vertex of graph) {
-				STOP
-				Graph is not strongly connected
-			}
-		}
-	}
 
 
 Applications of BFS :
