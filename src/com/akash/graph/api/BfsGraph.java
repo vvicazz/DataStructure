@@ -8,6 +8,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * TODO :
+ * BFS of a graph can be made as a utility method.
+ * The three factors taken by BFS (color,parent,distance) can be taken as hashtable or hashmap.
+ * 
+ */
 public class BfsGraph<N, E extends Comparable<E>> extends GenericGraph<N, E> {
 
 	private Set<BfsNode<N, E>> vertices;
