@@ -35,15 +35,17 @@ inefficient when finding an edge bw two given vertices
 2) Traditional Adjacency list :
 vertices are kept in an array.
 vertices point to a linked list of vertices that they are edged with.
+There can be two kinds of adjacency list, IN and OUT. 
 
 3)Modern adjacency list :
 its a combination of above 2 approaches
 Vertices contain a list of IN and OUT going edges
-There is also a list of edges, and the adjacency list of vertex point to edge in edge list.
+There is also an unordered list of edges, and the adjacency list of vertex point to edge in edge list.
 
 4)Matrix representation:
-creating a new vertex is costly, as 2D matrix is stored in a linear way in computer memory,
-so we need to copy and create a new one
+V x V matrix for storing weight of the edge OR can be taken as boolean in case weightless graph.
+Adding new vertex is costly, as 2D matrix is stored in a linear way in computer memory,
+so we need to copy and create a new one.
 
 
 
@@ -94,7 +96,7 @@ Applications of BFS :
 
 	Solution 1 :
 	Do BFS from each node and mark them with a component number.
-	color can be used to check if they are marked or not.
+	color can be used to check if they are visited or not.
 	
 	Solution 2 :
 	Do DFS on graph
@@ -181,11 +183,32 @@ time complexity for this = O(E*V)
 Diameter(G) <= 2*(max level no in any BFS)
 
 
-(Q)seven bridges of konigsberg problem :
+==>Eulerian path and circuit for undirected graph
+
+Eulerian path (trial) 	: which visits every edge exactly once
+Eulerian cycle 			: Eulerian path which starts and ends on the same vertex
+semi-Eulerian			: A graph that has an Eulerian path but not an Eulerian cycle
+
+Euler stated without any proof that a necessary condition for the existence of Eulerian circuits
+ is that all vertices in the graph have an even degree.
+
+Carl Hierholzer proved that for the existence of Eulerian trails it is necessary that zero or two vertices have an odd degree.
+
+(Q)Given a graph G, has G Eulerian path?
+(Q)Given a graph G, has G Eulerian cycle?
+(Q)Given a Eulerian graph G, print Eulerian path.
+
+=>seven bridges of konigsberg problem :
 If there is a graph G(V,E) , and a user must travel to all nodes without using any edge more than once.
 
 Solution : This can be possible if each vertex have an even degree.
 
+
+
+Hamiltonian path	: 
+Hamiltonian cycle 	: 
+
+(Q)check if a graph has Hamiltonian path
 
 ===========================
 
@@ -238,7 +261,7 @@ dep[u] > dep[v]
 2 Edge Connected :
 A graph is 2 edge connected if and only if, you remove an edge from graph and it is still connected.
 
-bridge edge : an edge which if removed, then the graph is not a connected.
+Bridge edge : an edge which if removed, then the graph is not a connected.
 We just need to find out if there is any bridge edge in a graph
 
 solution 1 : 
@@ -423,6 +446,7 @@ Applications of DFS in undirected graph :
 1. Two Edge Connected
 2. Planar graph
 3. Vertex connected
+4. Connected Components
 
 Applications of DFS in Directed graph :
 1. Strongly Connected graph
