@@ -178,10 +178,10 @@ Level of node can be calculated from distance parameter of node.
 =>Distance bw two vertices = length of shortest path bw two vertices
 
 	get Diameter for one BFS result :
-	Do BFS
-	get max level value in graph, say n
-	now get max level value in graph less than n, say m
-	diamter = n+m
+	->Do BFS
+	->get max level value in graph, say n
+	->now get max level value in graph less than n, say m
+	->diameter = n+m
 
 If we want to determine exact diameter of a graph, then we need to perform BFS from every node.
 time complexity for this = O(E*V)
@@ -276,9 +276,13 @@ int departure_time	d
 	time complexity = O(V+E)
 
 property of a DFS in undirected graph :
-arr[u] < arr[v]
-dep[u] > dep[v]
-
+	tree edge (u ---> v)
+		arr[u] < arr[v]
+		dep[u] > dep[v]
+		
+	back edge (u ---> v)
+		arr[u] > arr[v]
+		dep[u] < dep[v]
 
 =======
 Bridge Edge :
@@ -290,11 +294,12 @@ http://stackoverflow.com/questions/11218746/bridges-in-a-connected-graph
 2 Edge Connected :
 A graph is 2 edge connected if and only if, you remove an edge from graph and it is still connected.
 
-Bridge edge : an edge which if removed, then the graph is not a connected.
+Bridge edge : an edge which if removed, then the graph is not connected.
 We just need to find out if there is any bridge edge in a graph
 
 solution 1 : 
-remove each edge and perform BFS and check if graph is connected.
+Remove each edge and check if there is any increase in no of connected components,
+If it increases by 1, then removed edge is a bridge edge.
 
 solution 2 :
 When backtracking from a node v, 
@@ -305,6 +310,11 @@ There can be many back edges from descendent of v to ancestor of v,
 but we should be interested in Deepest back edge.
 Deepest Back Edge : 
 A back edge whose ancestor arrival time is minimum (i.e. edge goes top of the tree).
+
+**
+Every node asks its descendent to tell about the deepest back edge.
+deepest back edge means, a back edge that goes deepest to the root.
+this helps every parent node node to get its DBE by its child subgraph.
 
 variable used in algo :
 dbe = deepest back edge
@@ -337,7 +347,7 @@ Two errors in this algo:
 
 (Q)Given a graph G, is G a planar graph?
 
-Planar graph : a graph whose vertices and edges are on same plan and no two edge intersect each other.
+Planar graph : a graph whose vertices and edges are on same plane and no two edge intersect each other.
 
 Complete graph on 5 vertices, is not a planar graph.
 
