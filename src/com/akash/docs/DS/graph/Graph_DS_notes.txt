@@ -201,8 +201,25 @@ Euler stated without any proof that a necessary condition for the existence of E
 Carl Hierholzer proved that for the existence of Eulerian trails it is necessary that zero or two vertices have an odd degree.
 
 (Q)Given a graph G, has G Eulerian path?
+Solution :
+	->check if graph is connected
+	->if yes then
+	->count of vertices with odd degree must be 0 or 2
+	->if yes, then graph has eulerian path.
+	
 (Q)Given a graph G, has G Eulerian cycle?
+	->check if graph is connected
+	->if yes then
+	->count of vertices with odd degree must be 0
+	->if yes, then graph has eulerian path.
+	
 (Q)Given a Eulerian graph G, print Eulerian path.
+	->check if graph has eulerian path
+	->if yes, then if graph has any odd degree vertex start from there, 
+			else start from any vertex
+	->when you find more than one edge from a vertex,
+			choose that edge which is not a bridge
+	->use DFS to check if an edge is a bridge
 
 =>seven bridges of konigsberg problem :
 If there is a graph G(V,E) , and a user must travel to all nodes without using any edge more than once.
@@ -211,10 +228,11 @@ Solution : This can be possible if each vertex have an even degree.
 
 
 
-Hamiltonian path	: 
-Hamiltonian cycle 	: 
+Hamiltonian path	: that visits each vertex exactly once
+Hamiltonian cycle 	: Hamiltonian path which is a cycle
 
 (Q)check if a graph has Hamiltonian path
+
 
 ===========================
 
