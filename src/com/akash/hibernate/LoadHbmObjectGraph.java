@@ -1,8 +1,8 @@
 package com.akash.hibernate;
-/*
+
 import static java.util.Locale.ENGLISH;
 
-import java.beans.PropertyDescriptor;
+/*import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -17,42 +17,52 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.hcentive.eligibility.ssap.domain.SsapEligibility;
+class LoadHbmObjectGraph {
 
-public class LoadHbmObjectGraph {
+	private static final Logger logger = LoggerFactory.getLogger(LoadHbmObjectGraph.class);
 
-	public static void loadObjGraph(EntityManager entityManager) {
+	private static final String PACKAGE_TO_SCAN = "com.hcentive";
+	private static final String JPA_TRANSIENT_ANNOTATION = "javax.persistence.Transient";
+	private static final String JPA_COLUMN_ANNOTATION = "javax.persistence.Column";
+	private static final String JPA_ID_ANNOTATION = "javax.persistence.Id";
+	private static final String GET_METHOD_PREFIX = "get";
+	private static final String SET_METHOD_PREFIX = "set";
+	private static final String DOT = ".";
 
-		System.out.println("<---------reading object graph---------->");
-		String objectPath = "eligibility";
+	static String loadObjGraph(EntityManager entityManager, Class<?> classToLoad, Object primaryKey) {
+
+		StringBuilder objectGraphContent = new StringBuilder();
+		String objectPath = null;
+		if (classToLoad.getName().contains(DOT)) {
+			objectPath = classToLoad.getName().substring(classToLoad.getName().lastIndexOf(DOT) + 1,
+					classToLoad.getName().length());
+		} else {
+			objectPath = classToLoad.getName();
+		}
 		Set<EntityIdCache> entityIdCache = new HashSet<EntityIdCache>();
 		try {
-			Object ob = entityManager.find(SsapEligibility.class, 427290l);
-			loadElg(entityManager, entityIdCache, ob, 427290l, objectPath);
+			Object ob = entityManager.find(classToLoad, primaryKey);
+			loadElg(entityManager, entityIdCache, ob, primaryKey, objectPath, objectGraphContent);
 		} catch (Exception e) {
-			System.out.println(e);
-			for (StackTraceElement stackTrace : e.getStackTrace()) {
-				System.out.println(stackTrace);
-			}
+			logger.error(e.toString(), e);
 		}
-		System.out.println("<----------Object graph ends----------->");
-
+		return objectGraphContent.toString();
 	}
 
-	private static void loadElg(EntityManager entityManager, Set<EntityIdCache> entityIdCache, Object ob, Object id,
-			String objectPath) {
-
+	private static void loadElg(EntityManager entityManager, Set<EntityIdCache> entityIdCache, Object objectToLoad,
+			Object primaryKey, String objectPath, StringBuilder objectGraphContent) {
 		// TODO : code for Map entries in entity
 		// TODO : handling for embeddable
 		// TODO : check entity/embeddable annotation at class level
-		EntityIdCache cacheObj = new EntityIdCache(ob.getClass().getName(), id);
+		EntityIdCache cacheObj = new EntityIdCache(objectToLoad.getClass().getName(), primaryKey);
 		if (entityIdCache.contains(cacheObj)) {
 			return;
 		}
 		entityIdCache.add(cacheObj);
-		Class<?> clazz = ob.getClass();
-
+		Class<?> clazz = objectToLoad.getClass();
 		List<Field> fields = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
 		Class<?> current = clazz;
 		while (true) {
@@ -67,60 +77,53 @@ public class LoadHbmObjectGraph {
 			if (!isTransient(field) && field.getAnnotations().length > 0 && field.getModifiers() != Modifier.STATIC) {
 				if (hasColumnAnnotation(field)
 						&& field.isEnumConstant()
-						|| (!field.getType().getName().startsWith("com.hcentive") && !Collection.class
+						|| (!field.getType().getName().startsWith(PACKAGE_TO_SCAN) && !Collection.class
 								.isAssignableFrom(field.getType()))) {
 					try {
-						System.out.println(objectPath + "." + field.getName() + "\t\t\t:\t" + field.get(ob));
+						objectGraphContent.append(objectPath + DOT + field.getName() + "\t\t:" + field.get(objectToLoad) + "\r\n");
 					} catch (Exception e) {
-						System.out.println(e);
-						for (StackTraceElement stackTrace : e.getStackTrace()) {
-							System.out.println(stackTrace);
-						}
+						logger.error(e.toString(), e);
 					}
 				} else if (Collection.class.isAssignableFrom(field.getType())) {
 					try {
-
 						Collection<?> collectionObj = (Collection<?>) new PropertyDescriptor(field.getName(), clazz,
-								"get" + capitalize(field.getName()), "set" + capitalize(field.getName()))
-								.getReadMethod().invoke(ob);
+								GET_METHOD_PREFIX + capitalize(field.getName()), SET_METHOD_PREFIX
+										+ capitalize(field.getName())).getReadMethod().invoke(objectToLoad);
+						collectionObj = initialize(collectionObj);
 						int counter = 0;
 						if (collectionObj != null) {
 							for (Object nestedObj : collectionObj) {
-								nestedObj = initialize(nestedObj);
-								Object primaryKey = getPrimaryKey(nestedObj);
-								if (primaryKey != null) {
-									Object nestedObjFromDb = entityManager.find(nestedObj.getClass(), primaryKey);
-									loadElg(entityManager, entityIdCache, nestedObjFromDb, primaryKey, objectPath + "."
-											+ field.getName() + "[" + counter + "]");
+								Object nestedObjectPrimaryKey = getPrimaryKey(nestedObj);
+								if (nestedObjectPrimaryKey != null) {
+									Object nestedObjFromDb = entityManager.find(nestedObj.getClass(),
+											nestedObjectPrimaryKey);
+									loadElg(entityManager, entityIdCache, nestedObjFromDb, nestedObjectPrimaryKey,
+											objectPath + DOT + field.getName() + "[" + counter + "]",
+											objectGraphContent);
 									counter++;
 								}
 							}
 						}
 					} catch (Exception e) {
-						System.out.println(e);
-						for (StackTraceElement stackTrace : e.getStackTrace()) {
-							System.out.println(stackTrace);
-						}
+						logger.error(e.toString(), e);
 					}
-				} else if (!field.isEnumConstant() && field.getType().getName().startsWith("com.hcentive")) {
+				} else if (!field.isEnumConstant() && field.getType().getName().startsWith(PACKAGE_TO_SCAN)) {
 					try {
-						Object nestedObj = new PropertyDescriptor(field.getName(), clazz, "get"
-								+ capitalize(field.getName()), "set" + capitalize(field.getName())).getReadMethod()
-								.invoke(ob);
+						Object nestedObj = new PropertyDescriptor(field.getName(), clazz, GET_METHOD_PREFIX
+								+ capitalize(field.getName()), SET_METHOD_PREFIX + capitalize(field.getName()))
+								.getReadMethod().invoke(objectToLoad);
 						if (nestedObj != null) {
 							nestedObj = initialize(nestedObj);
-							Object primaryKey = getPrimaryKey(nestedObj);
-							if (primaryKey != null) {
-								Object nestedObjFromDb = entityManager.find(nestedObj.getClass(), primaryKey);
-								loadElg(entityManager, entityIdCache, nestedObjFromDb, primaryKey, objectPath + "."
-										+ field.getName());
+							Object nestedObjectPrimaryKey = getPrimaryKey(nestedObj);
+							if (nestedObjectPrimaryKey != null) {
+								Object nestedObjFromDb = entityManager.find(nestedObj.getClass(),
+										nestedObjectPrimaryKey);
+								loadElg(entityManager, entityIdCache, nestedObjFromDb, nestedObjectPrimaryKey,
+										objectPath + DOT + field.getName(), objectGraphContent);
 							}
 						}
 					} catch (Exception e) {
-						System.out.println(e);
-						for (StackTraceElement stackTrace : e.getStackTrace()) {
-							System.out.println(stackTrace);
-						}
+						logger.error(e.toString(), e);
 					}
 				}
 			}
@@ -146,7 +149,7 @@ public class LoadHbmObjectGraph {
 	private static boolean isTransient(Field field) {
 		Annotation[] annotations = field.getAnnotations();
 		for (Annotation annotation : annotations) {
-			if (annotation.annotationType().getName().equals("javax.persistence.Transient")) {
+			if (annotation.annotationType().getName().equals(JPA_TRANSIENT_ANNOTATION)) {
 				return true;
 			}
 		}
@@ -156,7 +159,7 @@ public class LoadHbmObjectGraph {
 	private static boolean hasColumnAnnotation(Field field) {
 		Annotation[] annotations = field.getAnnotations();
 		for (Annotation annotation : annotations) {
-			if (annotation.annotationType().getName().equals("javax.persistence.Column")) {
+			if (annotation.annotationType().getName().equals(JPA_COLUMN_ANNOTATION)) {
 				return true;
 			}
 		}
@@ -180,12 +183,12 @@ public class LoadHbmObjectGraph {
 			field.setAccessible(true);
 			Annotation[] annotations = field.getAnnotations();
 			for (Annotation annotation : annotations) {
-				if (annotation.annotationType().getName().equals("javax.persistence.Id")) {
+				if (annotation.annotationType().getName().equals(JPA_ID_ANNOTATION)) {
 					field.setAccessible(true);
 					try {
 						return field.get(obj);
 					} catch (Exception e) {
-						System.out.println(e);
+						logger.error(e.toString(), e);
 					}
 				}
 			}
