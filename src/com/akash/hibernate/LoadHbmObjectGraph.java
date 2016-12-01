@@ -1,8 +1,9 @@
 package com.akash.hibernate;
 
+/*
 import static java.util.Locale.ENGLISH;
 
-/*import java.beans.PropertyDescriptor;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -24,110 +26,146 @@ class LoadHbmObjectGraph {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoadHbmObjectGraph.class);
 
-	private static final String PACKAGE_TO_SCAN = "com.hcentive";
+	private static final String PACKAGE_TO_SCAN = "com.base.package";
 	private static final String JPA_TRANSIENT_ANNOTATION = "javax.persistence.Transient";
-	private static final String JPA_COLUMN_ANNOTATION = "javax.persistence.Column";
 	private static final String JPA_ID_ANNOTATION = "javax.persistence.Id";
+	private static final String JPA_ENTITY_ANNOTATION = "javax.persistence.Entity";
+	private static final String JPA_EMBEDDED_ANNOTATION = "javax.persistence.Embedded";
+	private static final String JPA_EMBEDDABLE_ANNOTATION = "javax.persistence.Embeddable";
 	private static final String GET_METHOD_PREFIX = "get";
 	private static final String SET_METHOD_PREFIX = "set";
+	private static final String EMBEDDED_OBJECT_KEY = "EMBEDDED_OBJECT_KEY";
 	private static final String DOT = ".";
 
-	static String loadObjGraph(EntityManager entityManager, Class<?> classToLoad, Object primaryKey) {
-
-		StringBuilder objectGraphContent = new StringBuilder();
-		String objectPath = null;
-		if (classToLoad.getName().contains(DOT)) {
-			objectPath = classToLoad.getName().substring(classToLoad.getName().lastIndexOf(DOT) + 1,
-					classToLoad.getName().length());
-		} else {
-			objectPath = classToLoad.getName();
+	static String loadFullObjectGraph(EntityManager entityManager, Class<?> classToLoad, Object primaryKey) {
+		if (!hasAnnotation(classToLoad, JPA_ENTITY_ANNOTATION)) {
+			return "Not a valid JPA Entity : " + classToLoad;
 		}
-		Set<EntityIdCache> entityIdCache = new HashSet<EntityIdCache>();
+		StringBuilder objectGraphContent = new StringBuilder();
+		String objectPath = getObjectPath(classToLoad);
+		Set<EntityIdInfo> entityIdCache = new HashSet<EntityIdInfo>();
 		try {
 			Object ob = entityManager.find(classToLoad, primaryKey);
-			loadElg(entityManager, entityIdCache, ob, primaryKey, objectPath, objectGraphContent);
+			loadObject(entityManager, entityIdCache, ob, primaryKey, objectPath, objectGraphContent);
 		} catch (Exception e) {
 			logger.error(e.toString(), e);
 		}
 		return objectGraphContent.toString();
 	}
 
-	private static void loadElg(EntityManager entityManager, Set<EntityIdCache> entityIdCache, Object objectToLoad,
-			Object primaryKey, String objectPath, StringBuilder objectGraphContent) {
-		// TODO : code for Map entries in entity
-		// TODO : handling for embeddable
-		// TODO : check entity/embeddable annotation at class level
-		EntityIdCache cacheObj = new EntityIdCache(objectToLoad.getClass().getName(), primaryKey);
-		if (entityIdCache.contains(cacheObj)) {
-			return;
-		}
-		entityIdCache.add(cacheObj);
-		Class<?> clazz = objectToLoad.getClass();
-		List<Field> fields = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
-		Class<?> current = clazz;
-		while (true) {
-			current = current.getSuperclass();
-			if (current.getSuperclass() == null) {
-				break;
+	private static void loadObject(EntityManager entityManager, Set<EntityIdInfo> loadedEntityCache,
+			Object objectToLoad, Object primaryKey, String objectPath, StringBuilder objectGraphContent) {
+		if (!EMBEDDED_OBJECT_KEY.equals(primaryKey)) {
+			EntityIdInfo entityIdInfo = new EntityIdInfo(objectToLoad.getClass().getName(), primaryKey);
+			if (loadedEntityCache.contains(entityIdInfo)) {
+				return;
 			}
-			fields.addAll(new ArrayList<>(Arrays.asList(current.getDeclaredFields())));
+			loadedEntityCache.add(entityIdInfo);
 		}
-		for (Field field : fields) {
-			field.setAccessible(true);
-			if (!isTransient(field) && field.getAnnotations().length > 0 && field.getModifiers() != Modifier.STATIC) {
-				if (hasColumnAnnotation(field)
-						&& field.isEnumConstant()
-						|| (!field.getType().getName().startsWith(PACKAGE_TO_SCAN) && !Collection.class
-								.isAssignableFrom(field.getType()))) {
+		Class<?> objectToLoadClass = objectToLoad.getClass();
+		List<Field> fieldsToScan = getAllFields(objectToLoadClass);
+		for (Field fieldToRead : fieldsToScan) {
+			fieldToRead.setAccessible(true);
+			if (!hasAnnotation(fieldToRead, JPA_TRANSIENT_ANNOTATION) && fieldToRead.getModifiers() != Modifier.STATIC) {
+				if (fieldToRead.isEnumConstant()
+						|| (!fieldToRead.getType().getName().startsWith(PACKAGE_TO_SCAN)
+								&& !Collection.class.isAssignableFrom(fieldToRead.getType()) && !Map.class
+									.isAssignableFrom(fieldToRead.getType()))) {
 					try {
-						objectGraphContent.append(objectPath + DOT + field.getName() + "\t\t:" + field.get(objectToLoad) + "\r\n");
+						objectGraphContent.append(objectPath).append(DOT).append(fieldToRead.getName()).append("\t\t:")
+								.append(fieldToRead.get(objectToLoad)).append("\r\n");
 					} catch (Exception e) {
-						logger.error(e.toString(), e);
+						logger.error(e.getMessage() + " in class " + objectToLoad.getClass() + " while reading :"
+								+ fieldToRead, e);
 					}
-				} else if (Collection.class.isAssignableFrom(field.getType())) {
+				} else if (Collection.class.isAssignableFrom(fieldToRead.getType())) {
 					try {
-						Collection<?> collectionObj = (Collection<?>) new PropertyDescriptor(field.getName(), clazz,
-								GET_METHOD_PREFIX + capitalize(field.getName()), SET_METHOD_PREFIX
-										+ capitalize(field.getName())).getReadMethod().invoke(objectToLoad);
-						collectionObj = initialize(collectionObj);
-						int counter = 0;
+						Collection<?> collectionObj = (Collection<?>) new PropertyDescriptor(fieldToRead.getName(),
+								objectToLoadClass, GET_METHOD_PREFIX + capitalize(fieldToRead.getName()),
+								SET_METHOD_PREFIX + capitalize(fieldToRead.getName())).getReadMethod().invoke(
+								objectToLoad);
 						if (collectionObj != null) {
+							collectionObj = initialize(collectionObj);
+							int counter = 0;
 							for (Object nestedObj : collectionObj) {
+								if (hasAnnotation(fieldToRead, JPA_EMBEDDED_ANNOTATION)
+										&& hasAnnotation(nestedObj.getClass(), JPA_EMBEDDABLE_ANNOTATION)) {
+									loadObject(entityManager, loadedEntityCache, nestedObj, EMBEDDED_OBJECT_KEY,
+											objectPath + DOT + fieldToRead.getName() + "[" + counter + "]",
+											objectGraphContent);
+								} else {
+									if (!hasAnnotation(nestedObj.getClass(), JPA_ENTITY_ANNOTATION)) {
+										break;
+									}
+									Object nestedObjectPrimaryKey = getPrimaryKey(nestedObj);
+									if (nestedObjectPrimaryKey != null) {
+										Object nestedObjFromDb = entityManager.find(nestedObj.getClass(),
+												nestedObjectPrimaryKey);
+										loadObject(entityManager, loadedEntityCache, nestedObjFromDb,
+												nestedObjectPrimaryKey, objectPath + DOT + fieldToRead.getName() + "["
+														+ counter + "]", objectGraphContent);
+									}
+								}
+								counter++;
+							}
+						}
+					} catch (Exception e) {
+						logger.error(e.getMessage() + " while reading :" + fieldToRead, e);
+					}
+				} else if (!fieldToRead.isEnumConstant() && fieldToRead.getType().getName().startsWith(PACKAGE_TO_SCAN)) {
+					try {
+						Object nestedObj = new PropertyDescriptor(fieldToRead.getName(), objectToLoadClass,
+								GET_METHOD_PREFIX + capitalize(fieldToRead.getName()), SET_METHOD_PREFIX
+										+ capitalize(fieldToRead.getName())).getReadMethod().invoke(objectToLoad);
+						if (nestedObj != null) {
+							nestedObj = initialize(nestedObj);
+							if (hasAnnotation(fieldToRead, JPA_EMBEDDED_ANNOTATION)
+									&& hasAnnotation(nestedObj.getClass(), JPA_EMBEDDABLE_ANNOTATION)) {
+								loadObject(entityManager, loadedEntityCache, nestedObj, EMBEDDED_OBJECT_KEY, objectPath
+										+ DOT + fieldToRead.getName(), objectGraphContent);
+							} else if (hasAnnotation(fieldToRead.getType(), JPA_ENTITY_ANNOTATION)) {
 								Object nestedObjectPrimaryKey = getPrimaryKey(nestedObj);
 								if (nestedObjectPrimaryKey != null) {
 									Object nestedObjFromDb = entityManager.find(nestedObj.getClass(),
 											nestedObjectPrimaryKey);
-									loadElg(entityManager, entityIdCache, nestedObjFromDb, nestedObjectPrimaryKey,
-											objectPath + DOT + field.getName() + "[" + counter + "]",
+									loadObject(entityManager, loadedEntityCache, nestedObjFromDb,
+											nestedObjectPrimaryKey, objectPath + DOT + fieldToRead.getName(),
 											objectGraphContent);
-									counter++;
 								}
 							}
 						}
 					} catch (Exception e) {
-						logger.error(e.toString(), e);
+						logger.error(e.getMessage() + " while reading:" + fieldToRead, e);
 					}
-				} else if (!field.isEnumConstant() && field.getType().getName().startsWith(PACKAGE_TO_SCAN)) {
-					try {
-						Object nestedObj = new PropertyDescriptor(field.getName(), clazz, GET_METHOD_PREFIX
-								+ capitalize(field.getName()), SET_METHOD_PREFIX + capitalize(field.getName()))
-								.getReadMethod().invoke(objectToLoad);
-						if (nestedObj != null) {
-							nestedObj = initialize(nestedObj);
-							Object nestedObjectPrimaryKey = getPrimaryKey(nestedObj);
-							if (nestedObjectPrimaryKey != null) {
-								Object nestedObjFromDb = entityManager.find(nestedObj.getClass(),
-										nestedObjectPrimaryKey);
-								loadElg(entityManager, entityIdCache, nestedObjFromDb, nestedObjectPrimaryKey,
-										objectPath + DOT + field.getName(), objectGraphContent);
-							}
-						}
-					} catch (Exception e) {
-						logger.error(e.toString(), e);
-					}
+				} else if (Map.class.isAssignableFrom(fieldToRead.getType())) {
+					// TODO
 				}
 			}
 		}
+	}
+
+	private static String getObjectPath(Class<?> classToLoad) {
+		String objectPath = "";
+		if (classToLoad.getName().contains(DOT)) {
+			objectPath = classToLoad.getName().substring(classToLoad.getName().lastIndexOf(DOT) + 1,
+					classToLoad.getName().length());
+		} else {
+			objectPath = classToLoad.getName();
+		}
+		return objectPath;
+	}
+
+	private static List<Field> getAllFields(Class<?> clazz) {
+		List<Field> fields = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
+		Class<?> currentClass = clazz;
+		while (true) {
+			currentClass = currentClass.getSuperclass();
+			if (currentClass.getSuperclass() == null) {
+				break;
+			}
+			fields.addAll(new ArrayList<>(Arrays.asList(currentClass.getDeclaredFields())));
+		}
+		return fields;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -146,43 +184,14 @@ class LoadHbmObjectGraph {
 		return name.substring(0, 1).toUpperCase(ENGLISH) + name.substring(1);
 	}
 
-	private static boolean isTransient(Field field) {
-		Annotation[] annotations = field.getAnnotations();
-		for (Annotation annotation : annotations) {
-			if (annotation.annotationType().getName().equals(JPA_TRANSIENT_ANNOTATION)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean hasColumnAnnotation(Field field) {
-		Annotation[] annotations = field.getAnnotations();
-		for (Annotation annotation : annotations) {
-			if (annotation.annotationType().getName().equals(JPA_COLUMN_ANNOTATION)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private static Object getPrimaryKey(Object obj) {
 		if (obj == null) {
 			return null;
 		}
-		List<Field> fields = new ArrayList<>(Arrays.asList(obj.getClass().getDeclaredFields()));
-		Class<?> current = obj.getClass();
-		while (true) {
-			current = current.getSuperclass();
-			if (current.getSuperclass() == null) {
-				break;
-			}
-			fields.addAll(new ArrayList<>(Arrays.asList(current.getDeclaredFields())));
-		}
+		List<Field> fields = getAllFields(obj.getClass());
 		for (Field field : fields) {
 			field.setAccessible(true);
-			Annotation[] annotations = field.getAnnotations();
-			for (Annotation annotation : annotations) {
+			for (Annotation annotation : field.getAnnotations()) {
 				if (annotation.annotationType().getName().equals(JPA_ID_ANNOTATION)) {
 					field.setAccessible(true);
 					try {
@@ -196,11 +205,29 @@ class LoadHbmObjectGraph {
 		return null;
 	}
 
-	private static class EntityIdCache {
+	static private boolean hasAnnotation(Field field, String annotationName) {
+		for (Annotation annotation : field.getAnnotations()) {
+			if (annotation.annotationType().getName().equals(annotationName)) {
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+
+	static private boolean hasAnnotation(Class<?> clazz, String annotationName) {
+		for (Annotation annotation : clazz.getAnnotations()) {
+			if (annotation.annotationType().getName().equals(annotationName)) {
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+
+	private static class EntityIdInfo {
 		private final String className;
 		private final Object id;
 
-		public EntityIdCache(String className, Object id) {
+		public EntityIdInfo(String className, Object id) {
 			this.className = className;
 			this.id = id;
 		}
@@ -222,7 +249,7 @@ class LoadHbmObjectGraph {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			EntityIdCache other = (EntityIdCache) obj;
+			EntityIdInfo other = (EntityIdInfo) obj;
 			if (className == null) {
 				if (other.className != null)
 					return false;
