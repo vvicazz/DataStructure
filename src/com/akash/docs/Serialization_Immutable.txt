@@ -175,15 +175,19 @@ http://docs.oracle.com/javase/8/docs/platform/serialization/spec/serial-arch.htm
 	then parent class parameters are not serialized.
 (4)if child class implements Serializable and parent class not, 
 	then parent class must have a no argument constructor.
+	why?
+	Ans : During deserialization, the fields of non-serializable classes will be 
+		initialized using the public or protected no-arg constructor of the class. 
+		A no-arg constructor must be accessible to the subclass that is serializable.  
 (5)constructor for serializable class never run while deserialization
 (6)transient fields in serializable class are assigned their default value or value defined in readResolve()
 (7)if child class implements Serializable and parent class not, 
 	then a no argument constructor of parent will be executed.
-	All fields of parent transient or non transient are initialized in constructor.
+	All fields of parent class, weather transient or non transient, are initialized in constructor.
 
 
 (Q)If a serializable class has a refrence of non-serializable class?
-Ans : it will throw NotSerializableException exception
+Ans : it will throw NotSerializableException exception at runtime
 
 (Q)Serialize a class, add a new field , then deserialize ?
 (Q)Serialize a class, remove a field , then deserialize ?

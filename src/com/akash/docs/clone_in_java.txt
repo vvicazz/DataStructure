@@ -1,0 +1,55 @@
+->clone method can be applied on an object if its class implement Cloneable interface
+
+->clone method must call its parent class clone method, i.e. super.clone()
+Object.clone() creates an object for your class natively, 
+	--so first we need to typecast object to our custom object
+	--we need to remove throws exception from clone()
+clone() method can be called recursively on parent hierarchy, 
+i.e. each cloneable class must call super.clone()
+we can also call clone() method on mutable objects for deep cloning
+http://stackoverflow.com/questions/5430944/java-clone-operation-calling-super-clone
+
+->clone() never invokes constructor of a class
+we can override clone() method in our class and call constructor inside it
+
+->Array elements in a class can be used to call clone() as Array implements Cloneable
+
+->final fields are not allowed to call clone(), as final fields are not allowed to change after object creation
+
+->Never make mutable fields of a Cloneable class as final
+
+->For a thread safe class, make clone() method synchronized
+
+->deep copy of an object can be done, by first serializing an object and deserialize it.
+It will create deep copy of full object graph.
+But in this case it must implement Serializable interface.
+
+class Abc implements Cloneable {
+
+	...
+	...
+	
+	@Override
+	public Abc clone() {
+		Abc clonedObject = null;
+		try {
+			clonedObject = (Abc) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clonedObject;
+	}
+}
+
+problems with clone() :
+http://www.artima.com/intv/bloch13.html
+
+->Cloneable interface has no method like clone()
+classes that implement it cannot use it in their own way.
+
+->If you have an array of Cloneable objects, and you clone that array, still you will be getting shallow copy.
+
+->Cloneable interface doesn't provide any feature to extend
+
+->It is better to make copy constructor or static constructor factory, whose name is also meaningful.
+final fields can be handled carefully, as not in case of clone.
