@@ -24,7 +24,20 @@ public abstract class Edge<N> {
 	public abstract boolean equals(Object ob);
 
 	@Override
-	public abstract int hashCode();
+	public int hashCode() {
+		int prime = 31;
+		int hashCode = 17;
+		hashCode += prime * this.getDestination().hashCode();
+		hashCode += prime * this.getSource().hashCode();
+		return hashCode;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer content = new StringBuffer();
+		content.append("{").append(getSource()).append(" -> ").append(getDestination()).append("}");
+		return content.toString();
+	}
 
 	static <N> Edge<N> of(Graph<N> graph, N source, N destination) {
 		if (source == null || destination == null) {
@@ -45,14 +58,18 @@ public abstract class Edge<N> {
 			super(source, destination);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object ob) {
+			if (ob == null) {
+				return false;
+			}
+			if (ob.getClass().getName().equals(DirectedEdge.class)) {
+				DirectedEdge<N> edge = (DirectedEdge<N>) ob;
+				return (edge.getSource().equals(this.getSource()) && edge.getDestination()
+						.equals(this.getDestination()));
+			}
 			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return 0;
 		}
 	}
 
@@ -62,13 +79,19 @@ public abstract class Edge<N> {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public boolean equals(Object ob) {
+			if (ob == null) {
+				return false;
+			}
+			if (ob.getClass().getName().equals(UndirectedEdge.class)) {
+				UndirectedEdge<N> edge = (UndirectedEdge<N>) ob;
+				return (edge.getSource().equals(this.getSource()) && edge.getDestination()
+						.equals(this.getDestination()))
+						|| (edge.getSource().equals(this.getDestination()) && edge.getDestination().equals(
+								this.getSource()));
+			}
 			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return 0;
 		}
 	}
 }
