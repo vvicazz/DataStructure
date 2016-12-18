@@ -2,39 +2,32 @@ package com.akash.graph.api;
 
 import java.util.Set;
 
-public interface Graph<N, E extends Comparable<E>> {
+public interface Graph<N> {
 
-	void addEdge(N srcData, N destData, E edgeData);
+	Set<N> nodes();
 
-	void addNode(N nodeData);
+	Set<Edge<N>> allEdges();
 
-	void removeEdge(N src, N dest);
+	Set<Edge<N>> adjacentEdges(N node);
 
-	void removeNode(N nodeData);
+	Set<Edge<N>> inAdjacentEdges(N node);
 
-	void removeGraph();
+	Set<Edge<N>> outAdjacentEdges(N node);
 
-	E findEdge(N src, N dest);
+	int degree(N node);
 
-	Set<N> findAdjacentVertices(N node);
+	int inDegree(N node);
 
-	Set<N> getAllVertices();
-
-	int getNumOfVertices();
-
-	int getNumOfEdges();
-
-	boolean existPath(N src, N dest);
-
-	boolean isCyclic();
-
-	boolean isStronglyConnected();
-
-	boolean isComplete();
+	int outDegree(N node);
 
 	boolean isDirected();
-	
-	boolean Bipartite();
-	
-	int getNumberOfConnectedComponents();
+
+	boolean isAllowsSelfLoops();
+
+	boolean deleteEdge(N source, N destination);
+
+	boolean addEdge(N source, N destination);
+
+	// boolean isEdgeAvailable(N source, N destination)
+	// boolean removeNode(N node)
 }
