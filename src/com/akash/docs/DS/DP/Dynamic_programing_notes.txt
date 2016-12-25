@@ -36,8 +36,11 @@ it does not have overlapping subproblems property.
 =>Divide And Conquer approach examples :
 1)Binary search
 2)Merge sort
-3)Quick sort
-4)Closest pair of points
+3)count no of inversions
+4)Quick sort
+5)calculate pow(x,n)
+6)median of two sorted arrays
+7)Closest pair of points
 
 =>Dynamic Programming examples :
 1)Fibonacci Nth term
