@@ -45,14 +45,25 @@ public class LongestCommonSubsequence {
 		}
 	}
 
+	private void printCostArr(int[][] costArr) {
+
+		for (int i = 0; i < costArr.length; i++) {
+			for (int j = 0; j < costArr[0].length; j++) {
+				System.out.print(costArr[i][j] + "\t");
+			}
+			System.out.println();
+		}
+	}
+
 	public static void main(String args[]) {
 
 		LongestCommonSubsequence lcs = new LongestCommonSubsequence();
 		char[] seq1 = { 'A', 'C', 'B' };
-		char[] seq2 = { 'A', 'D', ' ' };
+		char[] seq2 = { 'A', 'D', 'C' };
 		int[][] costArr = new int[seq1.length][seq2.length];
 		lcs.createCostArr(costArr);
 		int lcsLength = lcs.findLCSLength(seq1, seq2, seq1.length - 1, seq2.length - 1, costArr);
 		System.out.println(lcsLength);
+		lcs.printCostArr(costArr);
 	}
 }

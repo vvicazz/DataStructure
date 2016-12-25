@@ -79,9 +79,9 @@ public class ChangeMakingPermutationProblem {
 				Set<List<Integer>> cloneSetForCostOfSubNumber = null;
 				int subNumber = number - listOfCoin.get(counter);
 				Set setForCostOfSubNumber = memoizedList.get(subNumber);
-				int costOfSubNumber = 0;
+				Integer costOfSubNumber = 0;
 				if(setForCostOfSubNumber != null) {
-					costOfSubNumber = fetchOrRemoveFirstListFromSetOfList(setForCostOfSubNumber, true).get(0);
+					costOfSubNumber = (Integer)fetchOrRemoveFirstListFromSetOfList(setForCostOfSubNumber, true).get(0);
 				}
 				else {
 					costOfSubNumber = getCountForCoins(subNumber, listOfCoin);
