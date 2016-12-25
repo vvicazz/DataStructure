@@ -14,3 +14,40 @@ https://www.khanacademy.org/math/precalculus/precalc-matrices/matrices-as-transf
 
 http://programmers.stackexchange.com/questions/300113/what-are-the-advantages-of-matrix-multiplication-over-individual-variables-grap
 
+======================
+
+
+n-D matrix multiplication depicts the n dimensional transformation
+
+if we multiply a number line by -2, every number gets multiplied by -1 and expanded as twice.
+
+Now considering the case of 2 D
+we track the transformation of two coordinates : (1,0) and (0,1)
+
+x	=	x * 1  +  y * 0
+y           0         1
+
+
+lets say there is a transformation of (0,1) to (a,c)
+and a transformation of (1,0) to (b,d)
+
+then this x-y plane can be depicted as a matrix transformation of 
+
+A =  a  b
+     c  d
+
+x * A  =  ax  by
+y         cx  dy
+
+for example :
+
+let say after a transformation :
+(1,0) -- shifted to (1,-2)
+(0,1) -- shifted to (3,0)
+
+1  -2
+3   0
+
+
+
+==>determinant of a matrix = Area/volume of transformation

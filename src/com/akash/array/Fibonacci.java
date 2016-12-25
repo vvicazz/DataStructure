@@ -1,52 +1,39 @@
 package com.akash.array;
 
-import java.util.Arrays;
-
 public class Fibonacci {
 
-	public static void main(String args[]) {
-		printFibonacci1(15);
-		printFibonacci2(15);
+	public static void main(String[] args) {
+		int n = 9;
+		System.out.println(fibonacci1(n));
+		System.out.println(fibonacci2(n));
+		System.out.println(fibonacci3(n));
 	}
 
-	private static void printFibonacci1(int n) {
-		if (n == 0 || n < 0) {
-			return;
-		} else if (n == 1) {
-			System.out.println(0);
-			return;
-		} else {
-			int a = 0;
-			int b = 1;
-			int c = 0;
-			int count = 1;
-			System.out.println(a);
-			while (count < n) {
-				System.out.println(b);
-				c = a + b;
-				count++;
-				a = b;
-				b = c;
-			}
-		}
+	static int fibonacci1(int n) {
+		if (n <= 1)
+			return n;
+		return fibonacci1(n - 1) + fibonacci1(n - 2);
 	}
 
-	private static void printFibonacci2(int n) {
-		if (n == 0 || n < 0) {
-			return;
-		} else if (n == 1) {
-			System.out.println(0);
-			return;
-		} else {
-			int fib[] = new int[n];
-			fib[0] = 0;
-			fib[1] = 1;
-			int counter = 2;
-			while (counter < n) {
-				fib[counter] = fib[counter - 1] + fib[counter - 2];
-				counter++;
-			}
-			System.out.println(Arrays.toString(fib));
+	static int fibonacci3(int n) {
+		int[] mem = new int[n + 1];
+		mem[0] = 0;
+		mem[1] = 1;
+		for (int i = 2; i <= n; i++) {
+			mem[i] = mem[i - 1] + mem[i - 2];
 		}
+		return mem[n];
+	}
+
+	static int fibonacci2(int n) {
+		int a = 0, b = 1, c = b;
+		if (n <= 0)
+			return a;
+		for (int i = 2; i <= n; i++) {
+			c = a + b;
+			a = b;
+			b = c;
+		}
+		return c;
 	}
 }
