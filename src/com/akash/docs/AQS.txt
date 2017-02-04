@@ -144,10 +144,12 @@ void release() {
 
 
 Examples of state dependent classes in java :
-ReentrantLock
-Semaphore
-CountdownLatch
-ReentrantReadWriteLock
+->ReentrantLock
+->Semaphore
+->CountdownLatch
+->ReentrantReadWriteLock
+->ThreadPoolExecutor
+
 FutureTask
 SynchronousQueue
 
