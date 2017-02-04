@@ -37,7 +37,8 @@ The object that is shared with different threads.
 
 NOTE : wait(0) == wait(0,0) == wait()
 NOTE : wait(),notify(),notifyAll() are always called from inside synchronized block
-NOTE : Once a thread is awakened it cannot exit the wait() call until the thread calling notify() has left its synchronized block
+NOTE : Once a thread is awakened it cannot exit the wait() call until 
+		 the thread calling notify() has left its synchronized block
 
 http://stackoverflow.com/questions/2779484/why-must-wait-always-be-in-synchronized-block
 
