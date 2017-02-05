@@ -1,0 +1,197 @@
+class AQS  {
+	private transient volatile Node head;
+	private transient volatile Node tail;
+	private volatile int state;
+	
+	static final class Node {
+		static final int CANCELLED =  1;
+		//Non-negative values mean that a node doesn't need to signal
+		static final int SIGNAL    = -1;
+		static final int PROPAGATE = -3;
+		//Only used for Condition queues
+		static final int CONDITION = -2;
+		
+		volatile int waitStatus;
+		volatile Node prev;
+		volatile Node next;
+		volatile Thread thread;
+		
+		static final Node SHARED = new Node();
+		static final Node EXCLUSIVE = null;
+
+		//condition queues are accessed only when holding in exclusive mode
+		//In case of exclusive mode, threads for condition queue is saved
+		//In case of shared mode, empty Node object is saved.
+		Node nextWaiter;
+	}
+
+	public class ConditionObject {
+
+		private transient Node firstWaiter;
+		private transient Node lastWaiter;
+		//nextWaiter is used to hold next node of condition queue.
+	}
+}
+
+When a new thread comes and no thread is waiting, then it is allowed to run.
+If a thread has already acquired lock and a new thread tries to acquire the lock, 
+then it is inserted in the linked list of nodes.
+Nodes are inserted after tail and removed from head, i.e. it is treated as a Queue.
+ReentrantLock maintains :
+	head and tail : for making a queue of nodes in the form of linked list
+	state : variable used to determine if lock is acquired by one or more threads or not
+		eg: In ReentrantLock, if c > 0 then it means lock is held by some thread.
+Every node maintains :
+	waitStatus : status of current thread
+	prev and next : previous and next node in linked list
+	thread : running thread which is parked
+	nextWaiter : is used by ConditionObject to store queue of threads for condition predicate
+
+----------------
+
+Below is the example of how to use ReentrantLock with ConditionObject :
+
+Lock lock = new ReentrantLock();
+Condition condition1 = lock.newCondition();
+
+void foo() {
+	lock.lock();
+	try {
+		while(preCondition == false) {
+			condition1.await();
+		}
+		...
+		...
+		condition1.signal();
+	}
+	finally {
+		lock.unlock();
+	}
+}
+
+Now lets try go underneath and understand, how it really works:
+ReentrantLock has to different implementations of AQS : Fair Synchronizer and NonFair Synchronizer.
+In NonFair sync , if a new thread asks for a resource and resource is available,
+ then resource is provided to that thread, irrespective of the fact 
+ that any other thread has been waiting for this resource for long time.
+In Fair sync, a fair policy is used to provide resources to threads on the basis of their timings.
+
+Lets try to understand Non fair policy :
+
+ReentrantLock$NonfairSync class
+final void lock() {
+    if (compareAndSetState(0, 1))	//setting AQS state from 0 to 1 atomically
+        setExclusiveOwnerThread(Thread.currentThread());
+    else
+        acquire(1);
+}
+
+AbstractQueuedSynchronizer class
+public final void acquire(int arg) {
+    if (!tryAcquire(arg) && acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+
+If tryAcquire() returns true, current thread is allowed to execute without any wait.
+If tryAcquire() returns false, acquireQueued() method is called which internally parks the thread, using LockSupport.park() and thread becomes disabled.
+
+ReentrantLock$NonfairSync class
+protected final boolean tryAcquire(int acquires) {
+	return nonfairTryAcquire(acquires);
+}
+
+ReentrantLock$Sync class
+final boolean nonfairTryAcquire(int acquires) {
+	final Thread current = Thread.currentThread();
+	int c = getState();
+	if (c == 0) {
+		if (compareAndSetState(0, acquires)) {		// increment state atomically
+			setExclusiveOwnerThread(current);
+			return true;
+		}
+	}
+	else if (current == getExclusiveOwnerThread()) {
+		int nextc = c + acquires;
+		setState(nextc);				// increment state atomically
+		return true;
+	}
+	return false;
+}
+
+(Q) How Threads are parked in java ?
+Ans: java.util.concurrent.locks.LockSupport
+
+class LockSupport {
+	private static final sun.misc.Unsafe UNSAFE;
+	Class<?> tk = Thread.class;
+	
+	//Getting offset of parkBlocker variable from Thread class
+	//This is implemented to atomically update parkBlocker for the caller object (ReentrantLock in our case)
+    private static final long parkBlockerOffset = UNSAFE.objectFieldOffset(tk.getDeclaredField("parkBlocker"));
+
+	private static void setBlocker(Thread t, Object arg) {
+		UNSAFE.putObject(t, parkBlockerOffset, arg);
+	}
+
+	public static void unpark(Thread thread) {
+		if (thread != null)
+			UNSAFE.unpark(thread);
+	}
+
+	//blocker is object of ReentrantLock, in our case
+	public static void park(Object blocker) {
+		Thread t = Thread.currentThread();
+		setBlocker(t, blocker);
+		UNSAFE.park(false, 0L);
+		setBlocker(t, null);
+	}
+}
+
+public class Thread implements Runnable {
+	volatile Object parkBlocker;
+}
+
+Above code can be understood as :
+when current thread calls LockSupport.park() method ,by passing object of ReentrantLock class,
+current thread is disabled and parkBlocker = object of ReentrantLock class
+
+Now lets try to understand unlock() :
+
+ReentrantLock class
+public void unlock() {
+	sync.release(1);
+}
+
+AbstractQueuedSynchronizer class
+public final boolean release(int arg) {
+	if (tryRelease(arg)) {
+		Node h = head;
+		if (h != null && h.waitStatus != 0)
+			unparkSuccessor(h);
+		return true;
+	}
+	return false;
+}
+
+ReentrantLock$Sync class
+protected final boolean tryRelease(int releases) {
+	int c = getState() - releases;
+	if (Thread.currentThread() != getExclusiveOwnerThread())
+		throw new IllegalMonitorStateException();
+	boolean free = false;
+	if (c == 0) {
+		free = true;
+		setExclusiveOwnerThread(null);
+	}
+	setState(c);
+	return free;
+}
+
+If tryRelease() returns true, unparkSuccessor() is called which internally calls LockSupport.unpark() and disabled thread starts running.
+If tryRelease() returns false, disabled threads still needs to wait for signal.
+
+
+A queue is maintained for the threads having same condition object, i.e. same condition predicate.
+firstWaiter and lastWaiter are head and tail of queue
+Every node has nextWaiter, which determines next waiting thread in same condition queue.
+

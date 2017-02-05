@@ -1,0 +1,86 @@
+Volatile in java
+
+http://tutorials.jenkov.com/java-concurrency/threadlocal.html
+
+http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
+
+In English, Volatile means "liable to change rapidly and unpredictably".
+
+When multiple threads operate on a single shared object,their may be a case where
+different threads may have memory inconsistency issues with that shared variable.
+Threads operates on variable by first making a copy of that variable in their own CPU cache,
+then they operate that copy in CPU register.
+
+eg:
+Thread A reads x
+Thread B reads x
+Thread A increments x by 1
+Thread B increments x by 1
+Thread A writes back x to main memory
+Thread B writes back x to main memory
+
+now x=1
+ideally x must be 2.
+
+
+Java memory model
+Multiple threads have their own stack but they all share same heap space.
+Shared objects reside in heap.
+
+At Hardware level
+Operations are performed on CPU registers.
+Shared objects reside in RAM space so that every cpu can access shared variable.
+CPU has their own cache for doing any operation.
+
+For Read operation
+RAM -> CPU cache -> CPU register
+
+For Write operation
+RAM <- CPU cache <- CPU register
+
+These operations are not atomic and may result some inconsistency when multiple threads interleaved with these operations.
+Making a variable as Volatile guarantee that read operation is atomic and write operation is atomic.
+It guarantees a HAPPENS BEFORE relationship between two operations.
+i.e.
+write to a volatile variable by thread A
+read from a volatile variable by thread B
+
+write operation HAPPENS BEFORE read operation as both are atomic.
+
+(Q)When to use volatile :
+Ans : When you have one thread that writes a shared variable and all other thread reads that shared variable.
+
+(Q)When to use Synchronized with Volatile :
+Ans : When more than one thread try to write on shared variable
+
+(Q)If a shared variable is accessed by multiple threads for read/write operation ,
+ then is it neccessary to make it synchronized and volatile both ?
+Ans : 
+synchronized keyword makes a code block executed by a single thread thread only by keeping its monitor.
+volatile makes the read as atomic and write as atomic.
+But volatile alone cannot make both read and write operation as a single atomic operation.
+
+(Q)Is Volatile variable only effective for primitive types OR can we use it for non-primitive custom objects(stateful objects) ?
+Ans : 
+
+
+
+http://stackoverflow.com/questions/16940670/how-atomicity-is-achieved-in-the-classes-defined-in-java-util-concurrent-atomic
+
+
+==============
+
+
+=>Java volatile keyword guarantees visibility of changes to variables across threads
+=>JVM guarantees that every read of the variable will always be read from main memory,
+ and that all writes to the variable will always be written back to main memory
+=>Using volatile variables reduces the risk of memory consistency errors, because any write to a volatile variable
+ establishes a happens-before relationship with subsequent reads of that same variable.
+ This means that changes to a volatile variable are always visible to other threads.
+ If Thread A writes to a volatile variable and Thread B subsequently reads the same volatile variable,
+ then all variables visible to Thread A before writing the volatile variable, will also be visible to Thread B.
+=>Reads and writes are atomic for all variables declared volatile (including long and double variables).
+=>You need to use synchronization in that case to guarantee that the reading and writing of the variable is atomic
+=>Reading from and writing to main memory is more expensive than accessing the CPU cache.
+=>Effectively, a variable declared volatile must have it’s data synchronized across all threads,
+ so that whenever you access or update the variable in any thread, all other threads immediately see the same value.

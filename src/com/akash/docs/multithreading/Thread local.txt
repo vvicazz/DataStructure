@@ -1,0 +1,30 @@
+Thread Local
+
+// http://stackoverflow.com/questions/1202444/how-is-javas-threadlocal-implemented-under-the-hood
+// http://java.dzone.com/articles/java-thread-local-%E2%80%93-how-use
+// http://java.dzone.com/articles/painless-introduction-javas-threadlocal-storage
+
+Thread local are those objects whose values are associated with each thread.
+Each thread has a separate copy of threadLocal.
+Each thread can use its threadLocal variable across all methods that are executed inside thread's stack.
+i.e. both gloabl and local
+global to all methods of thread
+local to thread only (not visible to other threads)
+set() and get() methods of ThreadLocal class uses Thread.currentThread() to operate.
+
+When to use :
+mostly used as private static variable
+When you want to assign a unique transaction id to multiple threads
+
+How implemented internally:
+Each thread object has a map as <ThreadLocal,Object> which stores a mapping of threadLocal to Object.
+	
+	/* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+	
+Also See ThreadLocalMap
+=>The class is package private to allow declaration of fields in class Thread.
+=>the hash table entries use WeakReferences for keys
+=>No operations are exported outside of the ThreadLocal class
+
