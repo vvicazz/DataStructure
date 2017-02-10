@@ -13,7 +13,6 @@ These types of classes are known as state dependent classes.
 java 1.5 introduced a framework for creating and using these types of state dependent classes.
 abstract class AbstractQueuedSynchronizer
 also known as AQS.
-
 Many classes like ReentrantLock, ThreadPoolExecutor, Semaphore, CountdownLatch, ReentrantReadWriteLock
 uses AQS.
 
