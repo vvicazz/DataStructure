@@ -1,3 +1,279 @@
+For managing multi-threading applications, java follows monitor pattern.
+According to Monitor pattern if a thread is executing a critical section while holding 
+monitor of an object, no other thread can execute this critical section with monitor of same object.
+synchronized method and synchronized block are simple implementation of this technique.
+Many concepts of Semaphore and latches are implemented in java over this concept.
+All concurrent classes introduced in 1.5 like ReentrantLock, ThreadPoolExecutor and many others are 
+based on this technique.
+There are times when we require either wait a thread or start running a thread,
+ based on the state of an object.
+Thread can sleep/wait/run depending on some conditions.
+These types of classes are known as state dependent classes.
+
+java 1.5 introduced a framework for creating and using these types of state dependent classes.
+abstract class AbstractQueuedSynchronizer
+also known as AQS.
+
+Many classes like ReentrantLock, ThreadPoolExecutor, Semaphore, CountdownLatch, ReentrantReadWriteLock
+uses AQS.
+
+AQS in itself uses LockSupport class which helps to park and unpark threads for a specified monitor.
+LockSupport internally uses native API, for using Monitor pattern.
+
+This was all introduction, but lets raise some questions here:
+(Q)Why this framework was needed ?
+(Q)What were the problems in java that raised to create this framework ?
+
+Lets try to answer above questions.
+Below is the structure of blocking state-dependent actions
+
+1.  acquire lock on object state
+2.  while (precondition does not hold)
+3.  {
+4.    release lock
+5.	  wait until precondition might hold
+6.	  optionally fail if interrupted or timeout expires
+7.	  reacquire lock
+8.  }
+9.  perform action of CRITICAL SECTION
+10. release lock
+
+Above code can be considered as making a fixed size queue in a producer consumer problem.
+Producer will push the data in queue and wait if it is full
+Consumer will pull the data from queue and wait if it is empty
+
+Note that queue is empty or full are preconditions for the threads (see line 2).
+It is the state of queue object, that every thread need to check before doing any operation in 
+critical section (see line 9).
+Also note that , precondition must be checked only while holding the lock, 
+i.e. monitor of an object (see line 1 and 7).
+
+Lets try to solve above problem statement without using any concurrent API.
+Solution 1 : 
+
+public abstract class BaseBoundedBuffer<V> {
+	private final V[] buf;
+	private int tail;
+	private int head;
+	private int count;
+	protected BaseBoundedBuffer(int capacity) {
+		this.buf = (V[]) new Object[capacity];
+	}
+	protected synchronized final void doPut(V v) {
+		buf[tail] = v;
+		if (++tail == buf.length)
+		tail = 0;
+		++count;
+	}
+	protected synchronized final V doTake() {
+		V v = buf[head];
+		buf[head] = null;
+		if (++head == buf.length)
+		head = 0;
+		--count;
+		return v;
+	}
+	public synchronized final boolean isFull() {
+		return count == buf.length;
+	}
+	public synchronized final boolean isEmpty() {
+		return count == 0;
+	}
+}
+
+BaseBoundedBuffer is base class for creating queue of our producer consumer problem.
+
+public class GrumpyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
+	public GrumpyBoundedBuffer(int size) { super(size); }
+	public synchronized void put(V v) throws BufferFullException {
+		if (isFull())
+			throw new BufferFullException();
+		doPut(v);
+	}
+	public synchronized V take() throws BufferEmptyException {
+		if (isEmpty())
+			throw new BufferEmptyException();
+		return doTake();
+	}
+}
+
+GrumpyBoundedBuffer is first solution to our problem.It's a kind of short tempered solution.
+if pushing data when queue is full, will throw an exception
+if pulling data when queue is empty, will throw an exception
+
+This might be a good solution for some cases but not always.
+
+Solution 2: 
+sleep thread if precondition is failed.
+
+public class SleepyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
+	public SleepyBoundedBuffer(int size) { super(size); }
+	public void put(V v) throws InterruptedException {
+		while (true) {
+			synchronized (this) {
+				if (!isFull()) {
+					doPut(v);
+					return;
+				}
+			}
+			Thread.sleep(SLEEP_DURATION);
+		}
+	}
+	public V take() throws InterruptedException {
+		while (true) {
+			synchronized (this) {
+				if (!isEmpty())
+				return doTake();
+			}
+			Thread.sleep(SLEEP_DURATION);
+		}
+	}
+}
+
+problems with this solution are :
+1. CPU cycles will waste for a shorter sleep duration.
+2. performance of program will downgrade for a longer sleep duration.
+
+Solution 3:
+Using wait() and notifyAll()
+
+public class BoundedBuffer<V> extends BaseBoundedBuffer<V> {
+	// CONDITION PREDICATE: not-full (!isFull())
+	// CONDITION PREDICATE: not-empty (!isEmpty())
+	public BoundedBuffer(int size) { super(size); }
+	
+	public synchronized void put(V v) throws InterruptedException {
+		while (isFull())
+			wait();
+		doPut(v);
+		notifyAll();
+	}
+	
+	public synchronized V take() throws InterruptedException {
+		while (isEmpty())
+			wait();
+		V v = doTake();
+		notifyAll();
+		return v;
+	}
+}
+
+BoundedBuffer still seems good but it also have following problems:
+1. notifyAll() method will notify all waiting threads even if they are waiting for some other preconditions.
+   like in BoundedBuffer we have two totally different exhaustive preconditions of full and empty buffer.
+   After notifyAll() method is executed, every waiting thread will be given monitor and allowed to execute. 
+   Only few may pass the precondition and only one will get monitor.Hence a downgrade in performance.
+2. If we would be adding more preconditions to this program, code will become more messy.
+3. In case, if these type of classes are allowed to have inherit, 
+   then proper documentation should be done for handling critical section and checking preconditions.
+   
+Solution 4:
+Use notify() instead of notifyAll()
+
+notify() can only be used in scenarios where both of the below two conditions meet:
+1. Uniform waiters requirement
+2. One-in-One-out requirement
+
+Uniform waiters requirement means that all waiting threads are "same","Uniform"
+They are waiting for the same condition to become true.
+In our producer consumer buffer problem, there may be two types of waiting threads,
+push into the queue
+pull from the queue
+Hence we cannot apply notify() method in our problem.
+
+One-in-One-out requirement means a notification on the condition allows at most one thread to proceed.
+This requirement is fulfilled here.
+
+Also note that, 
+wait() notify() notifyAll() must be called on the object whose monitor is held by current thread.
+
+You can see that we have problems with the solutions of not using concurrent API.
+
+Here comes AbstractQueuedSynchronizer to the rescue.
+AQS provides api for releasing and acquiring monitor of an object.
+It provides empty methods which can be implemented by clients and 
+hence clients can create their own state dependent classes or Synchronizers.
+It also provides ConditionObject which can be used to create more than one condition predicates for 
+a single monitor object.As we have two condition predicates in BoundedBuffer.
+Each condition predicate has a queue of waiting ConditionObject.
+By this we can solve the problem of Uniform waiters requirement.
+
+Lets understand some basics of AQS:
+
+Below are public methods of AQS that has framework implementation:
+public final void acquire(int arg)
+public final boolean release(int arg)
+public final void acquireShared(int arg)
+public final boolean releaseShared(int arg)
+public final void acquireInterruptibly(int arg) throws InterruptedException
+public final void acquireSharedInterruptibly(int arg) throws InterruptedException
+public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws InterruptedException
+public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException
+
+Below are some methods of AQS that should be implemented by clients of AQS:
+protected boolean tryAcquire(int arg)
+protected boolean tryRelease(int arg)
+protected int tryAcquireShared(int arg)
+protected boolean tryReleaseShared(int arg)
+
+A state dependent class must have following features :
+1. They should define the meaning of acquire and release
+2. They should define state of a condition
+3. They can hold some extra info like holding running thread itself
+4. They should define type of acquisition : Exclusive or Shared
+Exclusive means only one thread is allowed to execute in critical section
+Shared means one or more than one threads are allowed to execute in critical section as in Semaphore.
+state of a synchronizer decides the precondition for critical section.
+
+//para from the book
+
+public class ConditionBoundedBuffer<T> {
+	protected final Lock lock = new ReentrantLock();
+	// CONDITION PREDICATE: notFull (count < items.length)
+	private final Condition notFull = lock.newCondition();
+	// CONDITION PREDICATE: notEmpty (count > 0)
+	private final Condition notEmpty = lock.newCondition();
+	
+	private final T[] items = (T[]) new Object[BUFFER_SIZE];
+	private int tail, head, count;
+	
+	public void put(T x) throws InterruptedException {
+		lock.lock();
+		try {
+			while (count == items.length)
+				notFull.await();
+			items[tail] = x;
+			if (++tail == items.length)
+				tail = 0;
+			++count;
+			notEmpty.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+	
+	public T take() throws InterruptedException {
+		lock.lock();
+		try {
+			while (count == 0)
+				notEmpty.await();
+			T x = items[head];
+			items[head] = null;
+			if (++head == items.length)
+				head = 0;
+			--count;
+			notFull.signal();
+			return x;
+		} finally {
+			lock.unlock();
+		}
+	}
+}
+
+//AQS data structure
+
+-----------------------------------------------------
+
 class AQS  {
 	private transient volatile Node head;
 	private transient volatile Node tail;
