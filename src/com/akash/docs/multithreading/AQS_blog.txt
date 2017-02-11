@@ -1,6 +1,6 @@
-For managing multi-threading applications, java follows monitor pattern.
-According to Monitor pattern if a thread is executing a critical section while holding 
-monitor of an object, no other thread can execute this critical section with monitor of same object.
+For managing multi-threading applications, java follows monitor construct.
+According to Monitor construct if a thread is executing a critical section while holding 
+mutex(or intrinsic lock) of an object, no other thread can execute this critical section with lock of same object.
 synchronized method and synchronized block are simple implementation of this technique.
 Many concepts of Semaphore and latches are implemented in java over this concept.
 All concurrent classes introduced in 1.5 like ReentrantLock, ThreadPoolExecutor and many others are 
@@ -10,21 +10,20 @@ There are times when we require either wait a thread or start running a thread,
 Thread can sleep/wait/run depending on some conditions.
 These types of classes are known as state dependent classes.
 
-java 1.5 introduced a framework for creating and using these types of state dependent classes.
-abstract class AbstractQueuedSynchronizer
+java 1.5 introduced a framework for creating and using these types of state dependent classes called as AbstractQueuedSynchronizer
 also known as AQS.
 Many classes like ReentrantLock, ThreadPoolExecutor, Semaphore, CountdownLatch, ReentrantReadWriteLock
 uses AQS.
 
 AQS in itself uses LockSupport class which helps to park and unpark threads for a specified monitor.
-LockSupport internally uses native API, for using Monitor pattern.
+LockSupport internally uses native API(sun.misc.Unsafe), for using Monitor pattern.
 
 This was all introduction, but lets raise some questions here:
 (Q)Why this framework was needed ?
 (Q)What were the problems in java that raised to create this framework ?
 
 Lets try to answer above questions.
-Below is the structure of blocking state-dependent actions
+Below is a pseudo code for blocking/waiting/executing state-dependent actions
 
 1.  acquire lock on object state
 2.  while (precondition does not hold)
@@ -37,15 +36,15 @@ Below is the structure of blocking state-dependent actions
 9.  perform action of CRITICAL SECTION
 10. release lock
 
-Above code can be considered as making a fixed size queue in a producer consumer problem.
+Lets take an example of a fixed size queue/buffer in a producer consumer problem for above pseudo code.
 Producer will push the data in queue and wait if it is full
 Consumer will pull the data from queue and wait if it is empty
 
 Note that queue is empty or full are preconditions for the threads (see line 2).
 It is the state of queue object, that every thread need to check before doing any operation in 
-critical section (see line 9).
-Also note that , precondition must be checked only while holding the lock, 
-i.e. monitor of an object (see line 1 and 7).
+critical section (see line 9).One single object of queue will be shared between the threads of producer and consumer.
+Also note that , precondition must be checked only when threads are holding the lock, 
+i.e. monitor of the queue object (see line 1 and 7).
 
 Lets try to solve above problem statement without using any concurrent API.
 Solution 1 : 
@@ -81,6 +80,7 @@ public abstract class BaseBoundedBuffer<V> {
 }
 
 BaseBoundedBuffer is base class for creating queue of our producer consumer problem.
+Our various solutions will be using this base abstract class.
 
 public class GrumpyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
 	public GrumpyBoundedBuffer(int size) { super(size); }
@@ -97,16 +97,18 @@ public class GrumpyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
 }
 
 GrumpyBoundedBuffer is first solution to our problem.It's a kind of short tempered solution.
-if pushing data when queue is full, will throw an exception
-if pulling data when queue is empty, will throw an exception
+if pushing data when queue is full, it will throw an exception
+if pulling data when queue is empty, it will throw an exception
 
 This might be a good solution for some cases but not always.
+There might be some requirements when we want to sleep current thread and allow other threads to execute.
 
 Solution 2: 
 sleep thread if precondition is failed.
 
 public class SleepyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
 	public SleepyBoundedBuffer(int size) { super(size); }
+	
 	public void put(V v) throws InterruptedException {
 		while (true) {
 			synchronized (this) {
@@ -118,6 +120,7 @@ public class SleepyBoundedBuffer<V> extends BaseBoundedBuffer<V> {
 			Thread.sleep(SLEEP_DURATION);
 		}
 	}
+	
 	public V take() throws InterruptedException {
 		while (true) {
 			synchronized (this) {
@@ -160,8 +163,8 @@ public class BoundedBuffer<V> extends BaseBoundedBuffer<V> {
 BoundedBuffer still seems good but it also have following problems:
 1. notifyAll() method will notify all waiting threads even if they are waiting for some other preconditions.
    like in BoundedBuffer we have two totally different exhaustive preconditions of full and empty buffer.
-   After notifyAll() method is executed, every waiting thread will be given monitor and allowed to execute. 
-   Only few may pass the precondition and only one will get monitor.Hence a downgrade in performance.
+   After notifyAll() method is executed, every waiting thread will be given monitor and will be allowed to execute. 
+   Only few may pass the precondition and only one will get monitor.Increase in context switching and hence a downgrade in performance.
 2. If we would be adding more preconditions to this program, code will become more messy.
 3. In case, if these type of classes are allowed to have inherit, 
    then proper documentation should be done for handling critical section and checking preconditions.
@@ -192,39 +195,13 @@ Here comes AbstractQueuedSynchronizer to the rescue.
 AQS provides api for releasing and acquiring monitor of an object.
 It provides empty methods which can be implemented by clients and 
 hence clients can create their own state dependent classes or Synchronizers.
-It also provides ConditionObject which can be used to create more than one condition predicates for 
+It has also implemented ConditionObject which can be used to create more than one condition predicates for 
 a single monitor object.As we have two condition predicates in BoundedBuffer.
 Each condition predicate has a queue of waiting ConditionObject.
 By this we can solve the problem of Uniform waiters requirement.
 
-Lets understand some basics of AQS:
-
-Below are public methods of AQS that has framework implementation:
-public final void acquire(int arg)
-public final boolean release(int arg)
-public final void acquireShared(int arg)
-public final boolean releaseShared(int arg)
-public final void acquireInterruptibly(int arg) throws InterruptedException
-public final void acquireSharedInterruptibly(int arg) throws InterruptedException
-public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws InterruptedException
-public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException
-
-Below are some methods of AQS that should be implemented by clients of AQS:
-protected boolean tryAcquire(int arg)
-protected boolean tryRelease(int arg)
-protected int tryAcquireShared(int arg)
-protected boolean tryReleaseShared(int arg)
-
-A state dependent class must have following features :
-1. They should define the meaning of acquire and release
-2. They should define state of a condition
-3. They can hold some extra info like holding running thread itself
-4. They should define type of acquisition : Exclusive or Shared
-Exclusive means only one thread is allowed to execute in critical section
-Shared means one or more than one threads are allowed to execute in critical section as in Semaphore.
-state of a synchronizer decides the precondition for critical section.
-
-//para from the book
+Lets to solve the producer consumer problem with one of the client implementation of AQS, 
+that is ReentrantLock.
 
 public class ConditionBoundedBuffer<T> {
 	protected final Lock lock = new ReentrantLock();
@@ -269,7 +246,129 @@ public class ConditionBoundedBuffer<T> {
 	}
 }
 
-//AQS data structure
+ConditionBoundedBuffer creates an object of ReentrantLock.
+One lock can have one or more than one Condition object.
+One Condition object represents one condition queue, i.e. queue of threads waiting for that condition to become true.
+Lock interface provides : lock() and unlock() methods.
+Condition interface provides : await() signal() and signalAll() methods.
+
+The advantage of ConditionBoundedBuffer are :
+1. Each precondition(condition predicate) has its own condition queue, 
+   means await() and signal() will be called on wait sets of same Condition object.
+   Hence reducing the no of context switching and reducing wastage of cpu cycles.
+2. It is easy to understand the logic of critical section and preconditions even without documentation.
+
+This was all about producer consumer problem.ConditionBoundedBuffer is using ReentrantLock and ConditionObject classes.
+Both these classes are backed up by AbstractQueuedSynchronizer.
+So lets try to understand some basics of AQS framework:
+
+Clients of AQS are:
+ReentrantLock
+ThreadPoolExecutor
+Semaphore
+CountDownLatch 
+and many more
+
+Below are public methods of AQS that has framework implementation and can be called by client:
+public final void acquire(int arg)
+public final boolean release(int arg)
+public final void acquireShared(int arg)
+public final boolean releaseShared(int arg)
+public final void acquireInterruptibly(int arg) throws InterruptedException
+public final void acquireSharedInterruptibly(int arg) throws InterruptedException
+public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws InterruptedException
+public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException
+
+Below are some methods of AQS that should be implemented by clients of AQS:
+protected boolean tryAcquire(int arg)
+protected boolean tryRelease(int arg)
+protected int tryAcquireShared(int arg)
+protected boolean tryReleaseShared(int arg)
+
+
+A state dependent class must have following features :
+1. They should define the meaning of acquire and release
+2. They should define state of a condition
+3. They can hold some extra info like holding running thread itself
+4. They should define type of acquisition : Exclusive or Shared
+Exclusive means only one thread is allowed to execute in critical section
+Shared means one or more than one threads are allowed to execute in critical section as in Semaphore.
+state of a synchronizer decides the precondition for critical section.
+
+Probably you will never use AQS directly, 
+but having a little understanding of it will make you clear about how standard synchronizer work.
+The basic operations that an AQS-based synchronizer performs are some 
+variants of acquire and release. 
+
+acquire and release :
+Acquisition is the state-dependent operation and can always block.
+With a ReentraLock or Semaphore, the meaning of acquire is straightforward : 
+acquire the lock or a permit—and the caller may have to wait
+until the synchronizer is in a state where that can happen.
+For CountdownLatch, it means wait until the latch has reached its terminal state.
+Release is not a blocking operation.A release may allow threads blocked in acquire to proceed.
+
+State :
+For a class to be state-dependent, it must have some state. AQS takes on the
+task of managing some of the state for the synchronizer class: it manages a single
+integer of state information that can be manipulated through the protected
+getState, setState, and compareAndSetState methods.
+For example:
+ReentraLock uses state as the count of times the owning thread has acquired the lock.
+Semaphore uses state as number of permits remaining.
+
+Exclusive or Shared
+Acquisition might be exclusive (ReentrantLock), or nonexclusive/Shared(Semaphore and CountDownLatch).
+
+A synchronizer supporting exclusive acquisition should implement the protected methods 
+ tryAcquire, tryRelease, and isHeldExclusively.
+Synchronizer supporting shared acquisition should implement 
+ tryAcquireShared and tryReleaseShared.
+The acquire, acquireShared, release, and releaseShared methods
+in AQS call the try forms of these methods in the synchronizer subclass
+to determine if the operation can proceed.
+
+
+Lets analyse data structure for AQS :
+
+class AQS  {
+	private transient volatile Node head;
+	private transient volatile Node tail;
+	private volatile int state;
+	
+	static final class Node {
+		static final int CANCELLED =  1;
+		//Non-negative values mean that a node doesn't need to signal
+		static final int SIGNAL    = -1;
+		static final int PROPAGATE = -3;
+		//Only used for Condition queues
+		static final int CONDITION = -2;
+		
+		volatile int waitStatus;
+		volatile Node prev;
+		volatile Node next;
+		volatile Thread thread;
+		
+		static final Node SHARED = new Node();
+		static final Node EXCLUSIVE = null;
+
+		//condition queues are accessed only when holding in exclusive mode
+		//In case of exclusive mode, threads for condition queue is saved
+		//In case of shared mode, empty Node object is saved.
+		Node nextWaiter;
+	}
+
+	public class ConditionObject implements Condition {
+
+		private transient Node firstWaiter;
+		private transient Node lastWaiter;
+		//nextWaiter is used to hold next node of condition queue.
+	}
+}
+
+As you can see, it maintains a doubly linked list of nodes, where each node hold waiting thread and its waitStatus.
+AQS has its own state whose value can be decided by client api.
+It also provides implementation of Condition interface.
 
 -----------------------------------------------------
 
