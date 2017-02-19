@@ -1,0 +1,295 @@
+Links :
+https://newcircle.com/s/post/1593/java_8_lambda_expressions_and_streams_adib_saikali_video
+https://www.youtube.com/watch?v=C_QbkGU_lqY
+https://www.youtube.com/watch?v=UKuFqAhDEN4
+
+
+---------------------------
+
+Topics :
+1) lambda expression
+2) Functional interface
+3) Method references
+4) Default methods
+5) Stream api
+
+----------------------------
+
+lambda expression = method of a class - method sygnature
+lambda expressions can be considered as anonymous methods,
+
+List<Integer> list = Arrays.asList(1,2,3,4,5);
+
+list.stream().forEach(x -> System.out.println(x));
+list.stream().forEach(x -> { System.out.println(x);} );
+
+list.stream().forEach((Integer x) -> { System.out.println(x); } );
+
+In other languages, function is represented as data type.
+In java , it was decided not to do this due to backward compatibility.
+
+Functional interface : any interface that has only one method.
+So you just need to pass a lambda expression for this kind of interface implementation, like anonymous classes.
+interfaces which have no of methods not equal to one cannot be marked as @FunctionalInterface.
+lambda expressions can only be passed to a FunctionalInterface.
+Any interface, which has exactly one method, will be considered as a FunctionalInterface even if it not marked.
+interface with one method and one or more default methods is also FunctionalInterface.
+
+public interface Runnable {
+	void run();
+}
+
+Consumer<Integer> lambda = x -> System.out.println(x);
+list.stream().forEach(lambda);
+
+if method of functional interface throws any checked exception , then there is no need to provide any throws clause for lambda expression.
+
+basically, lambda expression can be considered as an object of implementation of an interface, like anonymous class object.
+
+The method generated from lambda expression must have same sygnature as the method in the functional interface.
+
+---------------
+
+interface PasswordEncryptor {
+	String encrypt(String password, String salt);
+}
+
+public PasswordEncryptor getPasswordEncryptor() {
+	return (password, salt) -> { return password.toUpperCase() + salt; }
+}
+
+getPasswordEncryptor().encrypt("abc","123");
+
+-------------------
+
+(Q)How stack trace looks like in case of lambda ?
+
+-------------------
+
+variable capture : 
+code inside lambda expression uses :
+-> method local variable without final 		//valid
+-> changing local variable without final	//not valid
+-> fetching class static variables			//valid
+-> fetching class non-static variables		//
+
+using this inside a lambda expression will be same as current object of calling method unlike anonymous class which behaves differently.
+
+if you want to use this keyword inside anonymous class, you need to use 
+ClassName.this 
+
+Also , anonymous class can have static or non-static class level variables, but lambda expression cannot.
+
+Difference b/w lambda expression and anonymous classes:
+1) Anonymous classes can have a state, via class level variables
+2) Anonymous classes can have more than one methods, lambda expression has only one non default method
+3) this points to an object instance for an anonymous inner class but points to the enclosing object for a lambda
+
+java.util.function package has 43 commonly used functional interfaces.
+1) Consumer<T>		: function that takes a single argument of type T and returns void
+2) Supplier<T>		: function that takes no argument and returns a result of type T
+3) Predicate<T>		: function that takes a single argument of type T and returns boolean
+4) Function<T,R>	: function that takes a single argument of type T and returns result of type R
+5) BiFunction<T,U,R>: function that takes two input arguments T, U and returns type R
+6) BiConsumer<T,U>	: function that takes two input arguments T, U and returns void
+
+
+Method References :
+lambda is a way to define an anonymous function.But if that function is already written.
+method references can be used to pass an existing function in place where lambda expression is expected.
+
+:: operator is used to perform this feature.
+
+class Example {
+	public void f1(Integer x) {
+		System.out.println(x);
+	}
+	
+	public static void f2(Integer x) {
+		System.out.println(x);
+	}
+	
+	public static void main(String args[]) {
+		Example ob = new Example();
+		Consumer<Integer> consumer1 = x -> ob::f1(x);
+		consumer1.accept(1);
+		
+		Consumer<Integer> consumer2 = x -> Example::f2(x);
+		consumer2.accept(2);
+	}
+}
+
+References to a Constructor:
+
+Function<String,Integer> mapper1 = x -> new Integer(x);
+Function<String,Integer> mapper2 = x -> Integer::new;
+
+System.out.println(mapper2.apply("5"));
+
+Default Methods :
+
+(Q)What was the need of default methods?
+interface evolution problem
+
+java wanted to add lambda in collection framework, but they do not wanted to change interfaces.
+just to make changes backward compatible.
+
+forEach() and spliterator() methods are added to Iterable interface in java.
+
+-------------------------
+default method inheritence
+
+interface Test {
+	default void f1() {
+		System.out.println("Test");
+	}
+}
+
+class TestImpl implements Test {
+	public static void main(String args[]) {
+		TestImpl ob = new TestImpl();
+		ob.f1();		//Test
+	}
+}
+
+-------------------------
+overriding default method
+
+interface Test {
+	default void f1() {
+		System.out.println("Test");
+	}
+}
+
+class TestImpl implements Test {
+	@Override
+	void f1() {
+		System.out.println("TestImpl");
+	}
+
+	public static void main(String args[]) {
+		TestImpl ob = new TestImpl();
+		ob.f1();		//TestImpl
+	}
+}
+
+-------------------------
+hierarchy of default methods :
+
+interface A {
+	default void f1() {
+		System.out.println("A");
+	}
+}
+
+interface B extends A {
+	default void f1() {
+		System.out.println("B");
+	}
+}
+
+class C implements B {
+	public static void main(String args[]) {
+		C ob = new C();
+		ob.f1();		//B
+	}
+}
+
+----------------------------
+default method conflict :
+
+interface A {
+	default void f1() {
+		System.out.println("A");
+	}
+}
+
+interface B {
+	default void f1() {
+		System.out.println("B");
+	}
+}
+
+interface C extends A,B {		// compile time error
+	
+}
+
+class D implements A,B {		// compile time error
+
+}
+
+---------------------------
+Resolving default method conflict :
+
+interface A {
+	default void f1() {
+		System.out.println("A");
+	}
+}
+
+interface B {
+	default void f1() {
+		System.out.println("B");
+	}
+}
+
+interface C extends A,B {
+	default void f1() {
+		A.super.f1();
+		System.out.println("C");
+	}
+}
+
+class D implements A,B {
+	void f1() {
+		B.super.f1();
+		System.out.println("D");
+	}
+}
+
+-------------------------------
+Diamonds are no problem :
+
+default method of nearest level from bottom of the tree will be called.
+if more than one default methods are found at same level of tree, then its compile time error, and you need to override that method for u.
+
+interface A {
+	default void f1() {
+		System.out.println("A");
+	}
+}
+
+interface B extends A {
+	default void f1() {
+		System.out.println("B");
+	}
+}
+
+interface C extends A {
+	default void f2() {
+		System.out.println("C");
+	}
+}
+
+class D implements B,C {
+	public static void main(String args[]) {
+		D ob = new D();
+		ob.f1();		//B
+	}
+}
+
+-----------------------------
+
+Functional Interface : an interface that has exactly one non-default method.
+
+--------------------------
+
+Stream structure :
+
+Stream	-->		Pipeline	-->		Terminal
+
+Stream internal :
+
+Create	-->		Configuration	-->		Execute		-->		Cleanup
+
+----------------------------
