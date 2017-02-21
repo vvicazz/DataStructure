@@ -10,6 +10,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.util.concurrent.AtomicLongMap;
 
+
+/**
+ * Graph interface -> features like directed	<br>
+ * AbstractGraph class -> 	<br>
+ * 		N node	<br>
+ * 		edges, inEdges, outEdges	<br>
+ * 		degree, inDegree, outDegree	<br>
+ * 		methods for adding edge (isDirected will be decided here by in the api itself)	<br>
+ * 		abstract methods for providing impl	<br>
+ * 		isDirected must be passed in constructor	<br><br>
+ * WightedgraphImpl<N,T> extends AbstractGraph	<br>
+ * NonWightedgraphImpl<N> extends AbstractGraph	<br><br>
+ *
+ * There can be two types of Edge: with weight and without weight	<br>
+ * interface Edge	<br>
+ * class NoWeightEdge implements Edge	<br>
+ * class WeightEdge<T> implements Edge {	<br>
+ * 		NoWeightEdge noWeightEdge;	<br>
+ * 		T weight;	<br>
+ * }	<br>
+ * here, hasA is better than isA. It would help in equals() hashcode()	<br>
+ * 
+ */
 public class GraphImpl<N> implements Graph<N> {
 
 	private boolean isDirected;
