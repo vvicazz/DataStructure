@@ -3,6 +3,9 @@ https://newcircle.com/s/post/1593/java_8_lambda_expressions_and_streams_adib_sai
 https://www.youtube.com/watch?v=C_QbkGU_lqY
 https://www.youtube.com/watch?v=UKuFqAhDEN4
 
+https://www.beyondjava.net/blog/a-glance-into-the-crystal-ball-target-typing-in-java-8/
+http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-4.html
+http://stackoverflow.com/questions/33196325/java-8-target-typing
 
 ---------------------------
 
@@ -14,6 +17,11 @@ Topics :
 5) Stream api
 
 ----------------------------
+
+Why lambdas are required :
+1) make functionality multi core, user just need to give task to programming
+2) java does not have a feature of closure earlier
+3) inner anonymous classes were very (clunky) difficult to write and understand.
 
 lambda expression = method of a class - method sygnature
 lambda expressions can be considered as anonymous methods,
@@ -27,6 +35,22 @@ list.stream().forEach((Integer x) -> { System.out.println(x); } );
 
 In other languages, function is represented as data type.
 In java , it was decided not to do this due to backward compatibility.
+
+java is a typed language.
+(Q) What is the type of lambda expression?
+Ans : Lambda expression has a type of Functional interface.
+Other languages have a type as a function, but java has not.
+
+NOTE : lambda expression also supports Target Typing.
+Type of lambda expression is inferred from the surrounding context.
+left hand side of expression is infered from right hand side expression.
+for example :
+
+Callable<String> obj1 = () -> "complete";
+
+PrivilegedAction<String> obj2 = () -> "complete";
+
+-------------------------
 
 Functional interface : any interface that has only one method.
 So you just need to pass a lambda expression for this kind of interface implementation, like anonymous classes.
