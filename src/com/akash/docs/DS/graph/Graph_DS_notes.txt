@@ -505,7 +505,24 @@ Applications of DFS in Directed graph :
 All above applications have linear time complexity.
 
 ===============================================
+(1) diameter of a graph
+	
+(2) print eulerian path, how to check if an edge is bridge
+	http://www.geeksforgeeks.org/eulerian-path-and-circuit/
+	http://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-path/
+	http://www.geeksforgeeks.org/euler-circuit-directed-graph/
+(3) check if a graph is 2 edge connected
+	http://www.geeksforgeeks.org/biconnectivity-in-a-graph/
+	http://www.geeksforgeeks.org/bridge-in-a-graph/
+(4) strongly connected directed graph
+	http://www.geeksforgeeks.org/connectivity-in-a-directed-graph/
+	http://www.geeksforgeeks.org/tarjan-algorithm-find-strongly-connected-components/
+(5) Bipartite problem :
+	http://www.geeksforgeeks.org/maximum-bipartite-matching/
+(6) All pair shortest path problem (floyd-warshall-algorithm) :
+	http://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/
 
+===============================================
 
 Minimum spanning tree :
 

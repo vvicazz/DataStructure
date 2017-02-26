@@ -1,11 +1,15 @@
 package com.akash.graph.api;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Graphs {
 
@@ -13,29 +17,79 @@ public class Graphs {
 		throw new UnsupportedOperationException();
 	}
 
-	public static <N> BfsResponse<N> bfs(N source, Graph<N> graph) {
+	@SuppressWarnings("unchecked")
+	public static <N> int getConnectedComponents(Graph<N> graph) {
+		Objects.requireNonNull(graph);
+		int connectedComponents = 0;
+		Set<N> nodes = new HashSet<N>(graph.nodes());
+		while (nodes.size() > 0) {
+			N source = (N) nodes.stream().findAny();
+			BfsResponse<N> response = bfs(source, graph);
+			Set<N> processedNodes = response.getColor().entrySet().stream().map(entry -> entry.getKey())
+					.collect(Collectors.toSet());
+			nodes.removeAll(processedNodes);
+			connectedComponents++;
+		}
+		return connectedComponents;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <N> boolean isBipartite(Graph<N> graph) {
+		Objects.requireNonNull(graph);
+		N source = (N) graph.nodes().stream().findAny();
+		Objects.requireNonNull(source);
 		BfsResponse<N> bfsResponse = new BfsResponse<N>(graph);
 		bfsResponse.getColor().put(source, Color.GRAY);
 		bfsResponse.getDistance().put(source, 0);
 		Queue<N> queue = new LinkedList<>();
 		queue.add(source);
 		while (queue.isEmpty()) {
-			N node = queue.poll();
-			for (Edge<N> edge : graph.adjacentEdges(node)) {
+			N queueNode = queue.poll();
+			for (Edge<N> edge : graph.adjacentEdges(queueNode)) {
 				N tempNode = edge.getDestination();
+				if (bfsResponse.getDistance().get(queueNode).intValue() == bfsResponse.getDistance().get(tempNode)
+						.intValue()) {
+					return false;
+				}
 				if (bfsResponse.getColor().get(tempNode) == Color.WHITE) {
 					bfsResponse.getColor().put(tempNode, Color.GRAY);
-					bfsResponse.getDistance().put(tempNode, bfsResponse.getDistance().get(node) + 1);
-					bfsResponse.getParent().put(tempNode, node);
+					bfsResponse.getDistance().put(tempNode, bfsResponse.getDistance().get(queueNode) + 1);
+					bfsResponse.getParent().put(tempNode, queueNode);
 					queue.add(tempNode);
 				}
 			}
-			bfsResponse.getColor().put(node, Color.BLACK);
+			bfsResponse.getColor().put(queueNode, Color.BLACK);
+		}
+		return true;
+	}
+
+	public static <N> BfsResponse<N> bfs(N source, Graph<N> graph) {
+		Objects.requireNonNull(graph);
+		Objects.requireNonNull(source);
+		BfsResponse<N> bfsResponse = new BfsResponse<N>(graph);
+		bfsResponse.getColor().put(source, Color.GRAY);
+		bfsResponse.getDistance().put(source, 0);
+		Queue<N> queue = new LinkedList<>();
+		queue.add(source);
+		while (queue.isEmpty()) {
+			N queueNode = queue.poll();
+			for (Edge<N> edge : graph.adjacentEdges(queueNode)) {
+				N tempNode = edge.getDestination();
+				if (bfsResponse.getColor().get(tempNode) == Color.WHITE) {
+					bfsResponse.getColor().put(tempNode, Color.GRAY);
+					bfsResponse.getDistance().put(tempNode, bfsResponse.getDistance().get(queueNode) + 1);
+					bfsResponse.getParent().put(tempNode, queueNode);
+					queue.add(tempNode);
+				}
+			}
+			bfsResponse.getColor().put(queueNode, Color.BLACK);
 		}
 		return bfsResponse;
 	}
 
 	public static <N> DfsResponse<N> dfs(N source, Graph<N> graph) {
+		Objects.requireNonNull(graph);
+		Objects.requireNonNull(source);
 		DfsResponse<N> dfsResponse = new DfsResponse<N>(graph);
 		AtomicInteger time = new AtomicInteger(0);
 		doDfs(graph, source, time, dfsResponse);
