@@ -211,7 +211,7 @@ Solution :
 	->check if graph is connected
 	->if yes then
 	->count of vertices with odd degree must be 0
-	->if yes, then graph has eulerian path.
+	->if yes, then graph has eulerian cycle.
 	
 (Q)Given a Eulerian graph G, print Eulerian path.
 	->check if graph has eulerian path
