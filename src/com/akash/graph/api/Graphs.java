@@ -17,6 +17,51 @@ public class Graphs {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * 2 edge connected graph problem
+	 * 
+	 * @param graph
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <N> boolean hasBridgeEdge(Graph<N> graph) {
+		Objects.requireNonNull(graph);
+		N source = (N) graph.nodes().stream().findAny();
+		if (source != null) {
+			DfsResponse<N> dfsResponse = new DfsResponse<N>(graph);
+			AtomicInteger time = new AtomicInteger(0);
+			if (doBridgeEdge(graph, source, time, dfsResponse) == -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private static <N> int doBridgeEdge(Graph<N> graph, N source, AtomicInteger time, DfsResponse<N> dfsResponse) {
+		dfsResponse.getVisited().put(source, Boolean.TRUE);
+		dfsResponse.getArrivalTime().put(source, time.incrementAndGet());
+		int deepestBackEdge = dfsResponse.getArrivalTime().get(source);
+		for (Edge<N> edge : graph.adjacentEdges(source)) {
+			N tempNode = edge.getDestination();
+			if (!dfsResponse.getVisited().get(tempNode)) {
+				deepestBackEdge = min(deepestBackEdge, doBridgeEdge(graph, tempNode, time, dfsResponse));
+			} else {
+				deepestBackEdge = min(deepestBackEdge, dfsResponse.getArrivalTime().get(tempNode));
+			}
+		}
+		dfsResponse.getDepartureTime().put(source, time.incrementAndGet());
+		if (deepestBackEdge == -1 || deepestBackEdge == dfsResponse.getArrivalTime().get(source)) {
+			deepestBackEdge = -1;
+		}
+		return deepestBackEdge;
+	}
+
+	private static int min(int a, int b) {
+		return a > b ? b : a;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <N> int getConnectedComponents(Graph<N> graph) {
 		Objects.requireNonNull(graph);

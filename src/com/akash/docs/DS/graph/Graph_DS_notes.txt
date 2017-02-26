@@ -195,6 +195,8 @@ Eulerian path (trial) 	: which visits every edge exactly once
 Eulerian cycle 			: Eulerian path which starts and ends on the same vertex
 semi-Eulerian			: A graph that has an Eulerian path but not an Eulerian cycle
 
+Is it possible to draw a given graph without lifting pencil from the paper and without tracing any of the edges more than once.
+
 Euler stated without any proof that a necessary condition for the existence of Eulerian circuits
  is that all vertices in the graph have an even degree.
 
@@ -220,6 +222,11 @@ Solution :
 	->when you find more than one edge from a vertex,
 			choose that edge which is not a bridge
 	->use DFS to check if an edge is a bridge
+	
+(Q) Given a Directed Graph G, has G Eulerian cycle?
+	->check if G is Strongly Connected Component.
+	->For every edge, in-degree(u) = out-degree(u)
+	
 
 =>seven bridges of konigsberg problem :
 If there is a graph G(V,E) , and a user must travel to all nodes without using any edge more than once.
@@ -509,8 +516,9 @@ All above applications have linear time complexity.
 	
 (2) print eulerian path, how to check if an edge is bridge
 	http://www.geeksforgeeks.org/eulerian-path-and-circuit/
-	http://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-path/
 	http://www.geeksforgeeks.org/euler-circuit-directed-graph/
+	http://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-path/
+	http://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/
 (3) check if a graph is 2 edge connected
 	http://www.geeksforgeeks.org/biconnectivity-in-a-graph/
 	http://www.geeksforgeeks.org/bridge-in-a-graph/
