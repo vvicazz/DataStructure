@@ -103,6 +103,10 @@ Applications of BFS :
 	Solution 1 :
 	Do BFS from each node and mark them with a component number.
 	color can be used to check if they are visited or not.
+	Note: 	Do not check a node, if it is already processed for BFS.
+			Take an array of nodes and mark them as processed or not processed
+			(taking node and its status in a pojo).
+			This will reduce complexity from O(n2) to O(n)
 	
 	Solution 2 :
 	Do DFS on graph
