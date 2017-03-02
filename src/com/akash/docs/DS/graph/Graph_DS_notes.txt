@@ -556,3 +556,67 @@ make set of all connected components
 when you add an edge without creating a cycle, then no of components get reduced by 1.
 i.e. Union of edge and set of edges in a component must reduce final set of components by 1.
 
+------------------
+
+
+Spanning Tree :
+Tree : connected subgraph without any cycle
+spanning : it should include all vertices
+
+Spanning tree has n-1 edges
+
+Minimum spanning tree : spanning tree with minimum weight
+
+length of spanning tree = sum of length of all edges in the tree
+
+=>Kruskal Algorithm for minimum spanning tree :
+
+Greedy approach:
+make the best available choice
+
+take the edge with smallest edge length
+
+Algo :
+1. Sort edges in increasing order of length 
+2. take tree, T = empty
+3. for(i=0;i<n;i++)
+4  	if( {ei} U T  is a tree ) then
+5. 		T <- T U {ei}
+
+
+(Q) Is the MST unique?
+Ans: Yes if edge lengths are unique
+     no otherwise.
+	 
+(Q) How do we check if a cycle is formed if an edge e=(u,v) is included?
+
+Cycle is formed if u and v are already connected.
+u and v are in same connected component.
+If we include an edge to make a spanning tree (i.e without making any cycle),
+the no of connected components will be reduced by 1.
+
+vertices in a component are maintained as sets
+eg: {a,b,c} {d,e} {f} are 3 connected components.
+
+We will be doing two main operations:
+->check if 2 vertices are in same set or not
+->merge components of 2 vertices
+
+Initially we have n connected components
+In the end we have 1 connected component
+
+Algo :
+1. T <- empty
+2. Sort edges in the order of length
+3. for i=1 to m do 
+4. let ei = (u,v)
+5. if( find(u) != find(v)) then
+6. 		T <- T U {ei}
+7.		Union(find(u), find(v))
+
+n vertices and m edges in the graph :
+no of unions = n-1		--> U
+no of finds = 2m		--> F
+
+Total running time = O( mlog(m) + U.n + F.m )
+
