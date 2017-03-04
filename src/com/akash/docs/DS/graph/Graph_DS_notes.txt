@@ -624,6 +624,7 @@ Total running time = O( mlog(m) + U.n + F.m )
 
 =>Find Union Data structure :
 
+This Data Structure is used to maintain a collection of disjoint sets. 
 Initially lets assume that no vertices are connected.
 vertices will be representing sets.
 Graph will have n vertices , n connected components and n different sets.
