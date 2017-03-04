@@ -27,6 +27,8 @@ undirected graph terminologies :
 =>Complete graph : there is an edge bw every pair of vertices
 	How many edges in a complete graph : nC2 = n*(n-1)/2
 	How many edges in a complete directed graph : 2 * nC2 = n*(n-1)
+	As max value of no of edges, m <= n*pow(2) , log(m) <= 2*log(n)
+	log(m) ~ log(n)
 =>Minimum no of edges required to make a graph connected = n-1
 =>Spanning tree : Tree that contains all vertices
 				i.e. Connected subgraph that contains all vertices without cycle
@@ -620,3 +622,48 @@ no of finds = 2m		--> F
 
 Total running time = O( mlog(m) + U.n + F.m )
 
+=>Find Union Data structure :
+
+Initially lets assume that no vertices are connected.
+vertices will be representing sets.
+Graph will have n vertices , n connected components and n different sets.
+We can add an edge in graph only when both their vertices are in different sets/tree.
+
+Find operation : of a node will return reference of top node of that tree.
+Union operation : will join two different sets nodes.
+
+Find(x)
+Union(x,y)
+
+=>Union by Rank : 
+
+while making union of two trees, the tree with less no of nodes will point to tree with more no of nodes.
+-->Imp property :
+A tree in find union operation (union by rank) with n nodes has a height of AT MOST log n
+
+union operation will take : O(1) time
+find operation will take : O(log n) time
+
+=>Union by Height : 
+
+while making union of two trees, the tree with less height will point to tree with more height.
+
+-->Imp property :
+A tree in find union operation (union by height) with height h must have at least 2*pow(h) nodes
+
+union operation will take : O(1) time
+find operation will take : O(log n) time
+
+Total running time for Kruskal Algo = O( mlog(m) + n + mlog(n) ) = O(mlog(n))
+
+As m <= n*pow(2) , log(m) <= 2*log(n)
+
+=>Path Compression in Union Find:
+
+This technique is used to make futute finds easier.
+Resetting parent for all nodes in the path traversal to the parent of tree so that future finds are easier.
+This can only be implemented in Union by Rank and not in union by height, as we are changing heights.
+
+====================================
+
+Prims Algorithm:
