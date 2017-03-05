@@ -1,4 +1,4 @@
-package com.akash.graph.api.naya;
+package com.akash.graph.api.two;
 
 import java.io.Serializable;
 

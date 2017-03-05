@@ -1,4 +1,4 @@
-package com.akash.graph.api.naya;
+package com.akash.graph.api.two;
 
 public class WeightedGraphImpl<N, E> extends GraphImpl<N> implements WeightedGraph<N, E> {
 

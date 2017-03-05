@@ -1,6 +1,5 @@
-package com.akash.graph.api;
+package com.akash.graph.api.two;
 
 public interface WeightedGraph<N, E> extends Graph<N> {
 
-	E getEdge(N src, N dest);
 }

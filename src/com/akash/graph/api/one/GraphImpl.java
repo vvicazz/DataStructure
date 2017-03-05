@@ -1,4 +1,4 @@
-package com.akash.graph.api;
+package com.akash.graph.api.one;
 
 import java.util.Arrays;
 import java.util.Collections;
