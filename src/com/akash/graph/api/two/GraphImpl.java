@@ -48,7 +48,7 @@ public class GraphImpl<N> implements Graph<N> {
 		return edge1Added || edge2Added;
 	}
 
-	protected boolean addEdge(N source, N destination, Map<N, Set<Edge<N>>> edges) {
+	private boolean addEdge(N source, N destination, Map<N, Set<Edge<N>>> edges) {
 		boolean edgeAdded = false;
 		Edge<N> edge = new EdgeImpl<N>(source, destination, isDirected());
 		synchronized (edges) {

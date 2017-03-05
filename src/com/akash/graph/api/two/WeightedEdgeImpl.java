@@ -2,7 +2,7 @@ package com.akash.graph.api.two;
 
 import java.util.Objects;
 
-public class WeightedEdgeImpl<N, E> extends EdgeImpl<N> implements WeightedEdge<N, E> {
+public class WeightedEdgeImpl<N, E extends Comparable<E>> extends EdgeImpl<N> implements WeightedEdge<N, E> {
 
 	private static final long serialVersionUID = 129634L;
 	private E weight;
@@ -37,5 +37,10 @@ public class WeightedEdgeImpl<N, E> extends EdgeImpl<N> implements WeightedEdge<
 			return false;
 		WeightedEdgeImpl other = (WeightedEdgeImpl) obj;
 		return Objects.equals(weight, other.getWeight());
+	}
+
+	@Override
+	public int compareTo(WeightedEdge<N, E> object) {
+		return this.getWeight().compareTo(object.getWeight());
 	}
 }
