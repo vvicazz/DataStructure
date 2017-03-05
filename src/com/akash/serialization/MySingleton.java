@@ -17,6 +17,7 @@ import java.io.Serializable;
  * 3. calling clone() method <br>
  * 4. creating object via reflection <br>
  * 5. one single class in multiple webapp in same container <br>
+ * http://www.oracle.com/technetwork/articles/java/singleton-1577166.html	<br>
  * http://stackoverflow.com/questions/23445434/how-to-create-a-jvm-global-singleton <br>
  */
 class MySingleton implements Serializable {

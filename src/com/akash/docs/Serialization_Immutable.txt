@@ -159,6 +159,47 @@ writeReplace()		   readResolve()
 	 |						|
 writeObject()   ----   readObject()
 
+==========================================================
+/**
+ * Things to keep in mind while creating singleton <br>
+ * 1. multi-threaded environment <br>
+ * 2. Clustered environment, handeling Serialization and deserialzation <br>
+ * 3. calling clone() method <br>
+ * 4. creating object via reflection <br>
+ * 5. one single class in multiple webapp in same container <br>
+ http://www.oracle.com/technetwork/articles/java/singleton-1577166.html
+ */
+class MySingleton implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static volatile MySingleton instance;
+
+	private MySingleton() {
+		if (MySingleton.instance != null) {
+			throw new UnsupportedOperationException("Cannot create object via reflection");
+		}
+	}
+
+	public static MySingleton getInstance() {
+		if (instance == null) {
+			synchronized (MySingleton.class) {
+				if (instance == null) {
+					instance = new MySingleton();
+				}
+			}
+		}
+		return instance;
+	}
+
+	public Object readResolve() {
+		return getInstance();
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		throw new CloneNotSupportedException("Cloning of this class is not allowed");
+	}
+}
 
 ============================================================
 
