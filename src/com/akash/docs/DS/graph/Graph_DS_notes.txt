@@ -370,11 +370,20 @@ Theorem 2 : G has no circuit of length 3
 			|E| > 2|V| - 4
 			G is not planar
 
-(Q)2 Vertex connected graph :
+(Q)2 Vertex connected graph, Articulation Points (or Cut Vertices) in a Graph :
 If we remove a vertex from a graph, the graph must be connected.
+
+Algo :
+1. Every vertex must have a back edge to one of its ancestors (in DFS tree)
+2. In case of Root node of DFS tree : 
 
 =>K vertex connected
 =>K edge connected
+
+(Q)Given an undirected graph G, is G a Biconnected graph?
+A graph is Biconnected graph if :
+	1. It is a connected graph
+	2. It has no articulation point
 
 ===============================
 
