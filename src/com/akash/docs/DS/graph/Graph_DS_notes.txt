@@ -668,3 +668,24 @@ This can only be implemented in Union by Rank and not in union by height, as we 
 ====================================
 
 Prims Algorithm:
+
+MST is defined only for undirected graphs.
+A cut in Graph G , is a partition of vertices set into 2 parts.
+
+No. of cuts in a graph = 2*pow(n-1) - 1
+
+{a,b} {c,d,e}
+{a} {b,c,d,e}
+
+Edges that goes from one to cut to another are called as Edges in the Cut(Edges of the Cut).
+For any cut (S,S') the minimum of all edges of a Cut will be a part of MST.
+There might be a case where, more than one edge of any cut can be a part of MST.
+
+Prims Algo : 
+1. Start from a single vertex.
+2. Take that single vertex in one set and all other vertices in other set of the cut.
+3. find minimum edge of the cut
+4. include that edge in MST
+5. take vertices of this edge in same set and GO to step 3
+6. repeat until all vertices are in same set.
+
