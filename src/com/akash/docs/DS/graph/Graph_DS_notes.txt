@@ -127,6 +127,9 @@ Applications of BFS :
 		}
 		
 	time complexity = O(V+E)
+	
+(Q)Find the number of islands 
+->connected components
 
 
 2)Bipartite graph :
@@ -674,7 +677,59 @@ This technique is used to make futute finds easier.
 Resetting parent for all nodes in the path traversal to the parent of tree so that future finds are easier.
 This can only be implemented in Union by Rank and not in union by height, as we are changing heights.
 
+(Q)Find the number of islands
+(Q)Detect Cycle in an Undirected Graph
+(Q)Tarjan’s off-line lowest common ancestors algorithm
+(Q)Job Sequencing Problem
+
 ====================================
+Find Union Disjoint set data structure:
+
+class FindUnionSet {
+	N node;
+	int rank;
+	FindUnionSet parent;
+}
+
+void mst() {
+	Map<N,FindUnionSet> fuSets = new HashMap<>(nodes.length());
+	for(N node : nodes()) {
+		fuSets.put(node, new FindUnionSet(node, 1, null));
+	}
+	for(Edge<N,E> edge : edges()) {
+		N srcParent = find(fuSets, edge.getSource())
+		N destParent = find(fuSets, edge.getDestination())
+		if(!destParent.equals(srcParent)) {
+			union(fuSets, srcParent, destParent)
+		}
+	}
+}
+
+N find(Map<N,FindUnionSet> fuSets, N node) {
+	FindUnionSet fuSet = fuSets.get(node);
+	if(fuSet.getParent() != null) {
+		N parentNode = find(fuSets, fuSet.getParent());
+		fuSet.setParent(fuSets.get(parentNode));
+		return parentNode;
+	}
+	return fuSet.getNode();
+}
+
+void union(Map<N,FindUnionSet> fuSets, N src, N dest) {
+	N srcParent = find(fuSets, src);
+	N destParent = find(fuSets, dest);
+	FindUnionSet fuSrc = fuSets.get(srcParent);
+	FindUnionSet fuDest = fuSets.get(destParent);
+	if(fuSrc.getRank() > fuDest.getRank()) {
+		fuDest.setParent(fuSrc);
+		fuSrc.setRank(fuSrc.getRank()+fuDest.getRank());
+	} else {
+		fuSrc.setParent(fuDest);
+		fuDest.setRank(fuSrc.getRank()+fuDest.getRank());
+	}
+}
+
+=====================================
 
 Prims Algorithm:
 
