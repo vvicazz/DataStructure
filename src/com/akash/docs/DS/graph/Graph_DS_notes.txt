@@ -753,3 +753,46 @@ Prims Algo :
 5. take vertices of this edge in same set and GO to step 3
 6. repeat until all vertices are in same set.
 
+
+take two sets of vertices and take min edge of the cut
+A boolean variable can be used to differentiate the set
+
+Naive approach :
+search for all edges from S to S' which are edge of the cut and find minimum.
+
+Better Approach :
+Lets consider that, a node v is added from S' to S.
+hence in the next case, we will not consider edges of the cut which are not incident to v.
+For this , we can take heap.
+finding minimum edge at every step and then removing incident edges of v in the heap 
+and adding outgoing edges of v to the heap.
+
+Algo :
+
+S is an array
+S[v] = 1 if v is in Set 
+S[v] = 0 if v is not in Set
+
+For all vertices v set S[v] = 0
+setting 1 for any root node
+S[r]=1
+
+For all edges e incident to r do {
+	Heap.insert(e)
+}
+
+while(!Heap.isEmpty()) {
+	edge minEdge = heap.findMin();
+	print(minEdge)
+	let v be the endpoint of minEdge
+	if(S[v] == 0) {
+		for all e1 = (v,w) adjacent to v do {
+			if(S[w] == 0) {
+				Heap.insert(e1);
+			} else {
+				Heap.delete(e1);
+			}
+		}
+		S[v] = 1;
+	}
+}
