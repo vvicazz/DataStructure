@@ -796,3 +796,14 @@ while(!Heap.isEmpty()) {
 		S[v] = 1;
 	}
 }
+
+
+Modified Prim's algorithm:
+
+Instead of making a heap of edges we will take a heap of label of vertex.
+Every vertex in S' must contain a label value that determines path length of edge from S' to S.
+If there is no edge, then label is INFINITY.
+
+We will be only updating label values of vertices in heap
+i.e. decrease priority of vertices in heap
+Heap will contain only those vertices that are S'
