@@ -821,12 +821,12 @@ We can use SSSP in both directed and undirected graphs.
 To determine shortest path b/w two vertices we can determine all the paths and get shortest of them.
 But this may lead to a solution of 2pow(n)
 
-Property of Shortest path in graphs :
+=>Property of Shortest path in graphs :
 If shortest path from S to T has a vertex X, then this path also contains shortest path from S to X.
 
 We will compute the shortest path from S to every other vertex in G.
 
-According to Dijikstra algo :
+According to Dijkstra algo :
 
 We will divide all the vertices in two sets:
 Set S  					-> contains vertices whose exact distance from vertex s has been found
@@ -838,4 +838,9 @@ d[v] = is an upper bound on the length of the shortest path from s to v
 
 For all vertices v in S ,
 d[v] = is the length of the shortest path from s to v
+
+Correctness of Dijkstra Algo:
+
+let u be a vertex in S'
+d[u] = length of shortest path from s to u that includes only vertices from S except u
 
