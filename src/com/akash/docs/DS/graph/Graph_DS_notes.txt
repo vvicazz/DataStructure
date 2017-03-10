@@ -807,3 +807,35 @@ If there is no edge, then label is INFINITY.
 We will be only updating label values of vertices in heap
 i.e. decrease priority of vertices in heap
 Heap will contain only those vertices that are S'
+
+
+
+
+=================================================
+
+==>Single Source Shortest path:
+Determine shortest path from a given vertex S to another given vertex T.
+
+We can use SSSP in both directed and undirected graphs.
+
+To determine shortest path b/w two vertices we can determine all the paths and get shortest of them.
+But this may lead to a solution of 2pow(n)
+
+Property of Shortest path in graphs :
+If shortest path from S to T has a vertex X, then this path also contains shortest path from S to X.
+
+We will compute the shortest path from S to every other vertex in G.
+
+According to Dijikstra algo :
+
+We will divide all the vertices in two sets:
+Set S  					-> contains vertices whose exact distance from vertex s has been found
+Set S' (S compliment) 	-> contains vertices whose exact distance from vertex s has not been found yet,
+							we only know the upper bound of distance from vertex s
+
+For all vertices v in S' ,
+d[v] = is an upper bound on the length of the shortest path from s to v
+
+For all vertices v in S ,
+d[v] = is the length of the shortest path from s to v
+
