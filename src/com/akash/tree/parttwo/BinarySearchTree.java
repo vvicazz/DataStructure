@@ -8,7 +8,7 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 
 	private static final long serialVersionUID = 42145L;
 	private transient volatile Node<V> rootNode;
-	private int size = 0;
+	private transient int size = 0;
 
 	public BinarySearchTree() {
 	}
