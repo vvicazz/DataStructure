@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
+//http://www.geeksforgeeks.org/avl-tree-set-2-deletion/
 public final class AvlTree<V extends Comparable<V>> implements Serializable {
 
 	private static final long serialVersionUID = 19862L;
