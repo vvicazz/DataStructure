@@ -84,17 +84,21 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			else
 				parentNode.setRight(null);
 		} else if (nodeToDelete.getLeft() == null) {
-			nodeToDelete.setValue(null);
 			if (isLeft)
 				parentNode.setLeft(nodeToDelete.getRight());
 			else
 				parentNode.setRight(nodeToDelete.getRight());
-		} else if (nodeToDelete.getRight() == null) {
 			nodeToDelete.setValue(null);
+			nodeToDelete.setLeft(null);
+			nodeToDelete.setRight(null);
+		} else if (nodeToDelete.getRight() == null) {
 			if (isLeft)
 				parentNode.setLeft(nodeToDelete.getLeft());
 			else
 				parentNode.setRight(nodeToDelete.getLeft());
+			nodeToDelete.setValue(null);
+			nodeToDelete.setLeft(null);
+			nodeToDelete.setRight(null);
 		} else {
 			boolean isLeftInorderSucceser = false;
 			Node<V> inorderSucceserParent = nodeToDelete;
