@@ -1,0 +1,60 @@
+=>Binary Tree: Tree that has at most 2 children
+
+=>Binary tree traversal :
+PreOrder	- NLR
+InOrder		- LNR
+PostOrder	- LRN
+
+=================================================================
+
+=>Binary Search Tree : It is a binary tree with a property
+
+val[node.right] >= val[node] > val[node.left]
+
+class Node<T> {
+	T value;
+	Node<T> left;
+	Node<T> right;
+}
+
+Operations in BST:
+1) search = height of the tree
+2) insert = height of the tree
+3) delete = height of the tree
+
+Avg(height of the tree) = log(n)
+worst(height of the tree) = n
+
+=================================================================
+
+=>AVL tree
+
+worst(height of the tree) = log(n)
+This can be possible by rotation of nodes while insert and delete
+BF(node) = height of left - height of right
+BF can have values b/w  0,1,-1
+
+
+search = similar to BST
+insert = rotation is done from the node that is nearest ancestor (lets say A) of newly added node.
+	RR : node is added to right child of right child of A
+	LR : node is added to left child of right child of A
+	LL : node is added to left child of left child of A
+	RL : node is added to right child of left child of A
+	
+
+RR is mirror image of LL
+LR is mirror image of RL
+
+delete = Similarly there are four cases of deletion in AVL and 2 cases are mirror image of other two.
+
+class Node<T> {
+	T value;
+	Node<T> left;
+	Node<T> right;
+	int height;
+	Node<T> parent;
+}
+
+=================================================================
+
