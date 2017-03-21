@@ -58,3 +58,39 @@ class Node<T> {
 
 =================================================================
 
+=> 2-4 tree and Multi way search tree
+
+Both of them are ways to store dictionaries.
+easy to insert,search and delete.
+
+=> multi-way search tree properties :
+1) At least 2 children
+2) At most d-1 items in a node and d children
+3) node has pointer to d children
+
+=> 2-4 tree or 2-3-4 tree properties :
+1) At least 2 children
+2) At most 4 children
+3) node has pointer to 2/3/4 children
+4) All the leaf nodes are at same level
+
+=> height of 2-4 tree
+
+log(n) base 4 < Height < log(n) base 2
+
+
+=> InOrder traversal of a 2-4 tree :
+leftmost child
+1st left node
+child b/w 1st and 2nd node
+...
+in the end rightmost child
+
+
+
+=> Complexity for insert, search and delete = height of the tree
+
+https://www.cs.purdue.edu/homes/ayg/CS251/slides/chap13b.pdf
+http://smile.ee.ncku.edu.tw/Links/MTable/Course/DataStructure/2-3,2-3-4&red-blackTree_952.pdf
+=================================================================
+
