@@ -92,5 +92,31 @@ in the end rightmost child
 
 https://www.cs.purdue.edu/homes/ayg/CS251/slides/chap13b.pdf
 http://smile.ee.ncku.edu.tw/Links/MTable/Course/DataStructure/2-3,2-3-4&red-blackTree_952.pdf
+
+class TwoFourNode<T> {
+	T keys[] = new Object[3];
+	TwoFourNode<T> children[] = new TwoFourNode[4];
+}
+
 =================================================================
 
+=>insert
+	(1)no problem if node has empty space
+	(2)nodes get split if there is an insufficient space
+	one key is promoted to parent and inserted in there
+	If parent does not have sufficient space, then it is split
+	In this manner split can cascade
+	Eventually we may have to create new root, this increase height of the tree.
+
+=>delete
+	(1)no problem if key to be deleted is in the leaf node with at least 2 keys.
+	(2)If key to be deleted is an internal node then we swap it with
+	 	its predecessor(which is in a leaf) and then delete it.(as in BST)
+	predecessor of a node : go left from a node and keep going right
+	predecessor of a node will always be in a leaf node.
+	(4)If after deleting a key a node becomes empty then we borrow a key from its sibling.
+	(5)If sibling has only one key then we merge with it.
+		The key in the parent node separating these two siblings moves down into the merged node.
+		one of the key from parent node has to come down
+	(6)If sibling has only one key and if while merging, parent node has only one key.
+		
