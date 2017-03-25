@@ -345,13 +345,6 @@ data structure
   intercept the call of session in db in hibernate
   https://github.com/ttddyy/datasource-proxy
 
-===========================
-
-hum apki ankhon me --- pyasa
-aja sanam madhur chandni me hum -- 
-roshan tumhi se duniya --- paras mani
-unse mili nazar to hosh ud gaye -- jhukta asmaan
-
 ==================================
 
 Rest
