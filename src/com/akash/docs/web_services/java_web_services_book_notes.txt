@@ -163,3 +163,37 @@ note : targetNamespace is used to refer any external xsd or schema in wsdl.
 
 -----------------------------------
 
+Communication in SOAP is done via transferring xml content.
+This xml content is known as SOAP envelope.
+
+SOAP message Envelope contains :
+1) optional header
+2) mandatory body 
+3) optional attachments
+
+SOAP have a feature similar to filters in J2EE. These filters are known as Handlers.
+Handlers in SOAP can be at both side , client OR Server.
+
+For Server side handlers : request can be inbound and outbound.
+For Client side handlers : response can be can be outbound and inbound.
+
+Handlers in SOAP are two types :
+1) SOAPHandler : can access full soap envelope
+2) LogicalHandler : can access only body
+
+--------------------------
+
+=>methods in Handler interface :
+
+boolean handleMessage(SOAPMessageContext ctx);
+
+void close(SOAPMessageContext ctx);
+
+boolean handleFault(SOAPMessageContext ctx);
+
+Set<QName> getHeaders();
+
+
+--------------------------
+
+Exception handling in SOAP is done via Faults.
