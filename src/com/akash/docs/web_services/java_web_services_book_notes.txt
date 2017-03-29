@@ -59,3 +59,107 @@ http://localhost:8080/test?abc=1
 request.getParameter("abc");
 	
 
+http://www.javatpoint.com/jaxb-tutorial
+http://www.javatpoint.com/jax-rs-tutorial
+http://www.javatpoint.com/jax-ws-tutorial
+
+-----------------------------------
+
+JAXB :
+
+It is used for marshalling and unmarshalling.
+Marshal : converting java object to xml
+Unmarshal : converting xml to java
+
+@XmlRootElement  annotation is used for class that need to be converted to xml.
+
+JAXBContext contextObj = JAXBContext.newInstance(Employee.class);
+
+Marshaller marshallerObj = contextObj.createMarshaller();
+Unmarshaller jaxbUnmarshaller = contextObj.createUnmarshaller();
+
+
+----------------------------------
+Java tools 
+
+Schemagen : Converts java class to its xml schema
+
+xjc : converts xml schema to its Java class
+
+-----------------------------------
+
+JAX-RS :
+
+It is an RESTfull API.
+
+Its implementations are :
+1) Jersey --- reference implementation of JAX-RS
+2) RESTeasy -- jboss project
+
+Both of them have some annotations to use.
+
+Jersey uses below annotations :
+@Path
+@GET
+@POST
+@Consumes
+@Produces
+@PathParam
+@HeaderParam
+
+------------------------------------------
+
+JAX-WS :
+
+It can be used for both SOAP and REST, but it is generally used for SOAP.
+It is a Glassfish project.
+->JAX-WS service can be compiled and published in JDK 1.6 or greater.
+
+
+@WebService
+public class HelloWorld {
+	@WebMethod
+	public int increment(int number) {
+		return number+1;
+	}
+}
+
+-> An endpoint will be required for this webservice to work.
+-> Every request and response object in SOAP is a JAXB artifact.
+-> Web services can be written in two ways : Code first OR Contract first.
+-> url?xsd=1    is schema of wsdl
+-> url?wsdl     is wsdl
+
+-> wsimport  -- creates java files from wsdl at client side
+                It helps us to create JAXB artifact from wsdl file.
+
+
+For above example wsimport will create below named classes:
+
+HelloWorldService
+HelloWorld
+Increment
+IncrementResponse
+ObjectFactory
+Package-Info
+
+
+(Q) what is difference bw SOAP 1.1 and SOAP 1.2 ?
+
+
+-----------------------------------
+
+wsdl information:
+
+1) definitions  : specifies and declares any other xsd if required
+2) types 		: declares or links all complex data types used in web service
+3) message 		: Request and response message formats using complex data type of types section
+4) portType		: it defines operations of services, i.e. methods with input request and output response
+5) binding		: it defines soap architectural settings, like SOAP version or transport level protocol used.
+6) service 		: it is combination of portType and binding
+
+
+note : targetNamespace is used to refer any external xsd or schema in wsdl.
+
+-----------------------------------
+
