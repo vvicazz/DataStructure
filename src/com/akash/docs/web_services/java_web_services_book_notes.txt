@@ -1,0 +1,61 @@
+java web services:
+
+Conversation patterns:
+1) request-response	- client sends request , server sends response
+2) solicit-response	- server sends message to client, client sends message to server back
+3) one way			- message from client to server without any response
+4) notification		- server sends message to client
+
+=>Service Oriented architecture :
+1) every service is unassociated to every other service and are independent.
+S1 not depends on S2, S1 is not required to have S2 and vice versa
+loosely coupled
+
+2) services must be stateless. output of a service method depends on only input arguments
+
+3) Services should be treated as interfaces, which have only methods to call with some arguments.
+
+There are some similarities bw Web services and SOA.
+
+=>Marshalling : converting memory object to some document
+
+SOAP : Simple Object access protocol
+REST : Representational State Transfer
+
+Soap vs Rest :
+https://stackoverflow.com/questions/33088130/when-to-use-soap-and-when-to-use-rest
+
+1) Soap is standard protocol for web services. It has standard api for sending, receiving messages with security and fault handling.
+   REST is an architectural style. It does not have a standard API.
+   
+2) Soap is transport neutral.It supports HTTP, TCP, SMTP.
+   REST is based on HTTP protocol.
+   In REST based architecture everything is a resource.Resource have state.
+   A resource is accessed via standard http method.
+   Resources are sent in request as URI (uniform resource identifier).
+   
+Http protocol :
+
+Http verbs: GET, POST, PUT, DELETE
+Status code : for sending status of request in response. eg: 200(OK), 404(NOT FOUND), 403(FORBIDDEN REQUEST) 500(ERROR)
+Accept header : MIME type header sent by client in request. It specifies the MIME a client can handle.
+Content Type : MIME type that server sends while sending response.
+
+POST is non-idempotent.
+GET, PUT, DELETE are idempotent.
+
+GET - read operation
+PUT - update operation with specified id
+DELETE - delete operation with specified id
+POST - create new operation
+
+
+POST call contains data inside the BODY.
+GET call do not have any BODY, hence data is sent in header as query string.
+
+(Q)how to retrieve parameters from GET request:
+http://localhost:8080/test?abc=1
+
+request.getParameter("abc");
+	
+
