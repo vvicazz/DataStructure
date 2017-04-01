@@ -56,5 +56,4 @@ it does not have overlapping subproblems property.
 11) Longest Palindromic Subsequence, 	print Subsequence
 12) Longest palindromic substring, 		print substring
 13) Check if a given string is a rotation of a palindrome
-14) longest increasing subsequence
-15) Min Cost Path
+14) Min Cost Path
