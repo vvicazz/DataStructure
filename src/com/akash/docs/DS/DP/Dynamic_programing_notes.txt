@@ -43,13 +43,15 @@ it does not have overlapping subproblems property.
 7)Closest pair of points
 
 =>Dynamic Programming examples :
-1)Fibonacci Nth term
-2)Coin change problem
-3)Rod cutting problem
-4)Knapsack problem
-5)Word wrap problem / Test justification problem
-6)Tilling problem
-7)LCS (Lowest common sequence)
-8)LIS (Lowest increasing subsequence)
-9)parenthesis problem
-10)blackjack problem
+1) Fibonacci Nth term
+2) Coin change problem
+3) Rod cutting problem
+4) Knapsack problem
+5) Word wrap problem / Test justification problem
+6) Tilling problem
+7) LCS (Lowest common sequence)
+8) LIS (Lowest increasing subsequence)
+9) parenthesis problem
+10) blackjack problem
+11) Longest Palindromic Subsequence
+12) Check if a given string is a rotation of a palindrome
