@@ -53,5 +53,7 @@ it does not have overlapping subproblems property.
 8) LIS (Lowest increasing subsequence)
 9) parenthesis problem
 10) blackjack problem
-11) Longest Palindromic Subsequence
-12) Check if a given string is a rotation of a palindrome
+11) Longest Palindromic Subsequence, 	print Subsequence
+12) Longest palindromic substring, 		print substring
+13) Check if a given string is a rotation of a palindrome
+14) longest increasing subsequence
