@@ -1,4 +1,4 @@
-package com.akash.array;
+package com.akash.docs.DS.DP;
 
 public class Fibonacci {
 
