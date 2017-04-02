@@ -44,16 +44,17 @@ it does not have overlapping subproblems property.
 
 =>Dynamic Programming examples :
 1) Fibonacci Nth term
-2) Coin change problem
-3) Rod cutting problem
-4) Knapsack problem
-5) Word wrap problem / Test justification problem
-6) Tilling problem
-7) LCS (Longest common subsequence)
-8) LIS (Longest increasing subsequence)
-9) parenthesis problem
-10) blackjack problem
-11) Longest Palindromic Subsequence, 	print Subsequence
-12) Longest palindromic substring, 		print substring
-13) Check if a given string is a rotation of a palindrome
-14) Min Cost Path
+2) Coin change problem : Given dinominations, find min count of coins to make a sum
+3) Coin change problem : Given dinominations, find total no of ways to make a sum
+4) Rod cutting problem
+5) Knapsack problem
+6) Word wrap problem / Test justification problem
+7) Tilling problem
+8) LCS (Longest common subsequence)
+9) LIS (Longest increasing subsequence)
+10) parenthesis problem
+11) blackjack problem
+12) Longest Palindromic Subsequence, 	print Subsequence
+13) Longest palindromic substring, 		print substring
+14) Check if a given string is a rotation of a palindrome
+15) Min Cost Path
