@@ -58,3 +58,5 @@ it does not have overlapping subproblems property.
 13) Longest palindromic substring, 		print substring
 14) Check if a given string is a rotation of a palindrome
 15) Min Cost Path
+16) Maximum sum increasing subsequence
+17) Egg dropping problem
