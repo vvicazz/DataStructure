@@ -228,6 +228,8 @@ Annotations Used for authorizations that can be used on classes or methods :
 
 
 --------------------------------------------------------------
+Application security boils down to two more or less independent problems: 
+authentication (who are you?) and authorization (what are you allowed to do?).
 
 For Authentication:
 One ProviderManager has many AuthenticationProvider
