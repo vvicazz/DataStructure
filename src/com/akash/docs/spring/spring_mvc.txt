@@ -1,0 +1,64 @@
+DispatcherServlet acts as a front Controller
+Each Dispatcher Servlet has its own WebApplicationContext and it inherits all beans defined in root WebApplicationContext.
+
+upon initialization of DispatcherServlet it looks for [servlet-name]-servlet.xml in WEB-INF.
+
+Special bean types in DispatcherServlet:
+HandlerMapping
+HandlerAddapter
+ViewResolver
+ThemeResolver
+
+ViewResolver : InternalResouceViewResolver , UrlBasedViewResolver (for tiles)
+
+DipatcherServlet parameters:
+-contextConfigLocation  = xml file name
+-contextClass			= class name that implements WebApplicationContext
+
+
+HandlerMapping - 
+An interface which handles http request to appropriate controller-method class
+It also can have intercepters
+
+(1)DefaultAnotation HM
+This is default implementation of DispatcherServlet.
+@RequestMaping annotation works by applying this on Controller class
+But when applying @RequestMapping on method it requires AnotationMethod HM.
+
+(2)BeanNameUrl HM
+
+<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+<bean id="/hello.html" class="com.akash.HomeController">
+
+
+(3)ControllerClassName HM
+
+<bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" >
+   <property name="caseSensitive" value="true" />
+   <property name="pathPrefix" value="/app" />
+</bean>
+
+<bean class="com.akash.HomeController">
+
+
+(4)SimpleUrl HM
+
+key-value pairs of url-bean is registered
+
+<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+       <property name="mappings">
+        <props>
+           <prop key="/helloWorld.htm">homeController</prop>
+           <prop key="/*/hello.htm">homeController</prop>
+           <prop key="/hello*.htm">homeController</prop>
+         </props>
+       </property>
+    </bean>
+   <bean id="homeController" class="com.akash.HomeController" />
+   
+
+(5)RequestMapping HM
+
+It is combination of DefaultAnotation HM  and AnnotationMethod HM
+
+<mvc:annotation-driven>

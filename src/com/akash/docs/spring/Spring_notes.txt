@@ -1,0 +1,97 @@
+(1)context:component-scan 		= @Component @Service @Repository @Controller
+(2)context:annotation-config	= @Required @Autowired @PostConstruct @PreDestroy
+(3)mvc:annotation-driven		= (it dispatches request to controller) @RequestMapping 
+									@ResponseBody @RequestBody @RequestParam @PathVariable
+
+context:component-scan includes context-annotation-config
+
+@RequestParam	= controller/action?id=1&name=aa
+@PathVariable	= controller/action/id/name
+
+http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
+https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc
+http://java.dzone.com/articles/spring-rest-web-service-and
+
+content negotiation in web mvc
+
+DispatcherServlet : is based on Front-controller design pattern
+It is the only servlet in a spring based web application.
+
+WebApplicationInitializer is an interface which java class equivalent to web.xml file.
+
+class myWAI implements WebApplicationInitializer {
+	public void onStartup(ServletContext sc) {
+	}
+}
+
+RULE :
+Each DispatcherServlet has its own WebApplicationContext, which inherits all the beans already defined in the root WebApplicationContext
+
+web.xml has two configuration files ( two WebApplicationContext ):
+(1)root application conf xml	= ContextLoaderListner class listens when an event of ServletContextEvent occurs.
+								so its contextInitialized(event) method is called when container is started.
+								<context-param> tag is used for conf file
+								
+(2)web application conf xml 	= DispatcherServlet is created as Front-controller
+								<init-param> is used to specify the file
+								every request the url is handled here.
+								
+
+Root application context :
+->DB details
+->spring security
+
+
+Web application context :
+->handlers
+->message resource
+->view resolver
+
+spring based configurations like <context:component-scan>  can be declared in both files.
+
+==========================================
+
+RULE : @RequestMapping maps all HTTP methods by default.
+
+RequestMappingHandlerMapping
+RequestMappingHandlerAdapter
+
+@RequestMapping(value="/owners/{ownerId}")
+public String findOwner(@PathVariable String ownerId) {
+...
+}
+
+@RequestMapping(value="/owners/{ownerId}")
+public String findOwner(@PathVariable("ownerId") String ownerId) {
+...
+}
+
+produces
+consumes
+params
+headers
+
+@ModelAttribute
+
+@RequestParam
+@RequestBody
+@ModelAttribute
+
+@RequestHeader
+
+------------------------
+
+WebApplicationInitializer					---  web.xml
+public void onStartup(ServletContext container) {}
+
+AnnotationConfigWebApplicationContext		---  webApplicationContext
+
+@Configuration								---  xml file
+
+
+(Q) How to load initial data in spring project?
+--> InitializingBean   afterPropertiesSet()
+
+--> ApplicationListener<ContextRefreshed>
+
+

@@ -1,0 +1,295 @@
+
+http://docs.spring.io/spring-security/site/docs/3.0.x/reference/ns-config.html
+
+http://www.baeldung.com/2012/12/20/authentication-against-a-restful-service/
+
+****http://docs.spring.io/spring-security/site/docs/3.0.x/reference/technical-overview.html
+
+***http://www.baeldung.com/2011/10/31/securing-a-restful-web-service-with-spring-security-3-1-part-3/
+
+***https://www.quora.com/How-do-I-make-AJAX-calls-secure
+
+****https://spring.io/guides/topicals/spring-security-architecture/
+
+====pom.xml====
+
+<spring-security-version>3.2.5.RELEASE</spring-security-version>
+
+<dependency>
+	<groupId>org.springframework.security</groupId>
+	<artifactId>spring-security-core</artifactId>
+	<version>${spring-security-version}</version>
+</dependency>
+<dependency>
+	<groupId>org.springframework.security</groupId>
+	<artifactId>spring-security-web</artifactId>
+	<version>${spring-security-version}</version>
+</dependency>
+<dependency>
+	<groupId>org.springframework.security</groupId>
+	<artifactId>spring-security-config</artifactId>
+	<version>${spring-security-version}</version>
+</dependency>
+
+
+
+
+
+------------------------------------------------
+
+=====spring-security.xml=====
+
+
+
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    ...
+</beans:beans>
+
+
+
+
+------------------------------------------------
+
+web.xml
+
+
+<filter>
+  <filter-name>springSecurityFilterChain</filter-name>
+  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+</filter>
+
+<filter-mapping>
+  <filter-name>springSecurityFilterChain</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+
+
+
+This provides a hook into the Spring Security web infrastructure. DelegatingFilterProxy is a Spring Framework class which delegates to a filter
+ implementation which is defined as a Spring bean in your application context. In this case, the bean is named “springSecurityFilterChain”,
+ which is an internal infrastructure bean created by the namespace to handle web security.
+Web security services are configured using the <http> element.
+
+DelegatingFilterProxy is a simple filter.
+how it is used to secure clients url with roles and perm.
+
+
+----------------------------------------------------------
+
+
+(1)
+
+The <http> element is the parent for all web-related namespace functionality. The <intercept-url> element defines a pattern which is matched
+ against the URLs of incoming requests using an ant path style syntax[2].
+ The access attribute defines the access requirements for requests matching the given pattern. 
+
+
+
+<global-method-security secured-annotations="enabled" pre-post-annotations="enabled" />
+    
+    <http pattern="/favicon.ico" security="none" />
+    <http pattern="/myRest/**" security="none" />
+    <http pattern="/*/*.js" security="none" />
+    
+    <http auto-config='true'>
+    	<intercept-url pattern="/login" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/endpoints/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<form-login login-page='/login'
+			default-target-url="/"
+			authentication-failure-url="/login?error"
+			username-parameter="j_username"
+			password-parameter="j_password" />
+		<logout logout-url="/logout" logout-success-url="/logoutSuccess.html" />
+	</http> 
+
+
+
+
+(2)
+
+<authentication-manager>
+	<authentication-provider user-service-ref="customUserDetailsService">  
+		<password-encoder hash="plaintext" />
+	</authentication-provider>  
+</authentication-manager>
+
+
+
+OR
+<password-encoder hash="sha"/>
+
+
+
+
+(3)
+
+Create a class that implements org.springframework.security.core.userdetails.UserDetailsService
+You have to override 
+public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException ;
+
+We provide this class as authentication provider for spring security.
+Internally this is used for authenticating user.
+
+How?
+Answer: 
+The loadUserByUsername() method takes username as an argument, 
+then it fetches UserDetails (User extends UserDetails) object,
+then it internally compares the UserDetails object and and user details provided by the user at 
+login time (i.e. username and password)
+This concept also helps when password is encrypted using hashing algorithms 
+that are not bidirectional i.e. you cannot get original password from encrypted password. 
+
+(4)
+
+Spring security requires for 2 entity classes : User and Authority.
+User helps in authentication
+Authority helps in authorization.
+
+Luckily spring security itself provides these classes in its api,
+you just need to extend these classes according to your need.
+
+org.springframework.security.core.userdetails.User implements UserDetails, CredentialsContainer
+org.springframework.security.core.GrantedAuthority implements Serializable
+
+Create following Entities in your project : User.java , Authority.java 
+For showing user object on pages and saving it in a session object we prefer to make a copy of User 
+class that have all required data for User. We may name this as UserInSession.
+Object of this class will be saved in session via spring security when a user successfully login in an application.
+
+So finally we have 3 class:
+User			(entity)
+Authority 		(entity)
+UserInSession	(not an entity)
+
+
+@Entity(name="Users")
+public class User implements Serializable
+{
+//We prefer to name the entity as Users because User is reserved keyword in some of the database.
+
+	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+	@Id
+    @GeneratedValue
+    private Integer id;
+    private String password;
+    private  String username;
+    private String emailId;
+    
+    @ManyToMany
+    private Set<Authority> authorities=new HashSet<Authority>();
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
+}
+
+@Entity
+public class Authority implements GrantedAuthority
+{
+	@Id
+    @GeneratedValue
+    private Integer id;
+	private String authority;
+	
+	@ManyToMany(mappedBy="authorities")
+	Set<User> users=new HashSet<User>();
+}
+//GrantedAuthority implements Serializable
+
+public class UserInSession implements UserDetails, CredentialsContainer
+{
+	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+	
+    private transient String password;
+    private final String username;
+    private final String emailId;
+    private final Set<GrantedAuthority> authorities;
+    private final boolean accountNonExpired;
+    private final boolean accountNonLocked;
+    private final boolean credentialsNonExpired;
+    private final boolean enabled;
+}
+
+
+
+(5)
+Annotations Used for authorizations that can be used on classes or methods :
+
+@PreAuthorize("isAnonymous()")
+@PreAuthorize("hasAuthority('ROLE_TELLER')")
+
+
+--------------------------------------------------------------
+
+For Authentication:
+One ProviderManager has many AuthenticationProvider
+
+For Authorization :
+One AccessDecisionManager has many AccessDecisionVoter 
+
+interface AccessDecisionManager {
+	void decide(Authentication authentication, Object object,Collection<ConfigAttribute> configAttributes);
+	boolean supports(ConfigAttribute attribute);
+	boolean supports(Class<?> clazz);
+}
+
+public interface AccessDecisionVoter<S> {
+	int ACCESS_GRANTED = 1;
+	int ACCESS_ABSTAIN = 0;
+	int ACCESS_DENIED = -1;
+
+	boolean supports(ConfigAttribute attribute);
+	boolean supports(Class<?> clazz);
+	int vote(Authentication authentication, S object,Collection<ConfigAttribute> attributes);
+}
+
+public class RoleVoter implements AccessDecisionVoter<Object> {
+	private String rolePrefix = "ROLE_";
+	
+	public boolean supports(ConfigAttribute attribute) {
+		if ((attribute.getAttribute() != null)&& attribute.getAttribute().startsWith(rolePrefix)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public int vote(Authentication authentication, Object object,Collection<ConfigAttribute> attributes) {
+		if(authentication == null) {
+			return ACCESS_DENIED;
+		}
+		int result = ACCESS_ABSTAIN;
+		Collection<? extends GrantedAuthority> authorities = extractAuthorities(authentication);
+		for (ConfigAttribute attribute : attributes) {
+			if (this.supports(attribute)) {
+				result = ACCESS_DENIED;
+				// Attempt to find a matching granted authority
+				for (GrantedAuthority authority : authorities) {
+					if (attribute.getAttribute().equals(authority.getAuthority())) {
+						return ACCESS_GRANTED;
+					}
+				}
+			}
+		}
+		return result;
+	}
+}
+
+
+public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
+
+	public static final String IS_AUTHENTICATED_FULLY = "IS_AUTHENTICATED_FULLY";
+	public static final String IS_AUTHENTICATED_REMEMBERED = "IS_AUTHENTICATED_REMEMBERED";
+	public static final String IS_AUTHENTICATED_ANONYMOUSLY = "IS_AUTHENTICATED_ANONYMOUSLY";
+	
+	.....
+}
