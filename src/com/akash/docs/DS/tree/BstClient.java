@@ -1,4 +1,4 @@
-package com.akash.tree.parttwo;
+package com.akash.docs.DS.tree;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +11,7 @@ public class BstClient {
 	public static void main(String args[]) {
 
 		BinarySearchTree<Integer> tree = new BinarySearchTree<>();
+		BinarySearchTree<Integer> aa[] = new BinarySearchTree[2];
 		tree.add(20);
 		tree.add(15);
 		tree.add(25);
