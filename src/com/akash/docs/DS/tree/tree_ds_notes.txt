@@ -101,6 +101,7 @@ class TwoFourNode<T> {
 =================================================================
 
 =>insert
+	insertion of a new node is always done at leaf node of the tree
 	(1)no problem if node has empty space
 	(2)nodes get split if there is an insufficient space
 	one key is promoted to parent and inserted in there
