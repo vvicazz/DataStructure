@@ -359,6 +359,8 @@ Algo :
 		return dbe;
 	}
 
+http://www.geeksforgeeks.org/bridge-in-a-graph/
+
 Two errors in this algo:
 ->We must not consider dbe for Tree edge (in case of undirected graph, u --> v and v --> u both are same)
 ->The node from which DFS will start, will have a dbe = arr of that node.
