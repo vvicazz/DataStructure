@@ -211,6 +211,35 @@ public class Graphs {
 		dfsResponse.getDepartureTime().put(source, time.incrementAndGet());
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <N> boolean isDag(Graph<N> graph) {
+		N source = (N) graph.getAllNodes().stream().findAny();
+		DfsResponse<N> dfsResponse = new DfsResponse<N>(graph);
+		AtomicInteger time = new AtomicInteger(0);
+		return doDag(graph, source, time, dfsResponse);
+	}
+
+	private static <N> boolean doDag(Graph<N> graph, N source, AtomicInteger time, DfsResponse<N> dfsResponse) {
+		dfsResponse.getVisited().put(source, Boolean.TRUE);
+		dfsResponse.getArrivalTime().put(source, time.incrementAndGet());
+		for (Edge<N> edge : graph.getEdges(source)) {
+			N tempNode = edge.getDestination();
+			if (!dfsResponse.getVisited().get(tempNode)) {
+				doDfs(graph, tempNode, time, dfsResponse);
+			} else if (isBackEdgeInDirectedDfs(tempNode, source, dfsResponse)) {
+				return true;
+			}
+		}
+		dfsResponse.getDepartureTime().put(source, time.incrementAndGet());
+		return false;
+	}
+
+	private static <N> boolean isBackEdgeInDirectedDfs(N u, N v, DfsResponse<N> dfsResponse) {
+		return dfsResponse.getVisited().get(u)
+				&& dfsResponse.getArrivalTime().get(u).intValue() > dfsResponse.getArrivalTime().get(v).intValue()
+				&& dfsResponse.getDepartureTime().get(v).intValue() == -1;
+	}
+
 	public enum Color {
 		WHITE, GRAY, BLACK;
 	}
