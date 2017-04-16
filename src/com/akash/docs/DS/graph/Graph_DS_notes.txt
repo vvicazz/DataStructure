@@ -450,6 +450,10 @@ Topological sort : sorting vertices on the basis of departure timestamp
 	(this can be done while performing DFS just to avoid complexity of sorting)
 	
 DAG : Directed Acyclic Graph
+(Q) Given a directed graph G, check if G is Acyclic?
+	-> no back edge means no cycle
+(Q) Given an undirected graph G, check if G is Acyclic?
+	-> use find-union disjoint set
 
 =>In undirected Graph : 
 Connected Graph = There is a path bw every pair of vertices.
