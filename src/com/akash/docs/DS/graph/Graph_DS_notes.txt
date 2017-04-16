@@ -361,7 +361,7 @@ Algo :
 					"This is a back edge";
 				}
 			} else if(parent[node] != w) {
-				dbe[node] = min(dbe[w], arr[node]);
+				dbe[node] = min(dbe[node], arr[w]);
 			}
 		}
 	}
