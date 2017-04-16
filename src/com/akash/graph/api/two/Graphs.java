@@ -28,9 +28,9 @@ public class Graphs {
 		Objects.requireNonNull(graph);
 		N source = (N) graph.getAllNodes().stream().findAny();
 		if (source != null) {
-			DfsResponse<N> dfsResponse = new DfsResponse<N>(graph);
+			BridgeResponse<N> bridgeResponse = new BridgeResponse<N>(graph);
 			AtomicInteger time = new AtomicInteger(0);
-			if (doBridgeEdge(graph, source, time, dfsResponse) == -1) {
+			if (doBridgeEdge(graph, source, time, bridgeResponse)) {
 				return true;
 			} else {
 				return false;
@@ -39,27 +39,84 @@ public class Graphs {
 		return false;
 	}
 
-	private static <N> int doBridgeEdge(Graph<N> graph, N source, AtomicInteger time, DfsResponse<N> dfsResponse) {
-		dfsResponse.getVisited().put(source, Boolean.TRUE);
-		dfsResponse.getArrivalTime().put(source, time.incrementAndGet());
-		int deepestBackEdge = dfsResponse.getArrivalTime().get(source);
+	private static <N> boolean doBridgeEdge(Graph<N> graph, N source, AtomicInteger time,
+			BridgeResponse<N> bridgeResponse) {
+		bridgeResponse.getVisited().put(source, Boolean.TRUE);
+		Integer arrivalTime = time.incrementAndGet();
+		bridgeResponse.getArrivalTime().put(source, arrivalTime);
+		bridgeResponse.getDbe().put(source, arrivalTime);
 		for (Edge<N> edge : graph.getEdges(source)) {
 			N tempNode = edge.getDestination();
-			if (!dfsResponse.getVisited().get(tempNode)) {
-				deepestBackEdge = min(deepestBackEdge, doBridgeEdge(graph, tempNode, time, dfsResponse));
-			} else {
-				deepestBackEdge = min(deepestBackEdge, dfsResponse.getArrivalTime().get(tempNode));
+			if (!bridgeResponse.getVisited().get(tempNode)) {
+				bridgeResponse.getParent().put(tempNode, source);
+				boolean hasBackEdge = doBridgeEdge(graph, tempNode, time, bridgeResponse);
+				bridgeResponse.getDbe().put(source,
+						min(bridgeResponse.getDbe().get(tempNode), bridgeResponse.getDbe().get(source)));
+				if (bridgeResponse.getDbe().get(tempNode) > bridgeResponse.getArrivalTime().get(source)) {
+					System.out.println(source + " --> " + tempNode + " is back edge");
+					return true;
+				}
+				if (hasBackEdge) {
+					return true;
+				}
+			} else if (!tempNode.equals(bridgeResponse.getParent().get(source))) {
+				bridgeResponse.getDbe().put(source,
+						min(bridgeResponse.getArrivalTime().get(tempNode), bridgeResponse.getDbe().get(source)));
 			}
 		}
-		dfsResponse.getDepartureTime().put(source, time.incrementAndGet());
-		if (deepestBackEdge == -1 || deepestBackEdge == dfsResponse.getArrivalTime().get(source)) {
-			deepestBackEdge = -1;
-		}
-		return deepestBackEdge;
+		return false;
 	}
 
 	private static int min(int a, int b) {
 		return a > b ? b : a;
+	}
+
+	private static class BridgeResponse<N> {
+		private Map<N, Integer> arrivalTime;
+		private Map<N, Boolean> visited;
+		private Map<N, Integer> dbe;
+		private Map<N, N> parent;
+
+		BridgeResponse(Graph<N> graph) {
+			Set<N> nodes = graph.getAllNodes();
+			for (N tempNode : nodes) {
+				arrivalTime.put(tempNode, 0);
+				visited.put(tempNode, Boolean.FALSE);
+				dbe.put(tempNode, 0);
+				parent.put(tempNode, null);
+			}
+		}
+
+		public Map<N, Integer> getArrivalTime() {
+			return arrivalTime;
+		}
+
+		public Map<N, Boolean> getVisited() {
+			return visited;
+		}
+
+		public Map<N, Integer> getDbe() {
+			return dbe;
+		}
+
+		public Map<N, N> getParent() {
+			return parent;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder content = new StringBuilder();
+			Iterator<Map.Entry<N, Integer>> itr = getArrivalTime().entrySet().iterator();
+			while (itr.hasNext()) {
+				Map.Entry<N, Integer> entry = itr.next();
+				content.append("{node=").append(entry.getKey()).append(" , visited=");
+				content.append(getVisited().get(entry.getKey())).append(", dbe=");
+				content.append(getDbe().get(entry.getKey())).append(", parent=");
+				content.append(getParent().get(entry.getKey())).append(", arrivalTime=");
+				content.append(entry.getValue()).append("}");
+			}
+			return content.toString();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -178,29 +235,17 @@ public class Graphs {
 			return color;
 		}
 
-		public void setColor(Map<N, Color> color) {
-			this.color = color;
-		}
-
 		public Map<N, Integer> getDistance() {
 			return distance;
-		}
-
-		public void setDistance(Map<N, Integer> distance) {
-			this.distance = distance;
 		}
 
 		public Map<N, N> getParent() {
 			return parent;
 		}
 
-		public void setParent(Map<N, N> parent) {
-			this.parent = parent;
-		}
-
 		@Override
 		public String toString() {
-			StringBuffer content = new StringBuffer();
+			StringBuilder content = new StringBuilder();
 			Iterator<Map.Entry<N, Color>> itr = getColor().entrySet().iterator();
 			while (itr.hasNext()) {
 				Map.Entry<N, Color> entry = itr.next();
@@ -233,29 +278,17 @@ public class Graphs {
 			return visited;
 		}
 
-		public void setVisited(Map<N, Boolean> visited) {
-			this.visited = visited;
-		}
-
 		public Map<N, Integer> getArrivalTime() {
 			return arrivalTime;
-		}
-
-		public void setArrivalTime(Map<N, Integer> arrivalTime) {
-			this.arrivalTime = arrivalTime;
 		}
 
 		public Map<N, Integer> getDepartureTime() {
 			return departureTime;
 		}
 
-		public void setDepartureTime(Map<N, Integer> departureTime) {
-			this.departureTime = departureTime;
-		}
-
 		@Override
 		public String toString() {
-			StringBuffer content = new StringBuffer();
+			StringBuilder content = new StringBuilder();
 			Iterator<Map.Entry<N, Integer>> itr = getDepartureTime().entrySet().iterator();
 			while (itr.hasNext()) {
 				Map.Entry<N, Integer> entry = itr.next();
