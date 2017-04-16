@@ -389,13 +389,17 @@ Theorem 2 : G has no circuit of length 3
 If we remove a vertex from a graph, the graph must be connected.
 
 Algo :
-1. Every vertex must have a back edge to one of its ancestors (in DFS tree)
-2. In case of Root node of DFS tree : 
+In DFS tree, a vertex u is articulation point if one of the following two conditions is true.
+1) u is root of DFS tree and it has at least two children.
+2) u is not root of DFS tree and it has a child v such that
+ no vertex in subtree rooted with v has a back edge to one of the ancestors (in DFS tree) of u.
 
 =>K vertex connected
 =>K edge connected
 
 (Q)Given an undirected graph G, is G a Biconnected graph?
+-> graph with vertex connectivity greater than 1.
+-> It is a connected graph on two or more vertices having no articulation vertices
 A graph is Biconnected graph if :
 	1. It is a connected graph
 	2. It has no articulation point
