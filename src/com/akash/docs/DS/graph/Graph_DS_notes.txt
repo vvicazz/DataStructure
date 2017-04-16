@@ -337,6 +337,13 @@ this helps every parent node node to get its DBE by its child subgraph.
 
 variable used in algo :
 dbe = deepest back edge
+dbe[v] = earliest visited vertex reachable from subtree rooted with v.
+
+for every node we will have following DS:
+->arrival_time
+->dpe
+->parent
+->visited
 
 Algo :
 
@@ -344,19 +351,19 @@ Algo :
 	2EC(node) {
 		arr[node]=time++;
 		visited[node]=true;
-		dbe=arr[node];
+		dbe[node]=arr[node];
 		For all w adjacent to node do {
 			if(!visited[w]) {
-				dbe = min(dbe, 2EC(w));
-			} else {
-				dbe = min(dbe, arr[w]);
+				parent[w]=node;
+				2EC(w);
+				dbe[node] = min(dbe[w], dbe[node]);
+				if(dbe[w] > arr[node]) {
+					"This is a back edge";
+				}
+			} else if(parent[node] != w) {
+				dbe[node] = min(dbe[w], arr[node]);
 			}
 		}
-		if(dbe == arr[node]) {
-			//graph is not 2 Edge Connected
-			Abort;
-		}
-		return dbe;
 	}
 
 http://www.geeksforgeeks.org/bridge-in-a-graph/
