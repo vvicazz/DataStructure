@@ -1,0 +1,219 @@
+->Given an integer binary tree, find the path the yields maximum sum. The path may start and end at any node in the tree. The output can just be limited to the sum(no need of printing the path). (PS and Coding)
+
+->Given a sorted array which has been rotated figure out how many times the array has been rotated. For ex:- 5,4,3,1,2 should give 3, The array has been sorted in ascending order.
+
+->Given a sorted linked list, design a solution to create a balanced binary search tree from it. (DS)
+
+->You are given a stream of input numbers. Print the 20 maximum elements at any point of time in the input stream.
+
+->Write a function to return nth fibonacci number
+
+->Find common element in 2 sorted arrays
+
+->Give a shortest path to reach from source word to destination word from given list of words.
+
+->LRU Cache
+
+->Given a stream of numbers, find the earliest non-repeating number?
+
+
+http://www.geeksforgeeks.org/amazon-interview-set-8/
+
+--------------------
+***Important 
+
+=>Why u want to join : 
+					learning new things and working in chalenging environment
+=>projects done
+	-> Transcoding App -> Grails , Java , rest
+	-> American Resource Centre -> Gmat, Gre -> grails, java
+	-> NPD finnone -> java, Spring , hibernate, oracle
+	-> Hix individual -> java , spring, hibernate, oracle
+						COLA functionality, 131 job framework
+=>technologies done
+	-> java, spring, hibernate, spring security, rest, soap, mongodb, jquery, maven
+=>poc work
+	-> Oauth
+=>difficult tasks
+	-> American Resource Center : time constraint with indian clients, mismanagement
+	
+--------------
+
+Binary Tree or BST
+
+-> Given an integer binary tree, find the path the yields maximum sum. The path may start and end at any node in the tree. The output can just be limited to the sum(no need of printing the path). (PS and Coding)
+	->node itself
+	->node with left path
+	->node with reight path
+	->node with left and right
+	->two values are calculated, 1 is returned and one is saved in object stack
+
+-> Given a sorted linked list, design a solution to create a balanced binary search tree from it. (DS)
+
+-> Given doubly linked list, convert it to balanced BST.
+
+-> A binary tree with Int value stored in every node is given. Find the subtree with max sum.
+
+-> Find the Maximum Depth or Height of a binary Tree
+	-> recursive approach : h = max(hL, hR) + 1
+	-> Iterative approach : take 2 queues OR take 1 queue with counter of size
+
+-> Level Order Tree Traversal
+	->(1) using queue
+	->(2) using for loop and height
+	->(3) using two stacks
+
+	-—-—1
+
+	—-2—--3
+
+	–4–5–6–7
+
+	1 2 3 4 5 6 7
+	
+-> Print Left View of a Binary Tree
+	-> use level order traversal
+	
+-> check if two binary trees are identical
+
+???-> Print cousins of a given node in Binary Tree
+???-> get level of a node in BST
+???-> get all nodes at K level in BST
+
+???-> Diameter of binary tree
+
+-> Inorder traversal without recursion
+	-> using stack
+
+-> Two trees can be called isomorphic if they have similar structure and the only difference amongst them can be is, that their child nodes may or may not be swaped.
+
+		for example
+
+		——4
+
+		—-2—6
+
+		–1–3–5–7
+
+		and
+
+		——4
+
+		—-6—2
+
+		–1–3–7–5
+		
+		->n1.data==n2.data
+		-> isomorphic(n1.left, n2.left) && isomorphic(n1.right, n2.right) || 
+			isomorphic(n1.left, n2.right) && isomorphic(n1.right, n2.left)
+
+-> Find the Kth largest integer in a BST
+	-> RNL inorder traversal
+
+	-> get count of total nodes, say n
+	-> get (n-k+1) node in Inorder traversal
+-> Find k-th smallest element in BST (Order Statistics in BST)
+???-> Print BST keys in the given range
+
+???-> Inorder Tree Traversal without recursion and without stack , Using Morris Traversal
+-> Construct BST from preorder of BST
+
+-> Two nodes of a BST are swapped, correct the BST
+	->(hint) : two numbers in a sorted array are swapped, inorder traversal
+	
+???-> Floor and Ceil from a BST
+
+-> A program to check if a binary tree is BST or not
+	-> Inorder traversal should be increasing order
+
+???-> given two traversal sequences, construct the binary tree.
+
+-> Convert a Binary Tree into its Mirror Tree
+	->use recursion
+	->mirror(left)
+	  mirror(right)
+	  swap(left, right)
+	  
+-> check if two binary tree are mirror :
+	-> compare node data
+	-> mirror(left, right)
+	-> mirror(right, left)
+
+-> Delete a binary tree
+	-> Post order traversal
+	
+???->A binary tree with Int value stored in every node is given. Find the subtree with max sum.
+
+
+
+----------------------
+
+Sorting :
+
+bubble sort
+insertion
+selection
+
+quick -> recursive , iterative
+merge -> recursive , iterative
+heap
+counting
+radix
+bucket
+
+
+-------------------------
+
+Array :
+
+-> binary search
+
+???-> array of positive numbers, max no that can be formed with its permutation
+
+->Given a word and the dictionary, find all the anagrams of the particular word present in dictionary (That are valid words)
+	-> make array of words and their indexes
+	-> sort characters in all words
+	-> sort array of words
+	
+-> Check if two strings are anagrams
+	-> sort strings and compare
+	
+	-> use counting sort approach
+
+-------------------------
+
+Graph :
+
+BFS
+connected components
+bipartite
+has eulerian path
+has eulerian circuit
+print eulerian path
+DFS
+has bridge edge
+2 edge connected
+2 vertex connected
+DAG
+
+find union disjoint data set
+
+find no of islands in 2D array of 0 and 1
+
+cycle in undirected graph :  ->using dfs  ->using find union
+
+Topological sorting
+
+minimize cash flow among given set friends borrowed money
+	->get a list of outstanding amount of each person
+
+Job Sequencing Problem
+	-> find union data structure
+	-> array of job deadlines timers,
+		if parent[i]==i , then i no of jobs can be adjusted
+		else find(parent[i]) are the no of jobs that can be adjusted
+
+Snake and Ladder Problem
+	-> use BFS
+	-> array of values having location of snake and ladder
+
