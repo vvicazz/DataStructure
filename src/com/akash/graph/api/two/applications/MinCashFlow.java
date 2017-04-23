@@ -1,4 +1,4 @@
-package com.akash.graph.api.two;
+package com.akash.graph.api.two.applications;
 
 public class MinCashFlow {
 
