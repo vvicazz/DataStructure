@@ -20,8 +20,8 @@ public class MinCashFlow {
 		int outstandingAmount[] = new int[amountTransferGraph.length];
 		for (int personNum = 0; personNum < amountTransferGraph.length; personNum++) {
 			for (int otherPerson = 0; otherPerson < amountTransferGraph[personNum].length; otherPerson++) {
-				outstandingAmount[personNum] += amountTransferGraph[otherPerson][personNum]
-						- amountTransferGraph[personNum][otherPerson];
+				outstandingAmount[personNum] += amountTransferGraph[personNum][otherPerson]
+						- amountTransferGraph[otherPerson][personNum];
 			}
 		}
 		minCashFlowRecursive(outstandingAmount);
@@ -37,6 +37,7 @@ public class MinCashFlow {
 		int min = min(outstandingAmount[maxValueIndex], -outstandingAmount[minValueIndex]);
 		outstandingAmount[maxValueIndex] = outstandingAmount[maxValueIndex] - min;
 		outstandingAmount[minValueIndex] = outstandingAmount[minValueIndex] + min;
+		System.out.println("P" + maxValueIndex + " will pay " + min + " to P" + minValueIndex);
 		minCashFlowRecursive(outstandingAmount);
 	}
 
@@ -53,7 +54,7 @@ public class MinCashFlow {
 	private static int getMaxValueIndex(int[] outstandingAmount) {
 		int maxIndex = 0;
 		for (int i = 1; i < outstandingAmount.length; i++) {
-			if (outstandingAmount[i] < outstandingAmount[maxIndex]) {
+			if (outstandingAmount[i] > outstandingAmount[maxIndex]) {
 				maxIndex = i;
 			}
 		}
