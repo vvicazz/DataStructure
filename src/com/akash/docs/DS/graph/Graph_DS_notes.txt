@@ -36,6 +36,10 @@ undirected graph terminologies :
 =>Spanning tree : Tree that contains all vertices
 				i.e. Connected subgraph that contains all vertices without cycle
 
+Difference bw Complete and Connected graph
+=>Complete graph : every two vertices must have an edge
+=>connected graph : every two vertices must have a path
+
 Data structures for graphs :
 
 1) Edge list
@@ -491,9 +495,10 @@ If both statement1 and statement2 are correct than, graph is strongly connected.
 	path from Y --> X
 
 		1. Do DFS on arbitrary vertex V
-		2. Do reverse edges in G 
-		3. Do DFS from V in reversed G (DFS on reversed G can also be done by doing DFS on InAdjacency edges)
-		4. If all vertices are connected in both DFS, then graph is strongly connected
+		2. if above DFS does not visit all nodes then abort
+		3. Do reverse edges in G 
+		4. Do DFS from V in reversed G (DFS on reversed G can also be done by doing DFS on InAdjacency edges)
+		5. If all vertices are connected in both DFS, then graph is strongly connected
 
 Solution3=>
 
