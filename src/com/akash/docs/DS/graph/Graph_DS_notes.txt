@@ -536,6 +536,7 @@ Solution3=>
 			}
 		}
 
+(Q) print all strongly connected components of a directed graph.
 
 Applications of BFS :
 1.Connected Components
