@@ -76,9 +76,9 @@ Binary Tree or BST
 	
 -> check if two binary trees are identical
 
-???-> Print cousins of a given node in Binary Tree
-???-> get level of a node in BST
-???-> get all nodes at K level in BST
+-> Print cousins of a given node in Binary Tree
+-> get level of a node in BST
+-> get all nodes at K level in BST
 
 ???-> Diameter of binary tree
 
@@ -113,15 +113,15 @@ Binary Tree or BST
 	-> get count of total nodes, say n
 	-> get (n-k+1) node in Inorder traversal
 -> Find k-th smallest element in BST (Order Statistics in BST)
-???-> Print BST keys in the given range
+-> Print BST keys in the given range
 
-???-> Inorder Tree Traversal without recursion and without stack , Using Morris Traversal
+-> Inorder Tree Traversal without recursion and without stack , Using Morris Traversal
 -> Construct BST from preorder of BST
 
 -> Two nodes of a BST are swapped, correct the BST
 	->(hint) : two numbers in a sorted array are swapped, inorder traversal
 	
-???-> Floor and Ceil from a BST
+-> Floor and Ceil from a BST
 
 -> A program to check if a binary tree is BST or not
 	-> Inorder traversal should be increasing order
@@ -167,6 +167,9 @@ bucket
 Array :
 
 -> binary search
+
+-> Largest Sum Contiguous Subarray
+-> Maximum sum rectangle in a 2D matrix
 
 ???-> array of positive numbers, max no that can be formed with its permutation
 
@@ -216,4 +219,40 @@ Job Sequencing Problem
 Snake and Ladder Problem
 	-> use BFS
 	-> array of values having location of snake and ladder
+
+???-> http://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/
+???-> http://www.geeksforgeeks.org/dynamic-programming-set-23-bellman-ford-algorithm/
+
+-------------------------
+
+Dynamic Programming :
+
+1) Fibonacci Nth term
+2) Coin change problem : Given dinominations, find min count of coins to make a sum
+3) Coin change problem : Given dinominations, find total no of ways to make a sum
+4) Rod cutting problem
+5)- Knapsack problem
+6)- Word wrap problem / Test justification problem
+7)- Tilling problem
+8) LCS (Longest common subsequence)
+9)- LIS (Longest increasing subsequence)
+10)- parenthesis problem
+11)- blackjack problem
+12) Longest Palindromic Subsequence, 	print Subsequence
+13) Longest palindromic substring, 		print substring
+14) Check if a given string is a rotation of a palindrome
+15) Min Cost Path
+16)- Maximum sum increasing subsequence
+17) Egg dropping problem
+
+------------------------------
+
+=>Divide And Conquer approach examples :
+1)Binary search
+2)Merge sort
+3)count no of inversions
+4)Quick sort
+5)calculate pow(x,n)
+6)median of two sorted arrays
+7)Closest pair of points
 
