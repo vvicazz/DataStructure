@@ -44,7 +44,7 @@ Binary Tree or BST
 -> Given an integer binary tree, find the path the yields maximum sum. The path may start and end at any node in the tree. The output can just be limited to the sum(no need of printing the path). (PS and Coding)
 	->node itself
 	->node with left path
-	->node with reight path
+	->node with right path
 	->node with left and right
 	->two values are calculated, 1 is returned and one is saved in object stack
 
@@ -63,11 +63,11 @@ Binary Tree or BST
 	->(2) using for loop and height
 	->(3) using two stacks
 
-	-—-—1
+	----1
 
-	—-2—--3
+	--2---3
 
-	–4–5–6–7
+	-4-5-6-7
 
 	1 2 3 4 5 6 7
 	
@@ -89,19 +89,19 @@ Binary Tree or BST
 
 		for example
 
-		——4
+		----4
 
-		—-2—6
+		--2---6
 
-		–1–3–5–7
+		-1-3-5-7
 
 		and
 
-		——4
+		----4
 
-		—-6—2
+		--6---2
 
-		–1–3–7–5
+		-1-3-7-5
 		
 		->n1.data==n2.data
 		-> isomorphic(n1.left, n2.left) && isomorphic(n1.right, n2.right) || 
