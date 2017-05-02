@@ -1,3 +1,30 @@
+interview questions
+
+diff b/w merge and update
+diff b/w get and load
+diff b/w save and saveOrUpdate
+diff b/w save and persist
+first level cache, second level cache, query cache
+transient, managed and detached objects
+how to convert managed to detached
+how to convert detached to managed
+diff b/w list and set
+when oneToOne do not work with lazy
+order and sorted collection
+N+1 problem
+diff b/w getCurrentSession() and openSesion()
+cascade with inverse option
+criteria api
+diff b/w flush and commit
+session and transaction
+session and sessionFactory
+best way to make an hibernate entity
+types of inheritance in hibernate
+JoinTable and JoinColumn
+advantages of hibernate over jdbc
+
+-----------------------------------------------
+
 Hibernate
 
 *** http://www.onjava.com/pub/a/onjava/2006/09/13/dont-let-hibernate-steal-your-identity.html?page=1
