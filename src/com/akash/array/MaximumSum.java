@@ -7,6 +7,8 @@ public class MaximumSum {
 		int arr[] = { -2, -3, 4, -1, -2, 1, 4, -3 };
 		System.out.println(findMaxSum(arr));
 		System.out.println(maxSubArraySum(arr));
+		int productArr[] = { 1, -2, -3, 0, 7, -8, -2 };
+		System.out.println(maxSubArrayProduct(productArr));
 	}
 
 	// original
@@ -44,5 +46,26 @@ public class MaximumSum {
 
 	private static int max(int a, int b) {
 		return a > b ? a : b;
+	}
+
+	private static int maxSubArrayProduct(int arr[]) {
+		int maxEndingHere = arr[0];
+		int maxSoFar = arr[0];
+		int start = 0, end = 0, tempStart = 0;
+		for (int i = 1; i < arr.length; i++) {
+			maxEndingHere = maxEndingHere * arr[i];
+			if (maxEndingHere == 0) {
+				maxEndingHere = 1;
+				tempStart = i + 1;
+			}
+			if (maxSoFar < maxEndingHere && maxEndingHere != 0) {
+				maxSoFar = maxEndingHere;
+				end = i;
+				start = tempStart;
+			}
+		}
+		System.out.println("start :" + start);
+		System.out.println("end :" + end);
+		return maxSoFar;
 	}
 }
