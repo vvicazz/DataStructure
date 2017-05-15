@@ -22,6 +22,7 @@ best way to make an hibernate entity
 types of inheritance in hibernate
 JoinTable and JoinColumn
 advantages of hibernate over jdbc
+NamedEntityGraph
 
 -----------------------------------------------
 
@@ -80,6 +81,12 @@ It first checks in session cache then in DB.
 if not found it throws exception
 load() will return a proxied object.
 
+Proxy means, hibernate will prepare some fake object with given identifier
+ value in the memory without hitting the database.
+ database won't be hit until the proxy is first invoked.
+A consequence of this is that you may get an ObjectNotFoundException later,
+ as soon as you try to access the returned placeholder and force its initialization.
+
 get() can be used to check if entity exists in DB or not.
 It returns null if not found
 
@@ -90,8 +97,13 @@ objFromLoad.getName();										//Sql query is fired if object is not is session
 
 (Q)What is N+1 problem and how to resolve it ?
 Ans :
-There may be a scenario where we fetch an object and its children are fetch after that
+There may be a scenario where we fetch some objects and their children are fetch after that
 As a result , their will be N+1 sql queries.
+eg:
+	users are loaded 
+		Select * from users where age>18
+	addresses of all users will be loaded
+		select * from address where user_id=123
 1 parent object can have N children
 1 for the parent and
 N for the children
@@ -103,6 +115,7 @@ this query can also be used in HQL as :
 FROM parent JOIN FETCH child 
 
 NOTE : we can use this logic whenever we have to load full object graph.
+OR we can use @NamedEntityGraph
 
 (Q)Difference b/w save() and persist() ?
 persist() method saves entities and their children inside a transaction.
@@ -133,6 +146,8 @@ saveOrUpdate()
 merge()
 update()
 persist()
+
+?get()
 
 NOTE : One SessionFactory object is created for each Data source.
 
