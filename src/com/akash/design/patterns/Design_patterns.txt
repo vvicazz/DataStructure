@@ -1,0 +1,497 @@
+=>Creational Patterns:
+1) Singleton
+2) prototype  -- copy constructor
+3) Factory
+4) Abstract Factory
+5) Builder
+
+=> Behavioural Patterns:
+1) Chain of responsibility
+2) Command
+3) Interpreter
+4) Iterator
+5) Observer
+6) Strategy
+7) Visitor
+8) Mediator
+9) Momento
+10) Template Method
+
+=> Structural Patterns:
+1) Adaptor
+2) Decorator
+3) Composite
+4) Bridge
+5) Facade
+6) Flyweight
+7) Proxy
+
+
+-> protection proxy
+
+--------------------------------------------------
+
+The Liskov substitution principle says that any important property of a type
+should also hold for its subtypes, so that any method written for the type should
+work equally well on its subtypes.
+
+class Rectangle {
+	int height;
+	int width;
+	void setHeight(int height) {
+		this.height=height;
+	}
+	void setWidth(int width) {
+		this.width=width;
+	}
+}
+
+class Square extends Rectangle {
+	int side;
+	void setHeight(int height) {
+		side=height;
+	}
+	void setWidth(int width) {
+		side=width;
+	}
+}
+
+--------------------------------------------------
+
+(1) Singleton Design pattern :
+
+// scenarios that need to be handled here :
+// multiple threads creates multiple objects
+// deserialization problem
+// Cloning problem
+// Reflection
+// Multiple wars in a single container
+
+final class Singleton implements Serializable, Clonable {
+	private volatile static Singleton ob;
+
+	private Singleton() {
+		if(ob != null) {
+			throw new Exception();
+		}
+	}
+	
+	public Singleton getInstance() {
+		if(ob == null) {
+			synchronized(Singleton.class) {
+				if(ob == null) {
+					ob = new Singleton();
+				}
+			}
+		}
+		return ob;
+	}
+	
+	public Object readResolve() {
+		return getInstance();
+	}
+	
+	public Singleton clone() {
+		return getInstance();
+	}
+}
+
+// There is no impact of serialization, Cloning and reflection on enum
+enum Singleton {
+	INSTANCE;
+}
+
+------------------------------------------------------------------
+
+(2) Factory Design Pattern :
+
+JDBC connection example
+
+Class.forName("oracle driver class");
+Connection con = DriverManager.getConnection("jdbc url", "username", "password");
+Statement st = con.getStatement();
+st.executeUpdate("");
+st.executeQuery("");
+
+Product interface
+ConcreteProduct class
+Factory class
+Client class : asks from factory to provide an implementation of Product interface.
+				Factory class has done some registration of Product implementation classes
+				based on some key value pairs.
+				Client will provide a key, and based on that key Factory will provide ConcreteProduct object.
+
+------------------------------------------------------------------
+				
+(3) Factory Method Design Pattern :
+
+if you have many object of the same base type and 
+you manipulate them mostly as abstract objects, then you need a factory.
+
+public abstract class Factory {
+	public void anOperation() {
+		Product product = factoryMethod();
+	}
+	protected abstract Product factoryMethod();
+}
+
+public class ConcreteFactory extends Factory {
+	protected Product factoryMethod() {
+		return new ConcreteProduct();
+	}
+}
+
+public interface Product {}
+public class ConcreteProduct implements Product {}
+
+
+------------------------------------------------------------------
+
+(4) Prototype Design Pattern :
+
+copy constructor
+
+It is more convenient to copy an existing instance than to create a new one.
+We should take care of deep clone and shallow clone.
+
+------------------------------------------------------------------
+
+(5) Builder Design pattern :
+
+When your class has many mandatory and optional parameters.
+Object should be created only after setting mandatory fields.
+-> using setter getter pojo style may lead object to an inconsistent state
+-> using constructor overloading may increase ambiguity and will result in large no of constructors
+
+class Abc {
+	// mandatory
+	private int a,b;
+	
+	// optional
+	private int c,d;
+	
+	private Abc(AbcBuilder builder) {
+		a = builder.a;
+		b = builder.b;
+		c = builder.c;
+		d = builder.d;
+	}
+	
+	public static class AbcBuilder {
+		private int a,b;
+		private int c,d;
+		
+		public AbcBuilder() {
+		}
+		AbcBuilder buildA(int a) {
+			this.a = a; return this;
+		}
+		AbcBuilder buildB(int b) {
+			this.b = b; return this;
+		}
+		AbcBuilder buildC(int c) {
+			this.c = c; return this;
+		}
+		AbcBuilder buildD(int d) {
+			this.d = d; return this;
+		}
+		public Abc build() {
+			return new Abc(this);
+		}
+	}
+}
+
+public class BuilderPattern {
+	public static void main(String args[]) {
+		Abc ob = new Abc.AbcBuilder().buildA(2).buildB(1).buildC(5).build();
+	}
+}
+
+disadvantage : cannot inherit this class due to private constructor.
+
+------------------------------------------------------------------
+
+Behavioural Patterns:
+1) Chain of responsibility
+
+More than one object can handle a command
+The handler is not known in advance
+The group of objects that may handle the command must be specified in a dynamic way.
+
+interface Request {}
+
+class ActualRequest implements Request {}
+
+abstract class RequestHandler {
+	//we can also make an ordered list of handlers
+	private RequestHandler nextHandler;
+	
+	protected void setNextHandler(RequestHandler nextHandler) {
+		this.nextHandler = nextHandler;
+	}
+	
+	protected RequestHandler getNextHandler() {
+		return nextHandler;
+	}
+	
+	protected abstract boolean handle(Request req);
+	
+	public void handleCor(Request req) {
+		boolean result = handle(req);
+		if(!result)
+			return;
+		while(getNextHandler() != null) {
+			boolean nextResult = nextHandler.handle(req);
+			if(nextResult) {
+				nextHandler = nextHandler.getNextHandler();
+			} else {
+				break;
+			}
+		}
+	}
+}
+
+class RequestHandlerOne extends RequestHandler {
+	protected boolean handle(Request req) {
+		if(req.value == 0 ) {
+			return true;
+		}
+		return false;
+	}
+}
+
+class RequestHandlerTwo extends RequestHandler {
+	protected boolean handle(Request req) {
+		if(req.value > 0 ) {
+			return true;
+		}
+		return false;
+	}
+}
+
+class RequestHandlerThree extends RequestHandler {
+	protected boolean handle(Request req) {
+		if(req.value < 0 ) {
+			return true;
+		}
+		return false;
+	}
+}
+
+public class ChainOfResponsibility {
+	public static void main(String args[]) {
+		RequestHandlerOne h1 = new RequestHandlerOne();
+		RequestHandlerTwo h2 = new RequestHandlerTwo();
+		RequestHandlerThree h3 = new RequestHandlerThree();
+		h1.setNextHandler(h2);
+		h2.setNextHandler(h3);
+		h1.handleCor(new ActualRequest(2));
+	}
+}
+
+------------------------------------------------------------------
+
+(2) Command Design pattern :
+
+------------------------------------------------------------------
+
+(3) Iterator Design Pattern :
+
+interface Iterator {
+	boolean hasNext();
+	Object next();
+}
+
+interface Iterable {
+	Iterator iterator();
+}
+
+class BooksCollection implements Iterable {
+	Iterator iterator() {
+		new BooksIterator();
+	}
+	
+	class BooksIterator implements Iterator {
+		...
+	}
+}
+
+------------------------------------------------------------------
+
+(4) Observer Design Pattern :
+
+If there is any change in state of an object(subject/ Observable) , then other objects (observer) must be notified.
+There will be a one to many relationship bw Observer and Subject.
+One Subject/Observable  can have many Observers.
+We can also apply some kind of Aspect oriented programming here.
+
+interface Subject {
+	void addObserver(Observer observer);
+	void removeObserver(Observer observer);
+	void notifyObserver();
+}
+
+interface Observer {
+	void update();
+}
+
+class RedDress implements Subject {
+	private boolean inStock = true;
+	private List<Observer> users = new ArrayList<>();
+	
+	public boolean getInStock() {
+		return inStock;
+	}
+	
+	public void setInStock(boolean inStock) {
+		this.inStock = inStock;
+		notifyObserver();
+	}
+	
+	public void notifyObserver() {
+		//notify all users
+		for(Observer user : users) {
+			user.update(this);
+		}
+	}
+	
+	void addObserver(Observer observer) {
+		users.add(observer);
+	}
+	void removeObserver(Observer observer) {
+		users.remove(observer);
+	}
+}
+
+class User implements Observer {
+	void update(Subject observable) {
+		System.out.println(observable + " available");
+	}
+}
+
+------------------------------------------------------------------
+
+(5) Strategy Design pattern :
+
+When we have different implementations for different scenarios of same work, we use Strategy pattern.
+Ex : 	family of algorithm for different scenarios doing same thing , sorting algorithm
+		Different robotic behaviours for same robot
+		Different types of compression technique
+		
+
+interface ArthematicStrategy {
+	int doOperation(int a, int b);
+}
+
+class AddArthematicStrategy implementats ArthematicStrategy {
+	int doOperation(int a, int b) {
+		return a+b;
+	}
+}
+
+class SubtractArthematicStrategy implementats ArthematicStrategy {
+	int doOperation(int a, int b) {
+		return a-b;
+	}
+}
+
+class Context {
+	private ArthematicStrategy strategy;
+	void setStrategy(ArthematicStrategy strategy) {
+		this.strategy = strategy;
+	}
+	
+	void operate() {
+		strategy.doOperation();
+	}
+}
+
+------------------------------------------------------------------
+
+(6) Visitor Design Pattern :
+
+http://www.newthinktank.com/2012/11/visitor-design-pattern-tutorial/
+
+When multiple classes have same kind of functionality having different logic.
+Then you can implement visitor pattern.
+
+classes Liquor, Tobacco and Necessity all have some taxes involved.
+While creating these classes we do not want to insert tax logic in the class.
+These tax calculation is done in some separate class.
+There might be a case where tax can be of various types.
+One kind of tax calculation is done in one class.
+
+interface Visitor {
+    public double visit(Liquor liquorItem);
+
+    public double visit(Tobacco tobaccoItem);
+
+    public double visit(Necessity necessityItem);
+}
+
+import java.text.DecimalFormat;
+
+// Concrete Visitor Class
+
+class TaxVisitor implements Visitor {
+	
+	DecimalFormat df = new DecimalFormat("#.##");
+
+	public double visit(Liquor liquorItem) {
+		System.out.println("Liquor Item: Price with Tax");
+		return Double.parseDouble(df.format((liquorItem.getPrice() * .18) + liquorItem.getPrice()));
+	}
+	
+	public double visit(Tobacco tobaccoItem) {
+		System.out.println("Tobacco Item: Price with Tax");
+		return Double.parseDouble(df.format((tobaccoItem.getPrice() * .32) + tobaccoItem.getPrice()));
+	}
+	
+	public double visit(Necessity necessityItem) {
+		System.out.println("Necessity Item: Price with Tax");
+		return Double.parseDouble(df.format(necessityItem.getPrice()));
+	}
+}
+
+interface Visitable {
+	public double accept(Visitor visitor);
+}
+
+class Liquor implements Visitable {
+	private double price;
+	Liquor(double item) {
+		price = item;
+	}
+	public double accept(Visitor visitor) {
+		return visitor.visit(this);
+	}
+	public double getPrice() {
+		return price;
+	}	
+}
+
+------------------------------------------------------------------
+
+Structural Patterns:
+1) Adaptor pattern :
+
+a bridge between two objects
+Eg: adapters for power supplies
+	adapters for camera memory cards
+	
+	InputStreamReader
+	OutputStreamWriter
+	
+	There are two interfaces : Abc and Xyz
+	object of Abc wants some operations that are in Xyz
+	
+------------------------------------------------------------------
+
+2) Decorator :
+
+classes implementing an interface and taking that interface as instance variable for composition
+can be used to 
+All subclasses of InputStream, OutputStream, Reader, Writer that take same argument as Constructor
+Collections
+HttpServletResponseWrapper, HttpServletRequestWrapper
+
