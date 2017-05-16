@@ -4,22 +4,24 @@ diff b/w merge and update
 diff b/w get and load
 diff b/w save and saveOrUpdate
 diff b/w save and persist
+N+1 problem
+diff b/w flush and commit
+session and transaction
+session and sessionFactory
+jdbc driver connection code
+jdbc transaction isolation levels
 first level cache, second level cache, query cache
 transient, managed and detached objects
 how to convert managed to detached
 how to convert detached to managed
-diff b/w list and set
+ - diff b/w list and set
 when oneToOne do not work with lazy
-order and sorted collection
-N+1 problem
+ - order and sorted collection
 diff b/w getCurrentSession() and openSesion()
 cascade with inverse option
-criteria api
-diff b/w flush and commit
-session and transaction
-session and sessionFactory
+ - criteria api
 best way to make an hibernate entity
-types of inheritance in hibernate
+ - types of inheritance in hibernate
 JoinTable and JoinColumn
 advantages of hibernate over jdbc
 NamedEntityGraph
@@ -149,13 +151,48 @@ persist()
 
 ?get()
 
+-----------------------------------------
+
 NOTE : One SessionFactory object is created for each Data source.
 
-Session and Transaction
+(Q) Session and Transaction
 http://stackoverflow.com/questions/5409085/what-is-the-difference-between-a-session-and-a-transaction-in-jpa-2-0
 
-JPA vs Hibernate
+Connection.java
+	void commit()
+	void rollback()
+	
+Session.java
+	Transaction beginTransaction();
+	
+Transaction.java
+	void commit()
+	void rollback()
+	
+=>Why hibernate added an extra layer of class(Session and Transaction), while in jdbc it has only one class (Connection) ?
+
+A session contains multiple transaction.
+that is multiple transactions for same connection object.
+If a Requires_New transaction is opened, then 
+previous connection is suspended and new connection is opened.
+
+
+(Q) JPA vs Hibernate
 http://stackoverflow.com/questions/9881611/whats-the-difference-between-jpa-and-hibernate
+
+
+(Q) jdbc transaction isolation levels ?
+0 - Flush
+1 - Commit
+2 - Repeatable_Read	:  changes done by another tnx in a row, does not effect tnx ran earlier than that.
+						Repeated 'select' fires have no impact by other 'update' on same row.
+3 - Phantom_Read	:  new row inserted by another tnx get read second time in a tnx.
+
+int TRANSACTION_NONE             = 0;			nothing
+int TRANSACTION_READ_UNCOMMITTED = 1;	2^0		only flush
+int TRANSACTION_READ_COMMITTED   = 2;	2^1		Commited + Non_Repeatable_read + Phantom
+int TRANSACTION_REPEATABLE_READ  = 4;	2^2		Commited + Phantom
+int TRANSACTION_SERIALIZABLE     = 8;	2^3		Commited
 
 ======================================================
 
@@ -176,7 +213,31 @@ transient	: never persisted and not attached to a session
 persisted	: attached to a unique session
 detached	: previously persisted but not attached to session
 
-(Q)how lazy loading works and why required ?
+(Q) how lazy loading works and why required ?
+(Q) What is hibernate proxy and how it works ?
+
+We apply lazy loading on child entity of any parent entity.
+When we load parent entity, a proxy object of child entity is returned
+proxy object only contains id of an object with all other fields as default/null.
+proxy is an instance of HibernateProxy.
+
+class User {
+	@OneToMany
+	List<Address> addrs
+}
+
+user.getAddrs();
+//this will return a proxy object without firing any sql query
+
+user.getAddrs().get(0).getCity();
+//this will fire sql query and fetch all fields of address entity
+
+=>How to load original hibernate object without proxy:
+
+entity = (T)((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+
+
+
 Related entity or collections in (OneToOne,OneToMany,ManyToMany) are not loaded when actual entity is loaded.
 These are loaded by calling getters of proxy classes.
 calling getter from proxy classes out of session will throw LazyInitializationException.
