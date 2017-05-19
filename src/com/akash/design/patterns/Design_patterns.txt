@@ -523,6 +523,15 @@ Eg: adapters for power supplies
 	There are two interfaces : Abc and Xyz
 	object of Abc wants some operations that are in Xyz
 	
+	-> Arrays.ArrayList Arrays.asList(T[])
+	-> ArrayList Collections.list(Enumeration)
+	-> Enumeration Collections.enumeration(Collection)
+	-> InputStreamReader : has constructor as 
+								public InputStreamReader(InputStream in)
+						it provides all methods of Reader
+	-> OutputStreamWriter : has constructor as 
+								OutputStreamWriter(OutputStream out)
+								 
 ------------------------------------------------------------------
 
 2) Decorator :
