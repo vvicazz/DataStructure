@@ -2,7 +2,7 @@
 1) Singleton
 2) prototype  -- copy constructor
 3) Factory
-4) Abstract Factory
+4)-- Abstract Factory
 5) Builder
 
 => Behavioural Patterns:
@@ -28,6 +28,7 @@
 
 
 -> protection proxy
+-> Fluent Builder
 
 --------------------------------------------------
 
@@ -292,6 +293,43 @@ public class ChainOfResponsibility {
 ------------------------------------------------------------------
 
 (2) Command Design pattern :
+
+public interface ElectronicDevice {
+	public void on();
+}
+
+public class Television implements ElectronicDevice {
+	public void on() {
+		System.out.println("TV is on");	
+	}	
+}
+
+public interface Command {	
+	public void execute();
+}
+
+public class TurnTVOn implements Command {
+
+	ElectronicDevice theDevice;
+	
+	public TurnTVOn(ElectronicDevice newDevice){
+		theDevice = newDevice;
+	}
+	
+	public void execute() {
+		theDevice.on();		
+	}
+}
+
+
+Command command = new TurnTVOn();
+command.execute();
+
+=>Every operation on an object has its own command class
+=>object , its operation and its arguments are wrapped in a an object
+
+Object is used to represent and encapsulate all information needed to call a method
+store list of code to be executed later
 
 ------------------------------------------------------------------
 
