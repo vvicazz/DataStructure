@@ -36,7 +36,28 @@ public class LongestCommonSubsequence {
 				}
 			}
 		}
+		printLcs(memoizedArray, s1, s2);
 		return memoizedArray[l1][l2];
+	}
+
+	private static void printLcs(int memoizedArray[][], char[] arr1, char[] arr2) {
+		int row = memoizedArray.length - 1;
+		int column = memoizedArray[0].length - 1;
+		System.out.print("common subsequence in reverse order: ");
+		while (row > 0 && column > 0) {
+			if (arr1[row - 1] == arr2[column - 1]) {
+				System.out.print(arr1[row - 1]);
+				row--;
+				column--;
+			} else {
+				if (memoizedArray[row - 1][column] > memoizedArray[row][column - 1]) {
+					row--;
+				} else {
+					column--;
+				}
+			}
+		}
+		System.out.println();
 	}
 
 	private static int max(int a, int b) {
