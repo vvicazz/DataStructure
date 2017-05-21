@@ -10,6 +10,8 @@ public class RotatedPalimdrome {
 	}
 
 	static boolean lps(char arr[], int length) {
+		// 2D array that shows that if memoizedArray[i][j] is true
+		// then arr of i -> j is palimdrome
 		boolean memoizedArray[][] = new boolean[length][length];
 		int maxPalimdromeLength = 1;
 		int startIndex = 0;
