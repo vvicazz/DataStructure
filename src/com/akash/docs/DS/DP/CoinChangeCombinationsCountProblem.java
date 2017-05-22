@@ -43,7 +43,12 @@ public class CoinChangeCombinationsCountProblem {
 			coinSumMatrix[0][i] = 0;
 		}
 
-		// if coin is greater than sum,ignore that coin
+		// if coin is greater than sum, then pick value of sum for one smaller
+		// coin value.
+		// else answer is sum of two values :
+		// 1. get value of (sum-coin) for all denominations i.e. coin is picked
+		// 2. pick value of sum for one smaller coin value,i.e coin is not
+		// picked
 		for (int coinRow = 1; coinRow <= denominations.length; coinRow++) {
 			int coinValue = denominations[coinRow - 1];
 			for (int sum = 1; sum <= amount; sum++) {
