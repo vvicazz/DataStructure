@@ -1,7 +1,8 @@
 package com.akash.graph.api.usage;
 
-import com.akash.graph.api.Graph;
-import com.akash.graph.api.GraphImpl.GraphImplBuilder;
+
+import com.akash.graph.api.one.Graph;
+import com.akash.graph.api.one.GraphImpl.GraphImplBuilder;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 
