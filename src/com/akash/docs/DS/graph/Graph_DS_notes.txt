@@ -457,6 +457,7 @@ DAG : Directed Acyclic Graph
 (Q) Given a directed graph G, check if G is Acyclic?
 	-> no back edge means no cycle
 (Q) Given an undirected graph G, check if G is Acyclic?
+	-> no back edge means no cycle
 	-> use find-union disjoint set
 
 =>In undirected Graph : 
@@ -571,8 +572,18 @@ All above applications have linear time complexity.
 	http://www.geeksforgeeks.org/tarjan-algorithm-find-strongly-connected-components/
 (5) Bipartite problem :
 	http://www.geeksforgeeks.org/maximum-bipartite-matching/
-(6) All pair shortest path problem (floyd-warshall-algorithm) :
+--(6) All pair shortest path problem (floyd-warshall-algorithm) :
 	http://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/
+	
+--(7) single source shortest distances in O(VE) 
+		Bellman–Ford Algorithm
+		http://www.geeksforgeeks.org/dynamic-programming-set-23-bellman-ford-algorithm/
+		
+--(8) graph with no negative weights,single source shortest distances in O(E + VLogV) time
+		Dijkstra’s algorithm
+		http://www.geeksforgeeks.org/greedy-algorithms-set-7-dijkstras-algorithm-for-adjacency-list-representation/
+
+--(9) Shortest Path in DAG
 
 ===============================================
 
