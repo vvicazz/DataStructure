@@ -15,6 +15,8 @@ transient, managed and detached objects
 how to convert managed to detached
 how to convert detached to managed
  - diff b/w list and set
+ 		http://stackoverflow.com/questions/6562673/onetomany-list-vs-set-difference
+		http://stackoverflow.com/questions/13812283/difference-between-set-and-bag-in-hibernate
 when oneToOne do not work with lazy
  - order and sorted collection
 diff b/w getCurrentSession() and openSesion()
