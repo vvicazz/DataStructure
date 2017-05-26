@@ -435,6 +435,10 @@ For Tree edge (u,v) :		arr[u] < arr[v]
 								OR
 							arr[u] < arr[v] < dep[v] < dep[u] (similar to Forward Edge)
 							
+if(arr[u]>arr[v] && dep[v]==null) {
+	"back edge exists"
+}
+
 (Q)If there is no back edge in DFS of a directed graph G,
    does that mean it is acyclic ?
    
@@ -880,4 +884,92 @@ Correctness of Dijkstra Algo:
 
 let u be a vertex in S'
 d[u] = length of shortest path from s to u that includes only vertices from S except u
+
+
+-----------------
+
+
+The breadth-first-search algorithm is a shortest-paths algorithm that works 
+on unweighted graphs, that is, graphs in which each edge has unit weight.
+
+=>Optimal substructure of a shortest path
+Shortest-paths algorithms typically rely on the property that a shortest path 
+between two vertices contains other shortest paths within it.
+
+Dijkstra’s algorithm is a greedy algorithm.
+Floyd-Warshall algorithm: (all pairs shortest paths) is a dynamic-programming algorithm.
+
+If the graph contains a negative-weight cycle reachable from s,then shortest-path weights are not well defined.
+
+(Q) Can a shortest path contain a cycle?
+A cycle can be of weight 0, +ve or -ve.
+a shortest path cannot contain a cycle.
+shortest path can have atmost V-1 edges.
+
+intialize_all_nodes(G, s) {
+	for all vertices v in Graph {
+		v.distance = INFINITE;
+		v.parent = null;
+	}
+	s.distance=0;
+}
+
+relax(u, v, w) {
+	if(v.distance > u.distance + w(u,v)) {
+		v.distance = u.distance + w(u,v);
+		v.parent = u;
+	}
+}
+
+=>bellman ford : O(VE), considering negative-weight cycle.
+{
+	intialize_all_nodes();
+	for(int i=0; i<v-1; i++) {
+		for all edges (u,v)
+			relax(u, v, w)
+	}
+	for all edges (u,v)
+		if(v.d > u.d + w(u,v))
+			return false;
+	return true;
+}
+
+->property : if shortest path from s to v has n edges, then edges need to relaxed atmost n times.
+
+
+=>topological sort SSSP : O(V + E),  considering a graph having negative edge but no negative-weight cycle.
+{
+	do dfs and perform topological sort
+	intialize_all_nodes();
+	for vertices u in sorted order
+		for all adjacent edges of u (u,v)
+			relax(u,v,w)
+}
+
+topological sort can be done in O(V + E), during DFS we can store vertices of their departure time.
+
+=>Dijkstra Algorithm : considering a graph having no negative edge. O(E * log(V))
+->greedy approach
+{
+	intialize_all_nodes();
+	create_min_heap(for all V by d)
+	S = empty set
+	while(heap is not empty) {
+		u = extract_min_heap();
+		for(all adjacent edges of u (u,v))
+			relax(u,v,w)
+			update_heap();
+		S = S Union u
+	}
+}
+
+It is quite similar to prims algorithm, where we also take 2 sets.
+S' in prims algo contains vertices having a value d , 
+as minimum edge of all the edges from S to that vertex.
+
+Dijkstra’s algorithm maintains a set S of vertices whose final shortest-path
+weights from the source s have already been determined. The algorithm repeatedly
+selects the vertex u from {V - S} with the minimum shortest-path estimate, adds u
+to S, and relaxes all edges leaving u. In the following implementation, we use a
+min-priority queue Q of vertices, keyed by their d values.
 
