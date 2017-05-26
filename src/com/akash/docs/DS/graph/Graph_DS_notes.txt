@@ -714,7 +714,7 @@ As m <= n*pow(2) , log(m) <= 2*log(n)
 
 =>Path Compression in Union Find:
 
-This technique is used to make futute finds easier.
+This technique is used to make future finds easier.
 Resetting parent for all nodes in the path traversal to the parent of tree so that future finds are easier.
 This can only be implemented in Union by Rank and not in union by height, as we are changing heights.
 
@@ -925,7 +925,7 @@ relax(u, v, w) {
 {
 	intialize_all_nodes();
 	for(int i=0; i<v-1; i++) {
-		for all edges (u,v)
+		for all edges (u,v)		// mark processed edges
 			relax(u, v, w)
 	}
 	for all edges (u,v)
@@ -942,7 +942,7 @@ relax(u, v, w) {
 	do dfs and perform topological sort
 	intialize_all_nodes();
 	for vertices u in sorted order
-		for all adjacent edges of u (u,v)
+		for all adjacent edges of u (u,v)		// mark processed edges
 			relax(u,v,w)
 }
 
@@ -956,12 +956,16 @@ topological sort can be done in O(V + E), during DFS we can store vertices of th
 	S = empty set
 	while(heap is not empty) {
 		u = extract_min_heap();
-		for(all adjacent edges of u (u,v))
+		for(all adjacent edges of u (u,v)) {		// mark processed edges
 			relax(u,v,w)
 			update_heap();
+		}
 		S = S Union u
 	}
 }
+
+//for marking processed edges
+private Set<Edge<N>, Boolean> visited;
 
 It is quite similar to prims algorithm, where we also take 2 sets.
 S' in prims algo contains vertices having a value d , 
