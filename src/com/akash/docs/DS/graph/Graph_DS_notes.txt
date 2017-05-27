@@ -576,18 +576,15 @@ All above applications have linear time complexity.
 	http://www.geeksforgeeks.org/tarjan-algorithm-find-strongly-connected-components/
 (5) Bipartite problem :
 	http://www.geeksforgeeks.org/maximum-bipartite-matching/
---(6) All pair shortest path problem (floyd-warshall-algorithm) :
-	http://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/
-	
---(7) single source shortest distances in O(VE) 
-		Bellman–Ford Algorithm
-		http://www.geeksforgeeks.org/dynamic-programming-set-23-bellman-ford-algorithm/
-		
---(8) graph with no negative weights,single source shortest distances in O(E + VLogV) time
-		Dijkstra’s algorithm
-		http://www.geeksforgeeks.org/greedy-algorithms-set-7-dijkstras-algorithm-for-adjacency-list-representation/
-
---(9) Shortest Path in DAG
+(6) All pair shortest path problem (floyd-warshall-algorithm)
+(7) single source shortest distances in O(VE) ,Bellman–Ford Algorithm
+(8) graph with no negative weights,single source shortest distances in O(E + VLogV) time, 
+	Dijkstra’s algorithm
+(9) Shortest Path in DAG
+(10) All pair shortest path
+(11) Transitive closure
+(12) Kruskal's MST
+(13) Prims's MST
 
 ===============================================
 
@@ -977,3 +974,61 @@ selects the vertex u from {V - S} with the minimum shortest-path estimate, adds 
 to S, and relaxes all edges leaving u. In the following implementation, we use a
 min-priority queue Q of vertices, keyed by their d values.
 
+----------------------------------------------
+
+All pair shortest path probem :
+
+->This algo works only for matrix representation of graph
+
+path(i,j) = min{ path(i,k) + w(k,j) }
+
+We need to maintain two matrices for this algo.
+->1st for calculating distance from every vertex to every other vertex
+	D[i][j]
+->2nd for calculating actual path from every vertex to every other vertex.
+	P[i][j]
+
+Initially, 
+D[i][j] = 0 if i=j
+D[i][j] = INF if there is no edge from i to j
+
+P[i][j] = i if there is an edge from i to j
+P[i][j] = i if there is no edge from i to j
+
+floydWarshal(G) {
+	for(int k=0; k<V; k++) {
+		for(int i=0; i<V; i++) {
+			for(int j=0; j<V; j++) {
+				if(D[i][k]+D[k][j] < D[i][j]) {
+					D[i][j] = D[i][k] + D[k][j];
+					P[i][j] = k;
+				}
+			}
+		}
+	}
+}
+
+
+----------------------------------------------
+
+Transitive Closure of a Graph:
+
+It is a 2D matrix which has following property:
+-> T[i][j] = 0 , if there is no path from i to j vertex
+-> T[i][j] = 1 , if there is a path from i to j vertex
+
+Initially,
+T[i][j] = 1 if there is an edge from i to j
+T[i][j] = 0 if there is no edge from i to j
+
+transitiveClosure(G) {
+	for(int k=0; k<V; k++) {
+		for(int i=0; i<V; i++) {
+			for(int j=0; j<V; j++) {
+				T[i][j] = T[i][j] | ( T[i][k] & T[k][j] );
+			}
+		}
+	}
+}
+
+----------------------------------------------
