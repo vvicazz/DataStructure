@@ -30,6 +30,9 @@ public class BstClient {
 		System.out.println(tree.getNodeLevel(22));
 		tree.spiralLevelOrderTraversal();
 		tree.bstLeftView();
+		System.out.println(tree.getInOrderTraversal());
+		tree.inorderUsingStack();
+		tree.inOrderWithoutRecursionWithoutStack();
 
 		// ser(tree);
 		// deser();

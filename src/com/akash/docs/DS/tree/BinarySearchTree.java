@@ -365,4 +365,48 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 		}
 		System.out.println();
 	}
+
+	public void inorderUsingStack() {
+		Node<V> temp = rootNode;
+		Stack<Node<V>> stack = new Stack<>();
+		while (temp != null) {
+			stack.push(temp);
+			temp = temp.getLeft();
+		}
+		while (!stack.isEmpty()) {
+			Node<V> node = stack.pop();
+			System.out.print(node.getValue() + " ");
+			if (node.getRight() != null) {
+				node = node.getRight();
+				while (node != null) {
+					stack.push(node);
+					node = node.getLeft();
+				}
+			}
+		}
+		System.out.println();
+	}
+
+	public void inOrderWithoutRecursionWithoutStack() {
+		Node<V> currentNode = rootNode;
+		while (currentNode != null) {
+			if (currentNode.getLeft() == null) {
+				System.out.print(currentNode.getValue() + " ");
+				currentNode = currentNode.getRight();
+			} else {
+				Node<V> pre = currentNode.getLeft();
+				while (pre.getRight() != null && pre.getRight() != currentNode) {
+					pre = pre.getRight();
+				}
+				if (pre.getRight() == null) {
+					pre.setRight(currentNode);
+					currentNode = currentNode.getLeft();
+				} else {
+					pre.setRight(null);
+					System.out.print(currentNode.getValue() + " ");
+					currentNode = currentNode.getRight();
+				}
+			}
+		}
+	}
 }
