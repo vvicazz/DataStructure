@@ -217,7 +217,7 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			internalWriteEntriesInOrder(node.getRight(), s);
 		}
 	}
-	
+
 	// utility methods
 
 	public void printNodesByLevel() {
@@ -232,11 +232,11 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 				nodeCount--;
 				Node<V> temp = queue.poll();
 				System.out.print(temp.getValue() + " ");
-				if (temp.left != null) {
-					queue.offer(temp.left);
+				if (temp.getLeft() != null) {
+					queue.offer(temp.getLeft());
 				}
-				if (temp.right != null) {
-					queue.offer(temp.right);
+				if (temp.getRight() != null) {
+					queue.offer(temp.getRight());
 				}
 			}
 			System.out.println();
@@ -258,11 +258,11 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 				if (temp.getValue().equals(data)) {
 					return level;
 				}
-				if (temp.left != null) {
-					queue.offer(temp.left);
+				if (temp.getLeft() != null) {
+					queue.offer(temp.getLeft());
 				}
-				if (temp.right != null) {
-					queue.offer(temp.right);
+				if (temp.getRight() != null) {
+					queue.offer(temp.getRight());
 				}
 			}
 		}
@@ -279,11 +279,11 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 
 	private void traverseBst(Node<V> node, int counter) {
 		if (counter > 1) {
-			if (node.left != null) {
-				traverseBst(node.left, counter - 1);
+			if (node.getLeft() != null) {
+				traverseBst(node.getLeft(), counter - 1);
 			}
-			if (node.right != null) {
-				traverseBst(node.right, counter - 1);
+			if (node.getRight() != null) {
+				traverseBst(node.getRight(), counter - 1);
 			}
 		} else {
 			System.out.print(node.getValue() + " ");
@@ -300,11 +300,11 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			while (nodeCount > 0) {
 				nodeCount--;
 				Node<V> temp = queue.poll();
-				if (temp.left != null) {
-					queue.offer(temp.left);
+				if (temp.getLeft() != null) {
+					queue.offer(temp.getLeft());
 				}
-				if (temp.right != null) {
-					queue.offer(temp.right);
+				if (temp.getRight() != null) {
+					queue.offer(temp.getRight());
 				}
 			}
 		}
@@ -319,21 +319,47 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			while (!stack1.empty()) {
 				Node<V> temp = stack1.pop();
 				System.out.print(temp.getValue() + " ");
-				if (temp.left != null) {
-					stack2.push(temp.left);
+				if (temp.getLeft() != null) {
+					stack2.push(temp.getLeft());
 				}
-				if (temp.right != null) {
-					stack2.push(temp.right);
+				if (temp.getRight() != null) {
+					stack2.push(temp.getRight());
 				}
 			}
 			while (!stack2.empty()) {
 				Node<V> temp = stack2.pop();
 				System.out.print(temp.getValue() + " ");
-				if (temp.right != null) {
-					stack1.push(temp.right);
+				if (temp.getRight() != null) {
+					stack1.push(temp.getRight());
 				}
-				if (temp.left != null) {
-					stack1.push(temp.left);
+				if (temp.getLeft() != null) {
+					stack1.push(temp.getLeft());
+				}
+			}
+		}
+		System.out.println();
+	}
+
+	public void bstLeftView() {
+		Queue<Node<V>> queue = new LinkedList<>();
+		queue.offer(rootNode);
+		int nodesAtLevel;
+		boolean printFirstNode;
+		while (!queue.isEmpty()) {
+			nodesAtLevel = queue.size();
+			printFirstNode = true;
+			while (nodesAtLevel > 0) {
+				nodesAtLevel--;
+				Node<V> temp = queue.poll();
+				if (printFirstNode) {
+					System.out.print(temp.getValue() + " ");
+					printFirstNode = false;
+				}
+				if (temp.getLeft() != null) {
+					queue.offer(temp.getLeft());
+				}
+				if (temp.getRight() != null) {
+					queue.offer(temp.getRight());
 				}
 			}
 		}

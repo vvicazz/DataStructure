@@ -16,18 +16,20 @@ public class BstClient {
 		tree.add(25);
 		tree.add(12);
 		tree.add(22);
-		tree.add(9);
+		tree.add(7);
 		tree.add(29);
 		// tree.delete(25);
 		tree.add(26);
 		// tree.delete(9);
-		tree.add(8);
+		tree.add(11);
+		tree.add(10);
 		// System.out.println(tree.getInOrderTraversal());
 		tree.printNodesByLevel();
 		System.out.println("Height : " + tree.getHeight());
 		tree.levelOrderTraversal();
 		System.out.println(tree.getNodeLevel(22));
 		tree.spiralLevelOrderTraversal();
+		tree.bstLeftView();
 
 		// ser(tree);
 		// deser();
