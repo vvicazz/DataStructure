@@ -11,7 +11,6 @@ public class BstClient {
 	public static void main(String args[]) {
 
 		BinarySearchTree<Integer> tree = new BinarySearchTree<>();
-		BinarySearchTree<Integer> aa[] = new BinarySearchTree[2];
 		tree.add(20);
 		tree.add(15);
 		tree.add(25);
@@ -19,14 +18,19 @@ public class BstClient {
 		tree.add(22);
 		tree.add(9);
 		tree.add(29);
-		tree.delete(25);
+		// tree.delete(25);
 		tree.add(26);
-		tree.delete(9);
+		// tree.delete(9);
 		tree.add(8);
-		System.out.println(tree.getInOrderTraversal());
+		// System.out.println(tree.getInOrderTraversal());
+		tree.printNodesByLevel();
+		System.out.println("Height : " + tree.getHeight());
+		tree.levelOrderTraversal();
+		System.out.println(tree.getNodeLevel(22));
+		tree.spiralLevelOrderTraversal();
 
-		ser(tree);
-		deser();
+		// ser(tree);
+		// deser();
 	}
 
 	static void ser(BinarySearchTree<Integer> tree) {

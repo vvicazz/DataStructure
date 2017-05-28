@@ -2,7 +2,10 @@ package com.akash.docs.DS.tree;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
+import java.util.Stack;
 
 public final class BinarySearchTree<V extends Comparable<V>> implements Serializable {
 
@@ -160,7 +163,7 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 		}
 	}
 
-	private static class Node<V extends Comparable<V>> {
+	public static class Node<V extends Comparable<V>> {
 		private Node<V> left;
 		private Node<V> right;
 		private V value;
@@ -213,5 +216,127 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			s.writeObject(node.getValue());
 			internalWriteEntriesInOrder(node.getRight(), s);
 		}
+	}
+	
+	// utility methods
+
+	public void printNodesByLevel() {
+		Queue<Node<V>> queue = new LinkedList<Node<V>>();
+		queue.offer(rootNode);
+		int level = 0;
+		while (!queue.isEmpty()) {
+			int nodeCount = queue.size();
+			level++;
+			System.out.println("<-----level : " + level + " ------>");
+			while (nodeCount > 0) {
+				nodeCount--;
+				Node<V> temp = queue.poll();
+				System.out.print(temp.getValue() + " ");
+				if (temp.left != null) {
+					queue.offer(temp.left);
+				}
+				if (temp.right != null) {
+					queue.offer(temp.right);
+				}
+			}
+			System.out.println();
+		}
+	}
+
+	public int getNodeLevel(V data) {
+		if (data == null)
+			return -1;
+		Queue<Node<V>> queue = new LinkedList<Node<V>>();
+		queue.offer(rootNode);
+		int level = 0;
+		while (!queue.isEmpty()) {
+			int nodeCount = queue.size();
+			level++;
+			while (nodeCount > 0) {
+				nodeCount--;
+				Node<V> temp = queue.poll();
+				if (temp.getValue().equals(data)) {
+					return level;
+				}
+				if (temp.left != null) {
+					queue.offer(temp.left);
+				}
+				if (temp.right != null) {
+					queue.offer(temp.right);
+				}
+			}
+		}
+		return -1;
+	}
+
+	public void levelOrderTraversal() {
+		int h = getHeight();
+		for (int i = 1; i <= h; i++) {
+			traverseBst(rootNode, i);
+		}
+		System.out.println();
+	}
+
+	private void traverseBst(Node<V> node, int counter) {
+		if (counter > 1) {
+			if (node.left != null) {
+				traverseBst(node.left, counter - 1);
+			}
+			if (node.right != null) {
+				traverseBst(node.right, counter - 1);
+			}
+		} else {
+			System.out.print(node.getValue() + " ");
+		}
+	}
+
+	public int getHeight() {
+		Queue<Node<V>> queue = new LinkedList<Node<V>>();
+		queue.offer(rootNode);
+		int level = 0;
+		while (!queue.isEmpty()) {
+			int nodeCount = queue.size();
+			level++;
+			while (nodeCount > 0) {
+				nodeCount--;
+				Node<V> temp = queue.poll();
+				if (temp.left != null) {
+					queue.offer(temp.left);
+				}
+				if (temp.right != null) {
+					queue.offer(temp.right);
+				}
+			}
+		}
+		return level;
+	}
+
+	public void spiralLevelOrderTraversal() {
+		Stack<Node<V>> stack1 = new Stack<>();
+		Stack<Node<V>> stack2 = new Stack<>();
+		stack1.push(rootNode);
+		while (!stack1.empty() || !stack2.empty()) {
+			while (!stack1.empty()) {
+				Node<V> temp = stack1.pop();
+				System.out.print(temp.getValue() + " ");
+				if (temp.left != null) {
+					stack2.push(temp.left);
+				}
+				if (temp.right != null) {
+					stack2.push(temp.right);
+				}
+			}
+			while (!stack2.empty()) {
+				Node<V> temp = stack2.pop();
+				System.out.print(temp.getValue() + " ");
+				if (temp.right != null) {
+					stack1.push(temp.right);
+				}
+				if (temp.left != null) {
+					stack1.push(temp.left);
+				}
+			}
+		}
+		System.out.println();
 	}
 }
