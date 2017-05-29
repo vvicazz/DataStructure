@@ -1,0 +1,121 @@
+Preorder, inorder, postorder using recursion
+level order traversal -> queue, recursion, 2 stack
+get level of a node -> queue, recursion
+get all nodes at a level -> queue, recursion
+height of a binary tree
+check if a binary tree is BST
+print left view of binary tree
+print right view of binary tree
+print top view of binary tree
+print bottom view of binary tree
+print binary tree in vertical order
+print boundary nodes in a binary tree
+Kth largest in BST
+Inorder traversal of binary tree without recursion with stack
+Inorder traversal of binary tree without recursion without stack
+Delete binary tree
+check if two binary trees are identical
+check if two binary trees are isomorphic
+check if two binary trees are mirror
+convert a binary tree into its mirror
+check if two nodes are swapped in BST
+Diameter of a binary tree
+floor and ceiling of a BST
+Diagonal sum of binary tree
+Convert sorted linked list to BST
+Convert sorted array to BST
+path with max sum in binary tree
+Check if all leaves are at same level
+print perfect binary tree in below form:
+	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
+	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
+	-> 2 queue and 1 stack
+Remove all nodes which don’t lie in any path with sum>= k
+Convert left-right representation of a binary tree to down-right
+Minimum no. of iterations to pass information to all nodes in the tree
+
+
+--------------------------------------------------
+
+
+public void printVerticalNodes() {
+	Map<Integer, List<Node<V>>> map = new HashMap<>();
+	getVericalNodes(rootNode, map, 0);
+	Iterator it = map.entrySet().iterator();
+	while(it.hasNext()) {
+		Map.Entry<Integer, List<Node<V>>> entry = it.next();
+		System.out.print(entry.getKey()+" ");
+		for(Node<V> node : entry.getValue()) {
+			System.out.print(node.getValue()+" ");
+		}
+		System.out.println();
+	}
+}
+
+private void getVericalNodes(Node<V> rootNode, Map<Integer, List<Node<V>>> map, int horizontalDistance) {
+	if(rootNode==null) {
+		return;
+	}
+	map.put(horizontalDistance, rootNode);
+	getVericalNodes(rootNode.getLeft(), map, horizontalDistance-1);
+	getVericalNodes(rootNode.getRight(), map, horizontalDistance+1);
+}
+
+private static class QNode<V> {
+	Node<V> node;
+	int hd;
+}
+
+public void printTopView(Node<V> rootNode) {
+	Set<Integer> set = new HashSet<>();
+	Queue<QNode<V>> queue = new LinkedList<>();
+	queue.offer(rootNode);
+	int hd;
+	Node<V> temp;
+	while(!queue.isEmpty()) {
+		QNode<V> qNode = queue.poll();
+		hd = qNode.hd;
+		temp = qNode.node;
+		if(!set.contains(hd)) {
+			print(qNode.node.getValue()+" ");
+			set.add(hd);
+		}
+		if(temp.left != null) {
+			qNode.offer(new QNode(temp.left, hd-1));
+		}
+		if(temp.right != null) {
+			qNode.offer(new QNode(temp.right, hd+1));
+		}
+	}
+}
+
+
+public void printBottomView(Node<V> rootNode) {
+	Set<Integer> set = new HashSet<>();
+	Queue<QNode<V>> queue = new LinkedList<>();
+	Stack<QNode<V>> stack = new Stack<>();
+	QNode newQNode = new QNode(rootNode, 0);
+	queue.offer(newQNode);
+	int hd;
+	Node<V> temp;
+	while(!queue.isEmpty()) {
+		QNode<V> qNode = queue.poll();
+		hd = qNode.hd;
+		temp = qNode.node;
+		if(temp.left != null) {
+			newQNode = new QNode(temp.left, hd-1);
+			queue.offer(newQNode);
+		}
+		if(temp.right != null) {
+			newQNode = new QNode(temp.left, hd-1);
+			queue.offer(newQNode);
+		}
+	}
+	while(!stack.isEmpty()) {
+		QNode<V> qNode = stack.pop();
+		if(!set.contains(hd)) {
+			print(qNode.node.getValue()+" ");
+			set.add(hd);
+		}
+	}
+}
