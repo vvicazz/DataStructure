@@ -224,10 +224,21 @@ proxy object only contains id of an object with all other fields as default/null
 proxy is an instance of HibernateProxy.
 
 class User {
-	@OneToMany
-	List<Address> addrs
+	@OneToMany(fetch = FetchType.LAZY)
+	List<Address> addrs;
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	ContactInfo contactInfo;
 }
 
+->
+user.getContactInfo();
+//this will return a proxy object without firing any sql query
+
+user.getContactInfo().getPhone();
+//this will fire sql query and fetch all fields of ContactInfo entity
+
+->
 user.getAddrs();
 //this will return a proxy object without firing any sql query
 
