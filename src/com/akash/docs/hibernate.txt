@@ -15,8 +15,6 @@ transient, managed and detached objects
 how to convert managed to detached
 how to convert detached to managed
  - diff b/w list and set
- 		http://stackoverflow.com/questions/6562673/onetomany-list-vs-set-difference
-		http://stackoverflow.com/questions/13812283/difference-between-set-and-bag-in-hibernate
 when oneToOne do not work with lazy
  - order and sorted collection
 diff b/w getCurrentSession() and openSesion()
@@ -283,6 +281,25 @@ http://www.javalobby.org/java/forums/t48846.html
 
 (Q) @JoinTable - @JoinColumn
 
+
+(Q) Diff bw List and Set in hibernate:
+
+-> @OrderBy , @Sort , @OrderColumn
+	//both Set and List can be used with annotation above
+
+-> List without any order annotation is a bag
+	bag is an unordered list which supports duplicate
+	Set in java cannot support duplicate, but it depends on equals/hashcode impl
+	
+-> You must have an immutable key of Set implementation
+	generally ids are taken as key but they are not immutable
+	
+-> We cannot fetch full entity having multiple List in hibernate
+
+http://stackoverflow.com/questions/6562673/onetomany-list-vs-set-difference
+http://stackoverflow.com/questions/13812283/difference-between-set-and-bag-in-hibernate
+https://stackoverflow.com/questions/4243865/does-hibernate-preserve-the-order-of-a-linkedhashset-and-if-so-how
+https://stackoverflow.com/questions/408051/ordering-return-of-child-objects-in-jpa-query
 
 ==============================================
 
