@@ -138,3 +138,11 @@ depending upon following parameters :
 -size of array in hashtable
 -load factor
 
+
+properties of HashMap
+-> table size is always power of 2
+-> Entry class is static
+-> Iterator class is non-static
+-> keyIterator, ValueIterator, EntryIterator
+-> modCount is used to track any change after creation of iterator
+-> After a specific size of Linked list as a bucket, linked list is converted to RB tree
