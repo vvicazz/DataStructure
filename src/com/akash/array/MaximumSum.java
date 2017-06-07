@@ -7,7 +7,8 @@ public class MaximumSum {
 		int arr[] = { -2, -3, 4, -1, -2, 1, 4, -3 };
 		System.out.println(findMaxSum(arr));
 		System.out.println(maxSubArraySum(arr));
-		int productArr[] = { 1, -2, -3, 0, 7, -8, -2 };
+		int productArr[] = { 1, 3, -5, 4, 2, 1 };
+		System.out.println("--------");
 		System.out.println(maxSubArrayProduct(productArr));
 	}
 
@@ -48,24 +49,44 @@ public class MaximumSum {
 		return a > b ? a : b;
 	}
 
+	private static int max(int a, int b, int c) {
+		return a > b ? (a > c ? a : c) : (b > c ? b : c);
+	}
+
 	private static int maxSubArrayProduct(int arr[]) {
-		int maxEndingHere = arr[0];
-		int maxSoFar = arr[0];
-		int start = 0, end = 0, tempStart = 0;
+		int maxEndingHerePos = arr[0];
+		int maxEndingHereNeg = Integer.MIN_VALUE;
+		int maxTillNow = arr[0];
+		int temp1, temp2;
 		for (int i = 1; i < arr.length; i++) {
-			maxEndingHere = maxEndingHere * arr[i];
-			if (maxEndingHere == 0) {
-				maxEndingHere = 1;
-				tempStart = i + 1;
+
+			if (arr[i] == 0) {
+				maxEndingHerePos = 0;
+				maxEndingHereNeg = 0;
+				continue;
 			}
-			if (maxSoFar < maxEndingHere && maxEndingHere != 0) {
-				maxSoFar = maxEndingHere;
-				end = i;
-				start = tempStart;
+			temp1 = maxEndingHerePos * arr[i];
+			if (maxEndingHereNeg != Integer.MIN_VALUE) {
+				temp2 = maxEndingHereNeg * arr[i];
+				maxEndingHerePos = max(temp1, temp2, arr[i]);
+				maxEndingHereNeg = max(-temp1, -temp2, -arr[i]);
+			} else if (maxEndingHerePos * arr[i] < 0) {
+				maxEndingHereNeg = maxEndingHerePos * arr[i];
+				maxEndingHerePos = arr[i];
+			} else if (arr[i] <= maxEndingHerePos * arr[i]) {
+				maxEndingHerePos = maxEndingHerePos * arr[i];
+			}
+			if (maxTillNow < maxEndingHerePos) {
+				maxTillNow = maxEndingHerePos;
 			}
 		}
-		System.out.println("start :" + start);
-		System.out.println("end :" + end);
-		return maxSoFar;
+		return maxTillNow;
 	}
+	
+	/**
+	 * arr  : 1		3		-5		4		2		1	<br>
+	 * MEHN : -INF	-INF	-15		-60		-120	-8	<br>
+	 * MEHP : 1		3		-5		4		8		120	<br>
+	 * MTN	: 1		3		3		4		8		120	<br>
+	 */
 }
