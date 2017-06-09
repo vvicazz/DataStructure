@@ -25,6 +25,20 @@ tld file in META-INF ?
 
 
 ----------------------------
+
+As tomcat is a container for servlets,
+Spring BeanFactory/Application is a container for beans.
+It tracks life cycle of a bean.
+
+BeanFactory, ApplicationContext
+property tag and constructor-arg tag in bean
+
+BeanFactory acts as factory design pattern.
+Application fetches bean objects from it.
+BeanFactory/ApplicationContext creates objects of beans via reading from xml based configurations
+or annotation based configurations.
+
+Life cycle of a bean:
 (1)init()
 (2)constructor
 (3)setter
@@ -46,18 +60,26 @@ BeanPostProcessor  - custom logic is executed before and after initializing the 
 BeanPostProcessors are scoped per-container
 AOP auto-proxying is implemented as a BeanPostProcessor
 RequiredAnnotationBeanPostProcessor
+AutowiredAnnotationBeanPostProcessor
 
-All BeanPostProcessors and beans that they reference directly are instantiated on startup, as part of the special startup phase of the
- ApplicationContext. Next, all BeanPostProcessors are registered in a sorted fashion and applied to all further beans in the container.
+All BeanPostProcessors and beans that they reference directly are instantiated on startup, 
+as part of the special startup phase of the ApplicationContext. 
+Next, all BeanPostProcessors are registered in a sorted fashion and 
+applied to all further beans in the container.
 
 
 BeanFactoryPostProcessor - works on bean configuration metadata like xml
-BeanFactoryPostProcessors are scoped per-container
-PropertyPlaceholderConfigurer  - properties file
+They are scoped per-container.
+PropertyPlaceholderConfigurer  - reads data from properties file and places actual content in xml files
 
+(Q) Diff b/w InitializingBean and BeanPostProcessor?
+->BeanPostProcessor are scoped per container
+->BeanPostProcessor is called once for every bean in ApplicationContext.
+->InitializingBean is declared only for one bean
 
 <context:annotation-config/>
 http://www.springframework.org/schema/context/spring-context.xsd
+This will automatically register all of Spring's standard post-processors for annotation-based configuration
 only looks for annotations on beans in the same application context in which it is defined.
 @Required , @Autowired
 
@@ -86,6 +108,11 @@ If no name is specified explicitly, the default name is derived from the field n
 @Component is a generic stereotype for any Spring-managed component. 
 @Repository, @Service, and @Controller are specializations of @Component for more specific use cases
 
+(Q) Can @Repository, @Service, and @Controller be interchangeably used?
+@Controller supports mvc related annotations
+@Repository supports persistence exception translation
+	http://www.javapractices.com/topic/TopicAction.do?Id=120
+
 @RestController == @Controller and @ResponseBody
 
 NOTE: The use of <context:component-scan> implicitly enables the functionality of <context:annotation-config>
@@ -98,7 +125,8 @@ NOTE: The use of <context:component-scan> implicitly enables the functionality o
 
 
 NOTE : In Spring, instantiated beans have a singleton scope by default. This is where the magic comes in: 
-	All @Configuration classes are subclassed at startup-time with CGLIB. In the subclass, the child method checks the container first
+	All @Configuration classes are subclassed at startup-time with CGLIB. 
+	In the subclass, the child method checks the container first
 	for any cached (scoped) beans before it calls the parent method and creates a new instance.
 	
 	
@@ -110,6 +138,56 @@ Environment - profile and properties
 Different profiles are used for different environment
 
 -------------------------
+
+Scope of bean:
+Singleton
+Prototype
+Request
+Session
+Application
+
+https://stackoverflow.com/questions/25000406/how-many-instances-created-for-singleton-bean-referring-to-a-session-bean-protot
+(Q)How to inject session bean in a singleton bean?
+
+	<bean name="singletonBean" class="somepkg.SingletonBean">
+		<property name="someProperty" ref="sessionBean"/>
+	</bean>
+	
+	<bean name="sessionBean" class="somepkg.SessionBean" scope="session">
+		<aop:scoped-proxy/>
+	</bean>
+	
+	@Component
+	@Scope(value = "session", proxyMode = ScopedProxyMode.INTERFACES)
+	
+	@Bean
+	@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	
+(Q)How to inject prototype bean in a singleton bean?
+
+	<bean name="singletonBean" class="somepkg.SingletonBean">
+		<lookup-method name="someProperty" bean="prototypeBean"/>
+	</bean>
+	
+	<bean name="prototypeBean" class="PrototypeBean" scope="prototype">
+		
+	</bean>
+
+	Here CGLIB does bytecode generation and provides new prototype object everytime.
+	https://stackoverflow.com/questions/26028341/how-to-use-spring-lookup-annotation
+
+	@Component
+	public class MyClass1 {
+	  doSomething() {
+	    myClass2();
+	  }
+	
+	  //I want this method to return MyClass2 prototype
+	  @Lookup
+	  public MyClass2 myClass2(){
+	    return null; // This implementation will be overridden by dynamically generated subclass
+	  }
+	}
 
 ========Data Binding and validations========
 
@@ -289,7 +367,7 @@ http://tomcat.apache.org/tomcat-6.0-doc/jndi-resources-howto.html#JDBC_Data_Sour
 https://docs.jboss.org/hibernate/orm/4.3/manual/en-US/html_single/
 
 
-Spring Framework’s transaction infrastructure code only marks a transaction for rollback in the case of runtime, unchecked exceptions;
+Spring Framework transaction infrastructure code only marks a transaction for rollback in the case of runtime, unchecked exceptions;
 Checked exceptions that are thrown from a transactional method do not result in rollback in the default configuration.
 
 <tx:advice id="txAdvice" transaction-manager="txManager">
