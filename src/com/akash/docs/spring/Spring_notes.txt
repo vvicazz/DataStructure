@@ -35,7 +35,9 @@ web.xml has two configuration files ( two WebApplicationContext ):
 (2)web application conf xml 	= DispatcherServlet is created as Front-controller
 								<init-param> is used to specify the file
 								every request the url is handled here.
-								
+
+Annotation based example for spring web project:
+https://www.mkyong.com/spring-mvc/gradle-spring-4-mvc-hello-world-example-annotation/								
 
 Root application context :
 ->DB details
@@ -95,3 +97,4 @@ AnnotationConfigWebApplicationContext		---  webApplicationContext
 --> ApplicationListener<ContextRefreshed>
 
 
+https://www.mkyong.com/spring-mvc/gradle-spring-4-mvc-hello-world-example-annotation/

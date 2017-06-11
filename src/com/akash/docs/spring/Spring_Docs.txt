@@ -209,6 +209,22 @@ Both bean A and B have to register themselves in spring container.
 
 There are many lifecycle interfaces and Aware interfaces in spring that helps it to perform DI.
 
+https://stackoverflow.com/questions/3058/what-is-inversion-of-control
+->don't call us, we'll call you
+
+imagine a class which exposes a service which needs many more dependencies to be satisfied,
+ which, in turn, have dependencies on other services
+
+you won't even need to call its constructor. Someone else will do it on your behalf.
+
+The main point of a framework which offers IoC and DI is a software component called container. 
+As its name implies, the container will achieve knowledge about components needed by your application
+ to run and will try to be smart enough to understand which component you want.
+
+The other fundamental feature of the container is that it will be able to resolve-and inject-dependencies
+ between your objects; hence the name Dependency Injection.
+
+
 =====================================================
 Spring AOP is proxy-based.
 
