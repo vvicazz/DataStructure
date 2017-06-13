@@ -1,0 +1,44 @@
+Multi-threading interview question
+
+1) what are the ways to create a thread and which is better: Thread,Runnable
+2) why wait, notify and notifyAll are in object class? why they called inside syncronized ?
+3) diff bw sleep and wait
+4) ThreadLocal : set(), get(), initialValue()
+5) ThreadGroup
+6) what is ThreadPool ? How to create our own ThreadPool
+7) diff bw syncronized method and block
+8) daemon thread
+9)-- Java Timer classes
+10) diff bw Lock api and syncronized keyword -> try methods, interruptible, fair-unfair
+11) Executor framework
+12) Why atomic class are better than Lock api - 
+	CAS -> compare and swap , it opportunisticly updates the variable
+	AtomicLong, AtomicInteger, AtomicBoolean, AtomicReference
+	
+13) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
+14)-- ways to avoid deadlock
+15)-- CountDownLatch, CyclicBarrier, Semaphore
+16) volatile keyword
+17) Why suspend() and resume() methods are deprecated
+18) how to stop a thread 
+19) create your own ThreadPoolExecutor ? advantages of executor framework
+20)-- ReadWriteLock
+21) diff bw volatile and atomic 
+	-> volatile provides visibility guaranty, but not atomicity
+	
+22)-- fork-join framework in java
+23)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet
+
+
+
+lambda
+collection framework - register
+design patterns
+references in java
+hibernate questions
+spring questions
+DP
+array
+BST
+graph
+
