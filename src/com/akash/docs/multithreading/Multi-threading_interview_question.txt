@@ -13,6 +13,8 @@ Multi-threading interview question
 11) Executor framework
 12) Why atomic class are better than Lock api - 
 	CAS -> compare and swap , it opportunisticly updates the variable
+	These operations are implemented atomically at processor level
+	client api has to deal with contention
 	AtomicLong, AtomicInteger, AtomicBoolean, AtomicReference
 	
 13) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
@@ -27,7 +29,7 @@ Multi-threading interview question
 	-> volatile provides visibility guaranty, but not atomicity
 	
 22)-- fork-join framework in java
-23)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet
+23)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
 
 
  
