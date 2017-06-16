@@ -9,7 +9,9 @@ Multi-threading interview question
 7) diff bw syncronized method and block
 8) daemon thread
 9)-- Java Timer classes
-10) diff bw Lock api and syncronized keyword -> try methods, interruptible, fair-unfair
+10) diff bw Lock api and syncronized keyword -> 
+		try methods, interruptible, fair-unfair, 
+		separate Condition object for different diff condition queues.
 11) Executor framework
 12) Why atomic class are better than Lock api - 
 	CAS -> compare and swap , it opportunisticly updates the variable

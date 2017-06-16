@@ -48,7 +48,8 @@ Every node maintains :
 	waitStatus : status of current thread
 	prev and next : previous and next node in linked list
 	thread : running thread which is parked
-	nextWaiter : is used by ConditionObject to store queue of threads for condition predicate
+	nextWaiter : is used by ConditionObject to store queue of threads for condition predicate.
+				 It can be understood as threads of the condition queue. 
 
 ----------------
 
@@ -72,8 +73,8 @@ void foo() {
 	}
 }
 
-Now lets try go underneath and understand, how it really works:
-ReentrantLock has to different implementations of AQS : Fair Synchronizer and NonFair Synchronizer.
+Now lets try to understand, how it really works:
+ReentrantLock has two different implementations of AQS : Fair Synchronizer and NonFair Synchronizer.
 In NonFair sync , if a new thread asks for a resource and resource is available,
  then resource is provided to that thread, irrespective of the fact 
  that any other thread has been waiting for this resource for long time.
@@ -96,7 +97,8 @@ public final void acquire(int arg) {
 }
 
 If tryAcquire() returns true, current thread is allowed to execute without any wait.
-If tryAcquire() returns false, acquireQueued() method is called which internally parks the thread, using LockSupport.park() and thread becomes disabled.
+If tryAcquire() returns false, acquireQueued() method is called which internally parks the thread,
+ using LockSupport.park() and thread becomes disabled.
 
 ReentrantLock$NonfairSync class
 protected final boolean tryAcquire(int acquires) {
