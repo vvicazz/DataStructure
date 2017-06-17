@@ -25,7 +25,12 @@ Multi-threading interview question
 16) volatile keyword
 17) Why suspend() and resume() methods are deprecated
 18) how to stop a thread 
-19) create your own ThreadPoolExecutor ? advantages of executor framework
+Q) How ThreadPoolExecutor works? How FutureTask works ?
+	What are various types of pool executors in java, 
+	i.e. various implementations of ExecutorService interface in java
+	How state of pool is managed and how state of threads inside pool is managed ?
+	Advantages of executor framework ?
+19) create your own ThreadPoolExecutor ?
 20)-- ReadWriteLock
 21) diff bw volatile and atomic 
 	-> volatile provides visibility guaranty, but not atomicity
