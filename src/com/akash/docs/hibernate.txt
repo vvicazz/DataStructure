@@ -356,3 +356,28 @@ These IDs are first checked in Second level cache, if found then data is hydrate
 if data not found in second level cache then SQL SELECT is fired for each ID .
 
 hence it is necessary to use Query cache with second level cache .
+
+
+-------------------------------------------
+
+Types of inheritance in hibernate
+
+Table per Hierarchy
+	@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+	@DiscriminatorColumn
+	@DiscriminatorValue
+	A single table is created for all entities
+	uncommon columns in single table are nullable
+	
+	
+Table per concrete class
+	@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+	Every entity has its own table
+	All columns of parent are also present in child also
+	
+	
+Table Per Subclass 
+	@Inheritance(strategy=InheritanceType.JOINED)
+	@PrimaryKeyJoinColumn
+	Common columns are only present in parent class and not in child
+	fetching data from table requires join
