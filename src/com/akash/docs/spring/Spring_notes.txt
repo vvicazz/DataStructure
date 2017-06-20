@@ -39,6 +39,12 @@ web.xml has two configuration files ( two WebApplicationContext ):
 Annotation based example for spring web project:
 https://www.mkyong.com/spring-mvc/gradle-spring-4-mvc-hello-world-example-annotation/								
 
+(Q) how WebApplicationInitializer scanned
+SPI : Service Provider Implementation
+https://stackoverflow.com/questions/28131102/how-servlet-container-finds-webapplicationinitializer-implementations
+https://docs.oracle.com/javase/tutorial/ext/basics/spi.html
+
+
 Root application context :
 ->DB details
 ->spring security

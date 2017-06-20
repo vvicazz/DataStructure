@@ -182,17 +182,22 @@ http://stackoverflow.com/questions/9881611/whats-the-difference-between-jpa-and-
 
 
 (Q) jdbc transaction isolation levels ?
-0 - Flush
-1 - Commit
-2 - Repeatable_Read	:  changes done by another tnx in a row, does not effect tnx ran earlier than that.
-						Repeated 'select' fires have no impact by other 'update' on same row.
-3 - Phantom_Read	:  new row inserted by another tnx get read second time in a tnx.
+0	-	none        	- no changes
+1 	-	uncommitted 	- flush, commit, non-repeatable, phantom
+2	-	read_commited 	- commit, non-repeatable, phantom
+4 	-	repeatable_read	- commit, phantom
+8 	-	serializable 	- commit
 
-int TRANSACTION_NONE             = 0;			nothing
-int TRANSACTION_READ_UNCOMMITTED = 1;	2^0		only flush
-int TRANSACTION_READ_COMMITTED   = 2;	2^1		Commited + Non_Repeatable_read + Phantom
-int TRANSACTION_REPEATABLE_READ  = 4;	2^2		Commited + Phantom
-int TRANSACTION_SERIALIZABLE     = 8;	2^3		Commited
+
+non-repeatable	- changes in current row can be seen
+phantom			- change in no of rows filtered by query can be seen
+
+
+TRANSACTION_NONE
+TRANSACTION_READ_UNCOMMITTED
+TRANSACTION_READ_COMMITTED
+TRANSACTION_REPEATABLE_READ
+TRANSACTION_SERIALIZABLE
 
 ======================================================
 
