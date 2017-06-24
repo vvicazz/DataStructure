@@ -174,13 +174,13 @@ Level of node can be calculated from distance parameter of node.
 		While(Q is not empty) {
 			qNode <= Q
 			for all tempNode adjacent to qNode {
-				if(tempNode.distance==qNode.distance) {
-					return false
-				}
 				if(tempNode.color == WHITE) {
 					tempNode.color = GRAY
 					tempNode.distance = qNode.distance+1
 					Q <= tempNode
+				}
+				if(tempNode.distance == qNode.distance) {
+					return false
 				}
 			}
 			qNode.color = BLACK
