@@ -586,6 +586,8 @@ All above applications have linear time complexity.
 (12) Kruskal's MST
 (13) Prims's MST
 
+(14) Determine whether a given graph contains Hamiltonian Cycle or not.
+	If yes, then print the path.
 ===============================================
 
 Minimum spanning tree :
@@ -933,8 +935,12 @@ relax(u, v, w) {
 
 ->property : if shortest path from s to v has n edges, then edges need to relaxed atmost n times.
 
+=>Single source shortest path for Directed Acyclic graph
 
-=>topological sort SSSP : O(V + E),  considering a graph having negative edge but no negative-weight cycle.
+(DAG) Directed graph having no cycle means there is no back edge.
+Tree, forward and cross edges exist.
+
+topological sort SSSP : O(V + E),  considering a graph having negative edge but no negative-weight cycle.
 {
 	do dfs and perform topological sort
 	intialize_all_nodes();
@@ -993,7 +999,7 @@ D[i][j] = 0 if i=j
 D[i][j] = INF if there is no edge from i to j
 
 P[i][j] = i if there is an edge from i to j
-P[i][j] = i if there is no edge from i to j
+P[i][j] = NULL if there is no edge from i to j
 
 floydWarshal(G) {
 	for(int k=0; k<V; k++) {
