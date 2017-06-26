@@ -4,12 +4,14 @@ get level of a node -> queue, recursion
 get all nodes at a level -> queue, recursion
 height of a binary tree
 check if a binary tree is BST
-print left view of binary tree
-print right view of binary tree
-print top view of binary tree
-print bottom view of binary tree
+print left view of binary tree		-- NLR keep tracking depth from the root , iterative | recursive
+print right view of binary tree		-- NRL keep tracking depth from the root , iterative | recursive
+print top view of binary tree		-- level order traversal, keep track of horizontal dist from root, create a map for (dist_from_root, node)
+print bottom view of binary tree	-- same as top view, but next node found for same dist key , will override old key
 print binary tree in vertical order
-print boundary nodes in a binary tree
+print boundary nodes in binary tree
+print diagonal nodes in binary tree
+Diagonal sum of binary tree
 Kth largest in BST
 Inorder traversal of binary tree without recursion with stack
 Inorder traversal of binary tree without recursion without stack
@@ -21,7 +23,6 @@ convert a binary tree into its mirror
 check if two nodes are swapped in BST
 Diameter of a binary tree
 floor and ceiling of a BST
-Diagonal sum of binary tree
 Convert sorted linked list to BST
 Convert sorted array to BST
 path with max sum in binary tree
