@@ -1,0 +1,25 @@
+create table student 
+(
+name varchar2(50),
+subject varchar2(50),
+marks number(10)
+);
+
+-- insert into student(name,subject,marks) values('A', 'MATH', 90);
+-- insert into student(name,subject,marks) values('B', 'ENG', 92);
+-- insert into student(name,subject,marks) values('A', 'ENG', 90);
+-- insert into student(name,subject,marks) values('B', 'MATH', 89);
+-- commit;
+
+-- (Q) find max marks of each subject
+select subject, max(marks) from student group by subject;
+
+-- (Q) find topper of each subject
+select s1.* from student s1, (select subject, max(marks) as marks from student group by subject)  s2
+where s1.subject=s2.subject and s1.marks=s2.marks;
+
+-- (Q) find topper of class
+select S.* from (
+select name, avg(marks) as marks from student group by name order by marks desc 
+) S where ROWNUM = 1;
+
