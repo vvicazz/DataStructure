@@ -1,0 +1,302 @@
+Benefits of angularjs
+
+->dependency injection
+->2 way data binding - sync bw data and model
+->testing
+->MVC components
+->angular filter and directives
+
+
+download from angularjs.org
+can also use CDN
+	-> caching, latency, parallelism
+	
+include ng-app directive attribute in any part of html
+
+ng-app is one of the directive of angularjs
+It is starting point (bootstrap point) of application.
+
+{{ any_angular_exp }}   --->  binding expression 
+
+only those content will be evaluated by angular which are enclosed by ng-app directive
+
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	</head>
+	<body>
+		<div ng-app>
+			10+20 = {{ 10+20 }}
+		</div>
+		<div ng-app>
+			1==2 = {{ 1==2 }}
+		</div>
+	</body>
+</html>
+
+
+->fetching info from JSON object inside binding expression  :
+
+{{ {name:'abc', age:20}.name }}			--> abc
+
+{{ ['india', 'US', 'UK'][0] }}			--> india
+
+
+-------------------------------------------------------------------
+
+create a module
+create a controller
+register controller with module
+
+link ng-app with module
+link ng-controller with controller
+
+display controller scope data inside ng-controller directive
+
+
+var myApp = angular.module("myModule", []);		// we can specify list of module dependency
+
+var myController = function($scope) {
+	$scope.message = "hello to angular";
+}
+
+myApp.controller("myController", myController);
+
+myApp.controller("myController", function($scope) {
+	$scope.message = "hello to angular";
+	$scope.age = "22";
+});
+
+<div ng-controller="myController">
+	{{ message }}
+	{{ age }}
+</div>
+
+-------------------------------------------------------------------
+
+controller task is to provide behaiviour to scope object.
+
+if you have a spelling error while importing controller : error will be shown
+if you have a spelling error in property of model : no error is shown
+
+Method Chaining : All operations in single line
+
+creating model, create controller, register controller with model
+
+var myApp = angular
+				.module("myModule", [])
+				.controller"myController", function($scope) {
+					$scope.message = "hello to angular";
+					$scope.age = "22";
+				});
+				
+
+-------------------------------------------------------------------
+
+<img src="{{ dynamic_path }}"    />  		-- path is rendered 2 times
+											-- first time with error before evaluating angularjs and second time success.
+
+<img ng-src="{{ dynamic_path }}"  />		-- only one request to load image
+
+-------------------------------------------------------------------
+
+2 way data binding 
+ng-model directive
+
+	input
+	select
+	textarea
+	
+change in model updates the view and change in view updates the model
+->
+	<input type="text" ng-model="name">
+	{{ name }}
+
+->
+	at controller 
+	$scope.name="abc"
+
+	at view 
+	<input type="text" ng-model="name">
+
+	changes in view will be reflected back controller data.
+
+
+-------------------------------------------------------------------
+
+MVC in angularjs :
+
+model 		: where data is created : service layer (data is fetched from server)
+view  		: data is set in html using directives
+controller 	: here data is fetched from service layer and set in $scope
+
+
+var deferred = $q.defer();
+
+//fulfill a promise after ajax call
+deferred.resolve(data);
+
+//reject a promise after ajax call
+deferred.reject(error);
+
+return deferred.promise;
+
+
+returning a promise object of the result, keeping in mind 
+that whenever result/error may come it will be fetched from promise.
+
+
+
+function get_stuff()
+{
+    var deferred = q.defer();
+    $.ajax('server/url', { 
+        error: function() { deferred.reject(); },
+        success: function( data ) { deferred.resolve( data ); }
+    });
+    return deferred.promise;
+}
+ 
+get_stuff().then( 
+    function( data ) { // Do something with data },
+    function() { // Error handling goes here }
+ );
+ 
+
+http://websystique.com/springmvc/spring-mvc-4-angularjs-example/ 
+http://andyshora.com/promises-angularjs-explained-as-cartoon.html
+
+-------------------------------------------------------------------
+
+ng-repeat for iterating over a list
+
+-------------------------------------------------------------------
+
+=>event handling
+
+Inside controller :
+
+$scope.incrementLikes = function(technology) {
+	technology.likes++;
+}
+
+$scope.incrementDislikes = function(technology) {
+	technology.dislikes++;
+}
+
+
+Inside html :
+
+<div ng-repeat="technology in technologies">
+	<button type="button" value="like" ng-click="incrementLikes(technology)">
+	<button type="button" value="dislike" ng-click="incrementDislikes(technology)">
+</div>
+
+
+
+ng-blur
+ng-change
+ng-focus
+ng-keydown
+ng-keypress
+
+
+-------------------------------------------------------------------
+
+=>filter and formatting 
+
+{{ expression | filtername : parameter }}
+
+formatting :
+
+{{ username | uppercase }}
+{{ username | lowercase }}
+{{ salary | number:2 }}
+{{ dob | date:"dd/MM/yyyy" }}
+
+
+filtering :
+
+<div ng-repeat="name in names | limitTo:2:2">
+	{{ name }}
+</div>
+
+showing only 2 rows and start showing it from 2nd index row
+
+-------------------------------------------------------------------
+
+{{ expression | orderBy : +columnName }}
+
+-------------------------------------------------------------------
+
+filter of records :
+
+<input type="text" ng-model="searchText">
+<div ng-repeat="record in records | filter : searchText ">
+	{{ record }}
+</div>
+
+
+<input type="text" ng-model="searchText.city">
+<div ng-repeat="record in records | filter : searchText ">
+	{{ record }}
+</div>
+
+-------------------------------------------------------------------
+
+custom filter :
+
+var myApp = angular
+				.module("moduleName", [])
+				.filter("filterName", function() {
+					return function(gender) {
+						switch(gender) {
+							case 1 : "M";
+							case 2 : "F";
+						}
+					}
+				}).controller("contrName", function($scope){
+					
+				});
+				
+
+filter, controller, service all must have different files.
+
+-------------------------------------------------------------------
+
+ng-hide
+ng-show
+
+-------------------------------------------------------------------
+
+ng-include
+
+-------------------------------------------------------------------
+
+$http is one of the many services in angularjs
+$http.get() returns a promise object, i.e response is received asynchronously
+
+$log is a service in angular 
+
+-------------------------------------------------------------------
+
+What is service in angular :
+A service in angular is simply an object which provides some sort of service that can be reused with in an angular application.
+
+Why do we need services :
+Services encapsulate reusable logic that does not belong anywhere else i.e. directive, filter, view, Model, controller
+
+What are the benefits of using services :
+->reusability
+->DI
+->Testing
+
+
+myApp.factory('myService', function(){
+	
+});
+
+factory is used to register a service with a module.
+
+
+-------------------------------------------------------------------
