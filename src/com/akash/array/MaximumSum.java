@@ -89,4 +89,26 @@ public class MaximumSum {
 	 * MEHP : 1		3		-5		4		8		120	<br>
 	 * MTN	: 1		3		3		4		8		120	<br>
 	 */
+	
+	
+	
+	// 5 3 1 4 2 
+	// 5 6 1 4 2 
+	public int maxSumSubArrayWithNoConsecutive(int arr[]) {
+
+		int maxTillPre = arr[0];
+		int maxTillNow = max(arr[0], arr[1]);
+		int max = maxTillNow;
+		for (int i = 2; i < arr.length; i++) {
+			maxTillPre = maxTillPre + arr[i];
+			if (maxTillPre > max) {
+				max = maxTillPre;
+			}
+			// swap
+			int temp = maxTillPre;
+			maxTillPre = maxTillNow;
+			maxTillNow = temp;
+		}
+		return max;
+	}
 }
