@@ -2,7 +2,7 @@ package com.akash.bits;
 
 public class BitOperation {
 
-	public static void main(String args[]) {
+	public static void main(String args[]) { 
 		
 		//get negative of a number:
 		//1. find its one's complement by reversing all digits
