@@ -9,8 +9,8 @@ public class BitOperation {
 		//2. find its two's complement by adding 1 to it.
 		
 		int x=-1;
-		System.out.println(Integer.toBinaryString(x));
-		System.out.println(x>>5);	//-1
+		System.out.println(Integer.toBinaryString(x<<5));
+		System.out.println(x<<5);	//-1
 		System.out.println(x<<31);	//-2147483648
 		System.out.println(x<<33);	//-1
 		//left shift do not hold previous rotated bit from right end to left end
@@ -32,3 +32,18 @@ public class BitOperation {
 		System.out.println(Integer.toBinaryString(-2147483648)); 	//10000000000000000000000000000000
 	}
 }
+
+/**
+ * case 1 :
+ * 10111111111111111111111111111111  >> 2 = 11101111111111111111111111111111
+ * right shift holds right most bit value
+ * hence, it can be used for division for both negative and positive
+ * 
+ * case 2 :
+ * 11111111111111111111111111111111 << 2 = 11111111111111111111111111111100
+ * left shift does not hold left most bit value
+ * 
+ * case 3 :
+ * 10111111111111111111111111111111  >>> 2 = 00101111111111111111111111111111
+ * triple right shift does not hold right most bit value
+ */
