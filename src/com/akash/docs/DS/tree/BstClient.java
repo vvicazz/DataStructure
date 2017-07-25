@@ -33,7 +33,7 @@ public class BstClient {
 		System.out.println(tree.getInOrderTraversal());
 		tree.inorderUsingStack();
 		tree.inOrderWithoutRecursionWithoutStack();
-
+		tree.printAncestors(22);
 		// ser(tree);
 		// deser();
 	}

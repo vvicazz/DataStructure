@@ -409,4 +409,36 @@ public final class BinarySearchTree<V extends Comparable<V>> implements Serializ
 			}
 		}
 	}
+	
+	public void printAncestors(V key) {
+		if (rootNode == null) {
+			return;
+		}
+		System.out.println();
+		System.out.println("<----Printing Ancestors of "+key+" ---->");
+		printAncestors(rootNode, key);
+		System.out.println();
+		System.out.println("<-------->");
+	}
+	
+	private boolean printAncestors(Node<V> root, V key) {
+		boolean found = false;
+		if (root.left != null) {
+			found = printAncestors(root.left, key);
+			if (found) {
+				System.out.print(root.value+" ");
+				return found;
+			}
+		}
+		if (root.value.compareTo(key) == 0) {
+			return true;
+		}
+		if (root.right != null) {
+			found = printAncestors(root.right, key);
+			if (found) {
+				System.out.print(root.value+" ");
+			}
+		}
+		return found;
+	}
 }

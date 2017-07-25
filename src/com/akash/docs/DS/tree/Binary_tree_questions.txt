@@ -1,5 +1,5 @@
-Preorder, inorder, postorder using recursion
-level order traversal -> queue, recursion, 2 stack
+Preorder, inorder, postorder using recursion | without using recursion
+level order traversal (BFS) -> queue, recursion, 2 stack
 get level of a node -> queue, recursion
 get all nodes at a level -> queue, recursion
 height of a binary tree
@@ -20,22 +20,32 @@ check if two binary trees are identical
 check if two binary trees are isomorphic
 check if two binary trees are mirror
 convert a binary tree into its mirror
-check if two nodes are swapped in BST
-Diameter of a binary tree
+--check if two nodes are swapped in BST
+--Diameter of a binary tree
 floor and ceiling of a BST
-Convert sorted linked list to BST
-Convert sorted array to BST
-path with max sum in binary tree
+--Convert sorted linked list to BST
+--Convert sorted array to BST
+--path with max sum in binary tree
 Check if all leaves are at same level
 print perfect binary tree in below form:
 	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
 	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
 	-> 2 queue and 1 stack
-Remove all nodes which don’t lie in any path with sum>= k
-Convert left-right representation of a binary tree to down-right
+--Remove all nodes which don’t lie in any path with sum>= k
+--Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
 
+print all ancestors of a node with recursion
+print all ancestors of a node without recursion		-- create a map for maintain parent of each node
 
+Check for Children Sum Property in a Binary Tree 
+
+--Construct binary tree from 2 traversals :
+	Hint : binary tree can only be constructed if one of the traversal is inorder
+	->Inorder and Postorder
+	->Inorder and preorder
+	->Inorder and levelorder
+	
 --------------------------------------------------
 
 
