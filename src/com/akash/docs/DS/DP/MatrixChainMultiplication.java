@@ -1,9 +1,13 @@
 package com.akash.docs.DS.DP;
 
 /**
+ * 	Find min cost of n matrices multiplication.	<br>
+ * 
  *	{40, 20, 30, 10, 30}						<br>
  *	(40x20), (20x30), (30x10), (10x30)			<br>
  * 		A		B		C		 D				<br>
+ *	
+ *	Sub-problems : A(BCD) , (AB)(CD) , (ABC)D	<br>
  * 	
  * 	n elements in array		<br>
  * (n-1) matrices			<br>
