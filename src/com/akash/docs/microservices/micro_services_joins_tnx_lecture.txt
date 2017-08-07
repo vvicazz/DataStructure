@@ -1,0 +1,123 @@
+https://www.infoq.com/presentations/microservices-data-centric
+
+https://www.youtube.com/watch?v=xDuwrtwYHu8
+
+https://www.youtube.com/watch?v=0UTOLRTwOX0
+
+http://blog.jonathanoliver.com/cqrs-sagas-with-event-sourcing-part-i-of-ii/
+
+
+
+=================================================
+
+Events are necessary part of architecture
+
+=========
+
+How to convert a monolithic app to micro services app
+
+In an monolithic app, all types of data are in single shared DB
+
+1) first step is to create a single service for that entity
+2) then all other services should not contact that shared table directly, but they should communicate with only service
+3) then move this table to some other non shared DB
+
+======
+
+Rule : Every interesting piece of data should be owned by a single service
+Every other service will communicate with this service for Read or write
+
+If other service is not able to call this single service at real time,
+like it is relatively costly to call service as compared to shared DB,
+then this calling service call create a cache for data.
+Cache can be updated by firing an event.
+
+Customer service stores customer data.
+Billing service need customer data over and over again.
+Billing service will make a cache for customer address.
+If a change in address occurs, Customer service will fire an event to Billing service.
+(Q)What if calling address is down and misses some events?
+
+Ruby on rails
+GO language
+Node.js
+
+Shared data:
+There are times when we have to share a constant or fixed metadata
+like states in india, sizes of shoes
+
+Joins:
+Join in a single table with monolithic app is easy
+What if this data is distributed in different micro services.
+
+1) First approach is to call every service and join yourself.
+2) above approach can be time taking, so we can create a cache at final view service, and fire events on data changes.
+
+(Q) If data type in a service changes, then data type of caches should also be changed.
+So one change have to be replicated on multiple locations.
+This violates open close principle.
+
+
+No sql works in similar way
+RDBMS stores data in tabular, fetch it via joins
+No sql stores data in the way we want to fetch in future.
+things like elastic search also works on this similar concept.
+
+=>Transactions :
+very easy in monolithic, very difficult in micro services.
+->SAGA
+handling transactions with calling services and events.
+whole transaction can be considered as a state machine.
+
+How to rollback, do things in reverse order of workflow.
+revert things on reverse order.
+
+online payment works in this way
+approval design works this way
+
+=========
+
+Saga pattern was published in 1987
+
+distributed transactions can be implemented as 2 phase protocol:
+
+there is one single coordinator which will communicate with multiple services
+
+problems of 2PC (not a scalable solution) :
+1) n^2 messages transfers
+2) Coordinator : single point of failure
+3) Reduced throughput , many locks can be held on multiple resources at a time
+
+Google Spanner
+
+Sagas are long lived transactions.
+
+It has a collection of transactions
+It may also have a collection of compensating transactions
+
+T1, T2 , T3 ... C3, C2, C1
+
+Tradeoff : Atomicity for Availabity
+
+The saga operation is not atomic. you can read inconsistent data in b/w.
+But it has eventual consistency, i.e. eventually things will be ok.
+Its advantage is that it provides scalable solution with high availability.
+
+Saga are a failure management system
+
+Saga Execution Coordinator : manages transaction and compensating transaction
+
+Unsuccessful Saga : backwords recovery
+
+A distributed saga is a collection of Sub-Requests
+T1, T2, T3
+
+Each Sub request has a compensating Request
+C1, C2, C3
+
+We should have a sala log, which logs each and every request and compensating request.
+It should be durable and Distributed.
+
+What happens when compensating request fails ?
+->compensating request should be retried until they are done
+->they must be idempotent
