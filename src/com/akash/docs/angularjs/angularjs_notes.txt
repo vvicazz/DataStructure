@@ -85,7 +85,7 @@ creating model, create controller, register controller with model
 
 var myApp = angular
 				.module("myModule", [])
-				.controller"myController", function($scope) {
+				.controller("myController", function($scope) {
 					$scope.message = "hello to angular";
 					$scope.age = "22";
 				});
