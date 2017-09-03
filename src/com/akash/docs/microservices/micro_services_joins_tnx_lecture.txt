@@ -6,7 +6,7 @@ https://www.youtube.com/watch?v=0UTOLRTwOX0
 
 http://blog.jonathanoliver.com/cqrs-sagas-with-event-sourcing-part-i-of-ii/
 
-
+https://www.youtube.com/results?search_query=cloud+native+java
 
 =================================================
 
