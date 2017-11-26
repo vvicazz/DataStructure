@@ -210,6 +210,18 @@ http://docs.oracle.com/javase/7/docs/platform/serialization/spec/serialTOC.html
 http://docs.oracle.com/javase/8/docs/platform/serialization/spec/serial-arch.html
 **http://www.onjava.com/pub/a/onjava/excerpt/JavaRMI_10/index.html?page=1
 
+
+* Rules of assigning values to variables during deserialization : <br><br>
+ * ->instance variable of class (final or non final) initialized via serialization
+ * process. <br>
+ * ->transient values are always initialized as their default values and not the
+ * values as declared at class level. <br>
+ * ->static variables are initialized as declared at class level or as their
+ * default values if not declared at class level. <br>
+ * ->no constructor is called for final instance variable, non final instance
+ * variable, transient or static fields during deserialization
+
+
 (1)static and transient fields of a class are not serialized.
 (2)if parent class implement Serializable, child class is also serializable
 (3)if child class implements Serializable and parent class not, 
@@ -219,7 +231,8 @@ http://docs.oracle.com/javase/8/docs/platform/serialization/spec/serial-arch.htm
 	why?
 	Ans : During deserialization, the fields of non-serializable classes will be 
 		initialized using the public or protected no-arg constructor of the class. 
-		A no-arg constructor must be accessible to the subclass that is serializable.  
+		A no-arg constructor must be accessible to the subclass that is serializable.
+	This will come only at deserialization process at runtime.  
 (5)constructor for serializable class never run while deserialization
 (6)transient fields in serializable class are assigned their default value or value defined in readResolve()
 (7)if child class implements Serializable and parent class not, 
