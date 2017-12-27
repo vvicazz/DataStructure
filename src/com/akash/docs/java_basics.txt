@@ -1,0 +1,97 @@
+http://www.codecommit.com/blog/java/defining-high-mid-and-low-level-languages
+https://stackoverflow.com/questions/1517582/what-is-the-difference-between-statically-typed-and-dynamically-typed-languages
+http://iamcomputerexpert.blogspot.in/2008/09/difference-between-low-level-high-level.html
+
+
+Machine language :
+->In the form of 0 and 1
+->code that computer understands directly
+->platform dependent
+->error prone and difficult to find bugs
+
+Assembly language:
+->human readable code
+->mnemonic were used for coding operations
+->assembler converts this code to machine language
+->platform dependent
+->less error prone and easy to find bugs as compared to machine language
+
+
+Factors that decide low, mid and high level languages:
+-> Interaction with processor and hardware
+	direct machine code or assembler is required to convert code into machine code
+	or compiler and interpreter both are required 
+	(virtual environment is considered when 2 layers are present).
+-> H/W level abstraction
+	access of memory management (garbage collection)
+	access of registers and cpu cache
+	primitive variable or object oriented
+-> Performance of execution as it depends upon number of layers of execution
+-> Abstraction of understanding the process of execution(like how things internally works)
+	As the level increases, the abstraction layer increases.
+	high level languages handle all complexities of execution by its own.
+-> Static typing 
+	high level languages are primarily dynamic typed as they focus on high abstraction.
+	languages in which variable is known at compile time, it is static typing.
+		->easy to find bugs, programmer requires more skills
+	type of variable know at runtime, it is dynamic typing.
+		->difficult to find bugs, less programming skills are required.
+-> Type of development
+	low to mid are used for system programming
+	mid to high are used for application programming
+
+
+=================================
+
+http://www.stroustrup.com/1995_Java_whitepaper.pdf
+https://en.wikipedia.org/wiki/Java_virtual_machine
+https://stackoverflow.com/questions/11547458/what-is-the-difference-between-jvm-jdk-jre-openjdk
+http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html	
+
+
+(Q) What is difference bw JDK, JRE and JVM
+	JRE is subset of JDK
+	JRE contains utilities, classes, JVM and many other things that are required to run a java program
+	JDK has all these features with some other development tools like compiler and debugger
+	java converts source code to byte code.
+	This byte code is converted to machine code by JVM.
+	JVM also handles memory management, exception handling, type inference, handling native api calls
+	
+(Q) Task of JVM : 
+	-> converts byte code machine code
+	-> platform independent
+	-> garbage collection
+	-> exception handling
+	-> type inference
+	-> handling native api calls
+(Q) What is the diff bw platform independent and architecture neutral ?
+(Q) What is dynamic memory allocation ?
+(Q) How is java secure ?
+
+(Q) memory allocation in java :
+	-> heap (objects and arrays)
+	-> method area (Code, constants, and other class data)
+	-> stack (every jvm thread has its own)
+	
+(Q) Class Loader performs three basic activities in this strict order
+	-> Loading
+	-> Linking
+		-> Verification
+		-> Preparation
+		-> Resolution
+	-> Initialization
+	
+
+Java bytecode is executed by an interpreter.
+For each hardware architecture has a different Java bytecode interpreter is needed.
+JVM doesn't understand Java source code.
+
+java source code 	compiler	JVM1	OS1		machine code1
+					compiler	JVM2	OS2		machine code2
+					compiler	JVM3	OS3		machine code3
+
+					
+java secure code and compilers are same everywhere.
+platform = OS + H/W
+different hardware and OS combination requires different JVM implementation to generate diff machine code.
+
