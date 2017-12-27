@@ -1,3 +1,4 @@
+Links :
 http://www.codecommit.com/blog/java/defining-high-mid-and-low-level-languages
 https://stackoverflow.com/questions/1517582/what-is-the-difference-between-statically-typed-and-dynamically-typed-languages
 http://iamcomputerexpert.blogspot.in/2008/09/difference-between-low-level-high-level.html
@@ -23,7 +24,7 @@ Factors that decide low, mid and high level languages:
 	or compiler and interpreter both are required 
 	(virtual environment is considered when 2 layers are present).
 -> H/W level abstraction
-	access of memory management (garbage collection)
+	access of memory management, allocation and deallocation of objects (garbage collection)
 	access of registers and cpu cache
 	primitive variable or object oriented
 -> Performance of execution as it depends upon number of layers of execution
@@ -32,9 +33,9 @@ Factors that decide low, mid and high level languages:
 	high level languages handle all complexities of execution by its own.
 -> Static typing 
 	high level languages are primarily dynamic typed as they focus on high abstraction.
-	languages in which variable is known at compile time, it is static typing.
+	Static typing : languages in which variable is known at compile time.
 		->easy to find bugs, programmer requires more skills
-	type of variable know at runtime, it is dynamic typing.
+	Dynamic typing : type of variable know at runtime
 		->difficult to find bugs, less programming skills are required.
 -> Type of development
 	low to mid are used for system programming
@@ -42,8 +43,8 @@ Factors that decide low, mid and high level languages:
 
 
 =================================
-
-http://www.stroustrup.com/1995_Java_whitepaper.pdf
+Links :
+https://stackoverflow.com/questions/3849634/static-allocation-in-java-heap-stack-and-permanent-generation/3849819#3849819
 https://en.wikipedia.org/wiki/Java_virtual_machine
 https://stackoverflow.com/questions/11547458/what-is-the-difference-between-jvm-jdk-jre-openjdk
 http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html	
@@ -65,7 +66,8 @@ http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html
 	https://www.quora.com/What-is-the-role-of-JVM-in-Java
 	
 	-> converts byte code machine code
-	-> platform independent
+	-> byte code verification
+	-> memory initialization of primitive variables and objects
 	-> garbage collection
 	-> exception handling
 	-> type inference
@@ -73,16 +75,25 @@ http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html
 	
 (Q) What is the diff bw platform independent and architecture neutral ?
 	https://stackoverflow.com/questions/5796288/what-is-the-difference-between-architecture-neutral-and-portable
-	http://www.stroustrup.com/1995_Java_whitepaper.pdf
 	
 	platform independent : byte code created on one platform(OS+HW), can be executed on different platform.
 	architecture neutral : memory and hardware execution a java code will be same accross all architectures.
-							example : In C, size of int is different on diff machines whereas in java int is 32 bit everywhere.
+							example : In C, size of int is different on diff machines 
+							whereas in java int is 32 bit everywhere.
 	
 (Q) What is dynamic memory allocation ?
+	memory allocation of an object is done at runtime using new keyword.
+	Object is stored in heap and its reference is stored in stack of a thread.
+	objects deallocation is done by garbage collector.
+	
 (Q) How is java secure ?
-
+	source code verification is done by compiler
+	Also, runtime byte code verification is done by Class loader at verification step.
+	
 (Q) memory allocation in java :
+	https://stackoverflow.com/questions/3849634/static-allocation-in-java-heap-stack-and-permanent-generation/3849819#3849819
+	https://stackoverflow.com/questions/2129044/java-heap-terminology-young-old-and-permanent-generations/2129073#2129073
+	
 	-> heap (objects and arrays)
 	-> method area (Code, constants, and other class data)
 	-> stack (every jvm thread has its own)
@@ -95,17 +106,14 @@ http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html
 		-> Resolution
 	-> Initialization
 	
+(Q) How is java platform independent ?
+platform = OS + H/W
+Java secure code and compilers are same for every platform.
+Different hardware and OS combination requires different JVM implementation to generate different machine code.
+
+java source code  | compiler |	JVM1 |	OS1	|	machine code1  | (windows)
+				  |	compiler |	JVM2 |	OS2	|	machine code2  | (ubuntu)
+				  |	compiler |	JVM3 |	OS3	|	machine code3  | (mac)
 
 Java bytecode is executed by an interpreter.
-For each hardware architecture has a different Java bytecode interpreter is needed.
-JVM doesn't understand Java source code.
-
-java source code 	compiler	JVM1	OS1		machine code1
-					compiler	JVM2	OS2		machine code2
-					compiler	JVM3	OS3		machine code3
-
-					
-java secure code and compilers are same everywhere.
-platform = OS + H/W
-different hardware and OS combination requires different JVM implementation to generate diff machine code.
-
+For each hardware architecture, a different Java bytecode interpreter is needed.
