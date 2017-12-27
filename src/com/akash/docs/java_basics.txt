@@ -50,6 +50,9 @@ http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html
 
 
 (Q) What is difference bw JDK, JRE and JVM
+	https://en.wikipedia.org/wiki/Java_virtual_machine
+	https://stackoverflow.com/questions/11547458/what-is-the-difference-between-jvm-jdk-jre-openjdk
+	
 	JRE is subset of JDK
 	JRE contains utilities, classes, JVM and many other things that are required to run a java program
 	JDK has all these features with some other development tools like compiler and debugger
@@ -58,13 +61,24 @@ http://www.oracle.com/technetwork/java/javase/tech/index-jsp-140763.html
 	JVM also handles memory management, exception handling, type inference, handling native api calls
 	
 (Q) Task of JVM : 
+	https://qph.ec.quoracdn.net/main-qimg-e03bb2765a9869fcd1a02cd60d31bac8.webp
+	https://www.quora.com/What-is-the-role-of-JVM-in-Java
+	
 	-> converts byte code machine code
 	-> platform independent
 	-> garbage collection
 	-> exception handling
 	-> type inference
 	-> handling native api calls
+	
 (Q) What is the diff bw platform independent and architecture neutral ?
+	https://stackoverflow.com/questions/5796288/what-is-the-difference-between-architecture-neutral-and-portable
+	http://www.stroustrup.com/1995_Java_whitepaper.pdf
+	
+	platform independent : byte code created on one platform(OS+HW), can be executed on different platform.
+	architecture neutral : memory and hardware execution a java code will be same accross all architectures.
+							example : In C, size of int is different on diff machines whereas in java int is 32 bit everywhere.
+	
 (Q) What is dynamic memory allocation ?
 (Q) How is java secure ?
 
