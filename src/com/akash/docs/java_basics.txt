@@ -117,3 +117,23 @@ java source code  | compiler |	JVM1 |	OS1	|	machine code1  | (windows)
 
 Java bytecode is executed by an interpreter.
 For each hardware architecture, a different Java bytecode interpreter is needed.
+
+============================
+(Q) What is diff bw 
+String[] arr
+and
+String... arr
+
+String[] arr 	-> can be treated as array of String
+				-> can be declared as normal data type.
+
+String... arr 	-> can be treated as String and array of String
+				-> can only be declared as function argument and cannot be declared as normal data type.
+				
+Note : Java removed the concept of pointers.They avoided the programmer to handle memory management.
+		Java added abstraction by introducing Garbage collection.
+		
+Note : Java provides both primitive and object data types.
+		Primitives takes less memory as compared to object. (int takes less size than Integer)
+		primitive will always have default value but object can be null.
+		
