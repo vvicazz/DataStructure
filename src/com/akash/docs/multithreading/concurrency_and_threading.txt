@@ -46,6 +46,9 @@ this solution is still not thread safe as threads can see stale value.
 as thread will not have any impact on copy.
 This might have some performance issues.
 
+CopyOnWriteArrayList
+***https://stackoverflow.com/questions/17853112/in-what-situations-is-the-copyonwritearraylist-suitable
+
 
 NOTE:
 we have to apply locking where a shared collection is iterated, to avoid ConcurrentModificationException 
