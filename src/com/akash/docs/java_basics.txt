@@ -137,3 +137,6 @@ Note : Java provides both primitive and object data types.
 		Primitives takes less memory as compared to object. (int takes less size than Integer)
 		primitive will always have default value but object can be null.
 		
+(Q) What is the size of primitive boolean in java ?
+
+https://stackoverflow.com/questions/1907318/why-is-javas-boolean-primitive-size-not-defined
