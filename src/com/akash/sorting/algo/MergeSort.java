@@ -5,44 +5,60 @@ import java.util.Arrays;
 public class MergeSort {
 
 	private int arr[] = { 6, 5, 1, 6, 8, 7, 2, 4 };
+//	private int arr[] = { 100, 20, 13, 84, 55, 27, 81 };
 
 	public static void main(String args[]) {
 
 		MergeSort ms = new MergeSort();
 		System.out.println(Arrays.toString(ms.arr));
-		//ms.sort(ms.arr, 0, ms.arr.length - 1);
+		//ms.recursiveMergeSort(ms.arr, 0, ms.arr.length - 1);
 		ms.iterativeMergeSort(ms.arr);
 		System.out.println(Arrays.toString(ms.arr));
 	}
 	
 	private void iterativeMergeSort(int arr[]) {
-		 
-        int length = arr.length;
-        for (int currentSize = 1 ; currentSize < length ; currentSize = currentSize * 2) {
-            for (int startIndex = 0 ; startIndex < length ; startIndex = startIndex + 2 * currentSize) {
-                int endIndex = startIndex + 2 * currentSize - 1;
-                if (endIndex >= length) {
-                    endIndex = length - 1;
-                }
-                int middleIndex = (startIndex + endIndex) / 2;
-                merge(arr, startIndex, middleIndex, endIndex);
-            }
-        }
-    }
+		int sizeOfArrayToSort = 1;
+		int nearestPowerOfTwo = getNearestPowerOfTwo(arr.length);
+		while (sizeOfArrayToSort < arr.length) {
+			int outerIterationSize = nearestPowerOfTwo / (sizeOfArrayToSort * 2);
+			int index = 0;
+			while (outerIterationSize > 0) {
+				mergeArrayWithBoundaries(arr, sizeOfArrayToSort, index);
+				index = index + sizeOfArrayToSort * 2;
+				outerIterationSize--;
+			}
+			sizeOfArrayToSort = sizeOfArrayToSort * 2;
+		}
+	}
 
-	private void sort(int arr[], int low, int high) {
+	private void mergeArrayWithBoundaries(int arr[], int sizeOfArrayToSort, int start) {
+		int mid = start + sizeOfArrayToSort - 1;
+		int end = start + sizeOfArrayToSort * 2 - 1;
+		if (end >= arr.length) {
+			end = arr.length - 1;
+		}
+		merge(arr, start, mid, end);
+	}
 
-		
+	private int getNearestPowerOfTwo(int num) {
+		int counter = 1;
+		while (counter < num) {
+			counter = counter << 1;
+		}
+		return counter;
+	}
+
+	private void recursiveMergeSort(int arr[], int low, int high) {
 		if (low < high) {
 			int mid = (high + low) / 2;
-			sort(arr, low, mid);
-			sort(arr, mid + 1, high);
+			recursiveMergeSort(arr, low, mid);
+			recursiveMergeSort(arr, mid + 1, high);
 			merge(arr, low, mid, high);
 		}
 	}
 
 	private void merge(int arr[], int low, int mid, int high) {
-
+		
 		int length = high - low + 1;
 		int[] tempArr = new int[length];
 		int i, j, counter = 0;
