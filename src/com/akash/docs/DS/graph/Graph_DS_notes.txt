@@ -42,6 +42,17 @@ Difference bw Complete and Connected graph
 
 Data structures for graphs :
 
+Operations of Graph DS :
+->add a vertex
+->add an edge
+->check if vertex exists
+->check if edge exists bw two vertices
+->check if graph is connected
+->count no of vertices
+->count no of edges
+->get distance(count of edges OR weight sum) from one vertex to another vertex
+
+
 1) Edge list
 unordered list of vertices and edges
 simple to implement
@@ -103,6 +114,11 @@ Algo :
 Time complexity for BFS = O(V+E)
 for a Connected graph, E >= V-1 , then it is equivalent to O(E)
 http://stackoverflow.com/questions/11468621/why-is-the-time-complexity-of-both-dfs-and-bfs-o-v-e
+proof:
+=> v1 + (incident edges) + v2 + (incident edges) + .... + vn + (incident edges)
+=> (v1 + v2 + ... + vn) + [(incident_edges v1) + (incident_edges v2) + ... + (incident_edges vn)]
+=> O(V) + O(E)
+=> O(V+E)
 
 Breadth First Tree
 
@@ -146,8 +162,11 @@ Every edge has one vertex in set U and other vertex in set W, such that
 U union W = Vertices
 U intersection W = nil
 
+(Q) There is a party of friends with 2 tables provided.
+Arrange people in these two tables such that, people on a single table know each other.
+
 Go for a BFS, For a connected graph, graph has no edge in same level during BFS.
-If a graph has an edge then it has an odd cycle.
+If a graph has an edge in same level then it has an odd cycle.
 If a graph has an odd cycle, then it is not bipartite.
 Level of node can be calculated from distance parameter of node.
 
@@ -179,7 +198,7 @@ Level of node can be calculated from distance parameter of node.
 					tempNode.distance = qNode.distance+1
 					Q <= tempNode
 				}
-				if(tempNode.distance == qNode.distance) {
+				else if(tempNode.distance == qNode.distance) {
 					return false
 				}
 			}
