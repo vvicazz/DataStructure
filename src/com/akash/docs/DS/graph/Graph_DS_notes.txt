@@ -39,6 +39,12 @@ undirected graph terminologies :
 Difference bw Complete and Connected graph
 =>Complete graph : every two vertices must have an edge
 =>connected graph : every two vertices must have a path
+=>Parallel edge : 
+	Two edges are parallel if they connect the same nodes in the same order (if any),
+ 	and antiparallel if they connect the same nodes in the opposite order. 
+ 	(Undirected edges cannot be antiparallel.)
+=>multigraphs : graphs with parallel edges
+
 
 Data structures for graphs :
 
@@ -156,6 +162,13 @@ Applications of BFS :
 
 
 2)Bipartite graph :
+
+k-partite graph :
+	A k-partite graph is a graph whose graph vertices can be partitioned into k disjoint sets so that
+	 no two vertices within the same set are adjacent.
+	A graph that can be colored with k colors, so that no two endpoints of an edge have the same color.
+
+K=2 is bipartite
 
 A graph is Bipartite if,
 Every edge has one vertex in set U and other vertex in set W, such that 
