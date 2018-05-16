@@ -39,6 +39,8 @@ public class GraphImpl<N> implements Graph<N> {
 		nodes.add(source);
 		nodes.add(destination);
 		if (!isDirected()) {
+			//TODO : this is creating two objects for one edge
+			//there should be no src and dest for undirected edges
 			edge1Added = addEdge(source, destination, this.edges);
 			edge2Added = addEdge(destination, source, this.edges);
 		} else {
@@ -51,6 +53,7 @@ public class GraphImpl<N> implements Graph<N> {
 	private boolean addEdge(N source, N destination, Map<N, Set<Edge<N>>> edges) {
 		boolean edgeAdded = false;
 		Edge<N> edge = new EdgeImpl<N>(source, destination, isDirected());
+		//TODO : here we should apply monitor pattern as in SynchronizedCollection
 		synchronized (edges) {
 			Set<Edge<N>> adjacentEdges = edges.get(source);
 			if (adjacentEdges == null) {

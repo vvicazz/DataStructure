@@ -50,7 +50,7 @@ Operations of Graph DS :
 ->check if graph is connected
 ->count no of vertices
 ->count no of edges
-->get distance(count of edges OR weight sum) from one vertex to another vertex
+->get minimum distance(count of edges OR weight sum) from one vertex to another vertex
 
 
 1) Edge list
