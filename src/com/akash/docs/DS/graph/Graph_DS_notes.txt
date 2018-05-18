@@ -129,7 +129,9 @@ proof:
 Breadth First Tree
 
 Applications of BFS :
-1)Get no of connected components
+1)We can calculate shortest distance from a source vertex to every other vertex.
+
+2)Get no of connected components
 
 	Solution 1 :
 	Do BFS from each node and mark them with a component number.
@@ -161,7 +163,7 @@ Applications of BFS :
 ->connected components
 
 
-2)Bipartite graph :
+3)Bipartite graph :
 
 k-partite graph :
 	A k-partite graph is a graph whose graph vertices can be partitioned into k disjoint sets so that
@@ -183,6 +185,7 @@ If a graph has an edge in same level then it has an odd cycle.
 If a graph has an odd cycle, then it is not bipartite.
 Level of node can be calculated from distance parameter of node.
 
+Algo 1:
 	
 	isBipartiteGraph() {
 		nodeList = getAllNodes();
@@ -221,6 +224,15 @@ Level of node can be calculated from distance parameter of node.
 	}
 
 
+Algo 2 : Coloring method(graph having odd cycle is not bipartite)
+
+	Take a source node, mark it RED and do BFS
+	Color all children of RED as BLUE
+	Color all children of BLUE as RED
+	stop when all vertices are scanned
+	If any edge has same color vertex, then graph is not bipartite
+	else graph is bipartite
+	
 
 =>Diameter of BFS = maximum distance bw two vertices in G
 =>Distance bw two vertices = length of shortest path bw two vertices
