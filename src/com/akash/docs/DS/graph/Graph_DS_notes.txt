@@ -185,7 +185,7 @@ If a graph has an edge in same level then it has an odd cycle.
 If a graph has an odd cycle, then it is not bipartite.
 Level of node can be calculated from distance parameter of node.
 
-Algo 1:
+Algo 1:(graph having odd cycle is not bipartite)
 	
 	isBipartiteGraph() {
 		nodeList = getAllNodes();
@@ -243,8 +243,10 @@ Algo 2 : Coloring method(graph having odd cycle is not bipartite)
 	->now get max level value in graph less than n, say m
 	->diameter = n+m
 
-If we want to determine exact diameter of a graph, then we need to perform BFS from every node.
-time complexity for this = O(E*V)
+	->If we want to determine exact diameter of a graph, then we need to perform BFS from every node.
+	time complexity for this = O(E*V)
+	
+	->We can apply all pairs shortest path algo
 
 Diameter(G) <= 2*(max level no in any BFS)
 
@@ -307,7 +309,7 @@ Depth First Search(DFS) :
 
 DFS can be done on any path of the graph.
 There can be many DFS tree possibilities from a single node.
-There can be a possibilities that, DFS tree has a longer path bw two nodes as compared to its shortest path.
+There can be a possibility that, DFS tree has a longer path bw two nodes as compared to its shortest path.
 We store a timestamp of every node.
 Every node has two timestamp stored :
 	->start_timestamp = time at which node was monitored first.
@@ -381,7 +383,7 @@ A back edge whose ancestor arrival time is minimum (i.e. edge goes top of the tr
 **
 Every node asks its descendent to tell about the deepest back edge.
 deepest back edge means, a back edge that goes deepest to the root.
-this helps every parent node node to get its DBE by its child subgraph.
+this helps every parent node to get its DBE by its child subgraph.
 
 variable used in algo :
 dbe = deepest back edge
