@@ -444,6 +444,40 @@ In DFS tree, a vertex u is articulation point if one of the following two condit
 2) u is not root of DFS tree and it has a child v such that
  no vertex in subtree rooted with v has a back edge to one of the ancestors (in DFS tree) of u.
 
+
+for every node we will have following DS:
+->arrival_time
+->dpe
+->parent
+->visited
+
+Algo :
+
+	time=0;
+	AP(node) {
+		children = 0;
+		arr[node] = time++;
+		visited[node] = true;
+		dbe[node] = arr[node];
+		For all w adjacent to node do {
+			if(!visited[w]) {
+				children++;
+				parent[w] = node;
+				AP(w);
+				dbe[node] = min(dbe[w], dbe[node]);
+				if(parent[node] == null && children > 1) {
+					"node is articulation vertex";
+				}
+				if(parent[node] != null && dbe[w] >= arr[node]) {
+					"node is articulation vertex";
+				}
+			} else if(parent[node] != w) {
+				dbe[node] = min(dbe[node], arr[w]);
+			}
+		}
+	}
+	
+
 =>K vertex connected
 =>K edge connected
 
@@ -490,6 +524,17 @@ if(arr[u]>arr[v] && dep[v]==null) {
    
 No Back Edge === No Cycle
 
+=>Detect cycle in a graph (directed or undirected)
+check if there is any back edge in a graph
+
+solution 1 : go for complete DFS, and then check if there is an edge (u,v) 
+		where dep_time[u] > dep_time[v]
+		
+solution 2 : find back edge (if exists) during DFS
+		for any edge (u,v) during DFS,
+		if(v.visited == true && dep_time[v] == null)
+			then (u,v) is back edge
+
 Ans: 
 1)Do a DFS
 2)Order vertices of graph in departure time
@@ -508,7 +553,7 @@ DAG : Directed Acyclic Graph
 	-> no back edge means no cycle
 (Q) Given an undirected graph G, check if G is Acyclic?
 	-> no back edge means no cycle
-	-> use find-union disjoint set
+	-> use find-union disjoint set			
 
 =>In undirected Graph : 
 Connected Graph = There is a path bw every pair of vertices.
