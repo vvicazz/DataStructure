@@ -264,29 +264,41 @@ Euler stated without any proof that a necessary condition for the existence of E
 
 Carl Hierholzer proved that for the existence of Eulerian trails it is necessary that zero or two vertices have an odd degree.
 
-(Q)Given a graph G, has G Eulerian path?
+(Q)Given a graph G, has G Eulerian path? (undirected graph)
 Solution :
 	->check if graph is connected
 	->if yes then
 	->count of vertices with odd degree must be 0 or 2
 	->if yes, then graph has eulerian path.
 	
-(Q)Given a graph G, has G Eulerian cycle?
+(Q)Given a graph G, has G Eulerian cycle? (undirected graph)
 	->check if graph is connected
 	->if yes then
 	->count of vertices with odd degree must be 0
 	->if yes, then graph has eulerian cycle.
 	
-(Q)Given a Eulerian graph G, print Eulerian path.
+(Q)Given a Eulerian graph G, print Eulerian path.(undirected graph)
 	->check if graph has eulerian path
 	->if yes, then if graph has any odd degree vertex start from there, 
 			else start from any vertex
+	->when you find single edge from a vertex, 
+		traverse that edge and remove that edge
 	->when you find more than one edge from a vertex,
-			choose that edge which is not a bridge
-	->use DFS to check if an edge is a bridge
+		choose that edge which is not a bridge
+		traverse that edge and remove that edge
+	->use DFS/BFS to check if an edge is a bridge
 	
-(Q) Given a Directed Graph G, has G Eulerian cycle?
-	->check if G is Strongly Connected Component.
+	time complexity of above algo = O(E to the power 2)
+	
+	(Q)How to check if an edge is a bridge during eulerian path traversal.
+		Solution 1 : (BFS) check no of connected components
+					 if number increased after edge removal
+					 then this edge is bridge edge
+					 
+		Solution 2 : (DFS) To check if (u-v) is a bridge edge using DFS
+	
+(Q) Given a Directed Graph G, has G Eulerian cycle? (Hierholzer’s Algorithm)
+	->check if G is Strongly Connected Component.(there is a path bw every pair of ordered vertices)
 	->For every edge, in-degree(u) = out-degree(u)
 	
 
@@ -417,6 +429,13 @@ Algo :
 	}
 
 http://www.geeksforgeeks.org/bridge-in-a-graph/
+
+for an edge u--v
+u.arr is the arrival time of a node u via DFS tree
+initially u.dbe is considered as u.arr,
+but if there is any path other that DFS tree such that it reaches to this node u
+having u.arr > u.dbe
+then there is a cycle and in this cycle there can be no bridge edge
 
 Two errors in this algo:
 ->We must not consider dbe for Tree edge (in case of undirected graph, u --> v and v --> u both are same)
@@ -632,7 +651,20 @@ Solution3=>
 			}
 		}
 
+
+=>Strongly Connected Component 
+	A directed graph is strongly connected if there is a path between all pairs of vertices.
+	A strongly connected component of a directed graph is a maximal strongly connected subgraph
 (Q) print all strongly connected components of a directed graph.
+
+1. Call DFS(G) to compute finishing times f[u] for all u.
+2. Compute GT, transpose of G
+3. Call DFS(GT), but in the main loop, consider vertices in order of decreasing f[u] (as computed in first DFS)
+4. Output the vertices in each tree of the depth-first forest formed in second DFS as a separate SCC.
+
+http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/GraphAlgor/strongComponent.htm
+
+------------------------------------------
 
 Applications of BFS :
 1.Connected Components
