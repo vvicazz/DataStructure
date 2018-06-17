@@ -604,19 +604,42 @@ Thread Confinement :
 https://www.quora.com/Java-programming-language/What-are-some-tips-tricks-and-gotchas-when-using-ThreadLocal
 http://stackoverflow.com/questions/11283369/how-does-threadlocal-usage-reduce-reusability
 
+/**
+*	Every thread has its own map
+*	key of map = threadlocal object
+*	value of map = value to be stored in threadlocal
+*/
+
 class Thread {
 	ThreadLocal.ThreadLocalMap threadLocals = null;
 }
 
-//Every thread has its own map.
-
 class ThreadLocal {
-
-	get() OR set() {
 	
+	static class ThreadLocalMap {
+		private Entry[] table;
+		static class Entry extends WeakReference<ThreadLocal<?>> {
+			Object value;
+		}
+	}
+	
+	public T get() {
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = t.threadLocals;
+        ThreadLocalMap.Entry e = map.get(this);
+        return e.value;
+	}
+
+	public void set(T value) {
 		Thread t = Thread.currentThread();
 		ThreadLocalMap map = t.threadLocals;
-		map.get() OR map.set()
+		map.set(this, value);
+	}
+	
+	public void remove() { 
+		Thread t = Thread.currentThread();
+		ThreadLocalMap map = t.threadLocals;
+		map.set(this);
 	}
 }
 
