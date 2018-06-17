@@ -710,6 +710,39 @@ properties of Immutable class :
 
 
 ====================================================================================================
+http://www.programmr.com/blogs/what-every-java-developer-should-know-strong-and-weak-references
+https://web.archive.org/web/20061130103858/http://weblogs.java.net/blog/enicholas/archive/2006/05/understanding_w.html
+
+** strong, soft, weak, and phantom, in order from strongest to weakest
+
+=>Strong References :
+
+	Widget w = new Widget();
+
+A Widget object is created on the heap, and the variable w holds a reference to that object. 
+As long as the variable w is active, the object which it points to (Widget) will not be garbage collected.
+That is why this is known as Strong Reference.
+Strong because the object referenced by it cannot be garbage collected against its will.
+
+
+=>Weak References :
+
+Objects referenced by Weak Reference may be garbage collected,
+if the JVM runs short of memory, even when they are being used.
+ 
+WeakReference<String> wr = new WeakReference<String>(new String("abc"));
+
+	String s = wr.get();
+	if(s != null ) {
+	    // great the weak ref has not been garbage collected
+	} else {
+	    // oops the weak ref was garbage collected... now I will have to create another one
+	}
+	
+The most common use for weak references are read-only caches, where losing an object is not disastrous.
+We can also use WeakHashMap for these kind of caches.
+
+====================================================================================================
 
 Spring transactions
 Refrences in java
