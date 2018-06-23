@@ -8,12 +8,12 @@ They break the problem into several subproblems that are similar to the original
  solve the subproblems recursively, and then combine these solutions to create a solution to the original problem. 
  
 ex : merge sort
-The key operation of the merge sort algorithm is the merging of two sorted sequences in the â€œcombineâ€ step.
+The key operation of the merge sort algorithm is the merging of two sorted sequences in the “combine” step.
 
 When an algorithm contains a recursive call to itself, we can often describe its running time by a recurrence equation or recurrence.
 
 Suppose that our division of the problem yields a subproblems, each of which is 1=b the size of the original. 
-(For merge sort, both a and b are 2, but we shall see many divide-and-conquer algorithms in which a Â¤ b.)
+(For merge sort, both a and b are 2, but we shall see many divide-and-conquer algorithms in which a ¤ b.)
  It takes time T.n=b/ to solve one subproblem of size n=b, and so it takes time aT.n=b/ to solve a of them.
  If we take D.n/ time to divide the problem into subproblems and C.n/ time to combine the solutions to the subproblems
  into the solution to the original problem, 
@@ -69,7 +69,7 @@ heapsort
 	->inserting a new number in a heap takes log(n) time.
 -> convert heap to a sorted array - n log(n)
 
-(Q) Give an O(n log k) -time algorithm to merge k sorted lists into one sorted list, 
+(Q) merge k sorted lists into one sorted list, 
 	where n is the total number of elements in all the input lists. (Hint: Use a minheap for k-way merging.)
 
 	
@@ -122,10 +122,69 @@ countingSort(A, B, k) {
 
 (Q) Describe an algorithm that, given n integers in the range 0 to k, preprocesses its input
 	and then answers any query about how many of the n integers fall into a range [a..b] O(1) time.
-	Your algorithm should use â€šO(n+k) preprocessing time.
+	Your algorithm should use ‚O(n+k) preprocessing time.
 
 	
 --------------------------------------------------------------
 
 => Radix sort : 
 
+->This algorithm assumes that all numbers must have same numbers of digits.
+
+radixSort(A, d) {
+	for(i=1 to d) {
+		sort array A on digit i
+	}
+}
+
+329 457 657 839 436 720 355
+
+720 355 436 457 657 329 839     --- unit place sorted
+
+720 329 436 839 355 457 657		--- tens place sorted
+
+329 355 436 457 657 720 839		--- hundred place sorted
+
+
+time complexity = O(n*d)
+
+--------------------------------------------------------------
+
+Bucket Sort :
+
+
+--------------------------------------------------------------
+
+Stack
+Queue
+linked list
+doubly linked list
+
+insertion , deletion , search operation in above DS
+
+--------------------------------------------------------------
+
+=> Binary Tree :
+
+->binary tree traversals
+Inorder 
+preorder
+postorder
+
+-> traversals without using recursion
+
+--------------------------------------------------------------
+
+Binary Search Tree
+
+searching
+insertion
+Deletion
+
+--------------------------------------------------------------
+
+AVL tree
+Red Black tree
+Interval Tree
+
+--------------------------------------------------------------
