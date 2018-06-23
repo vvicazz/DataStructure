@@ -1,0 +1,27 @@
+=>Array Rotations :
+
+rotate array by d elements
+	->gcd way
+	->left reversal algo
+	->right reversal algo
+find pivot element in sorted and rotated array
+find sum of pair of numbers in sorted and rotated array
+majority element	-> hashmap, moore voting algo
+Lexicographically minimum string rotation	-> array of size 26,count occurence of character from A-Z
+Rotate Matrix Elements (shift all elements by 1)
+Print a given matrix in spiral form
+Inplace rotate square matrix by 90 degrees -> rotate -> transpose
+--TODO--Rotate each ring of matrix anticlockwise by K elements
+Check if all rows of a matrix are circular rotations of each other -> append array to array itself
+Minimum rotations required to get the same string -> same as above
+Check if strings are rotations of each other or not
+Count rotations divisible by 4
+
+
+Rearrange an array such that arr[i] = i
+Move all negative numbers to beginning and positive to end
+Rearrange array such that arr[i] >= arr[j] if i is even and arr[i]<=arr[j] if i is odd and j < i
+Convert array into Zig-Zag fashion
+Rearrange array in alternating positive & negative items with O(1) extra space
+Rearrange array such that even positioned are greater than odd
+Arrange given numbers to form the biggest number

@@ -1,0 +1,131 @@
+Cormenn :
+
+->Insertion sort 
+
+->Divide and conquer approach
+
+They break the problem into several subproblems that are similar to the original problem but smaller in size,
+ solve the subproblems recursively, and then combine these solutions to create a solution to the original problem. 
+ 
+ex : merge sort
+The key operation of the merge sort algorithm is the merging of two sorted sequences in the “combine” step.
+
+When an algorithm contains a recursive call to itself, we can often describe its running time by a recurrence equation or recurrence.
+
+Suppose that our division of the problem yields a subproblems, each of which is 1=b the size of the original. 
+(For merge sort, both a and b are 2, but we shall see many divide-and-conquer algorithms in which a ¤ b.)
+ It takes time T.n=b/ to solve one subproblem of size n=b, and so it takes time aT.n=b/ to solve a of them.
+ If we take D.n/ time to divide the problem into subproblems and C.n/ time to combine the solutions to the subproblems
+ into the solution to the original problem, 
+ 
+ T(n) = aT(n/b) + D(n) + C(n)
+ 
+ for merge sort , 
+ T(n) = 2 T(n/2) + cn
+ 
+To determine time complexity by this recursion equation, we can create recursion tree.
+for merge sort , 
+T(n) = cn log(n) + cn
+
+(Q) write insertion sort using recursive procedure.
+(Q) use binary search in insertion sort
+(Q) bubble sort
+(Q) find number of inversions in an array
+(Q) write merge sort in iterative way.
+
+-> maximum sum subarray
+
+------------------------------------------------------------------
+
+Heap Sort
+
+advantages of heap data structure
+1) heap sort
+2) priority queue
+
+-> heap is a complete binary tree
+	The tree is completely filled on all levels except possibly the lowest, which is filled from the left up to a point.
+-> It is represented in an array
+-> heapSize <= array.length
+
+types of heap
+min heap
+max heap
+
+max heap
+	parent >= child
+	child = 2*i+1 , 2*i+2   (if i is parent)
+	parent = (i-1)/2        (if i is any child)
+	
+For heap sort we use max heap
+min heaps are used as priority queues
+
+height of a binary heap tree = log(n)
+
+(Q) find smallest element in max heap.
+
+heapsort
+-> convert an array to heap    - n log(n)
+	->inserting a new number in a heap takes log(n) time.
+-> convert heap to a sorted array - n log(n)
+
+(Q) Give an O(n log k) -time algorithm to merge k sorted lists into one sorted list, 
+	where n is the total number of elements in all the input lists. (Hint: Use a minheap for k-way merging.)
+
+	
+A d-ary heap is like a binary heap, but (with one possible exception) non-leaf nodes have d children instead of 2 children.
+
+--------------------------------------------------------------
+
+=>Quick sort 
+
+like merge sort, it applies the divide-and-conquer paradigm.
+
+time complexity = n log(n)
+
+--------------------------------------------------------------
+
+=>Sorting in Linear Time
+
+comparison sorts : the sorted order they determine is based only on comparisons between the input elements.
+
+=>Counting sort 
+
+->Counting sort assumes that each of the n input elements is an integer in the range 0 to k, for some integer k. 
+->Counting sort determines, for each input element x, the number of elements less than x. 
+	It uses this information to place element x directly into its position in the output array. 
+->It is a stabel sort.
+
+A - input array  [1..n]
+B - sorted array [1..n]
+C - temp array   [0..k]
+
+countingSort(A, B, k) {
+	let C[0..k] be a new array
+	for(int i=0; i<k; i++) 
+		C[i]=0;
+		
+	for(int i=0; i<A.length; i++)
+		C[A[i]]++;
+	// C[i] now contains the number of elements equal to i. 
+	
+	for(int i=1; i<=k; i++)
+		C[i] = C[i] + C[i-1];
+	// C[i] now contains the number of elements less than or equal to i. 
+	
+	for(int i=A.length-1 ; i>=0; i--) {
+		B[C[A[i]]] = A[i];
+		C[A[i]]--;
+	}
+}
+
+
+(Q) Describe an algorithm that, given n integers in the range 0 to k, preprocesses its input
+	and then answers any query about how many of the n integers fall into a range [a..b] O(1) time.
+	Your algorithm should use ‚O(n+k) preprocessing time.
+
+	
+--------------------------------------------------------------
+
+=> Radix sort : 
+
