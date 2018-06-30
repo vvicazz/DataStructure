@@ -67,7 +67,11 @@ public class PostOrderWithoutRecursion {
 		 * its left subtree is already processed <br>
 		 * Now we need to process its right subtree <br>
 		 * if right subtree is not present or already processed <br>
+<<<<<<< HEAD
 		 * then pop the node from stack and process it.
+=======
+		 * then process node itself
+>>>>>>> 4c00ad451bf0bd246d8974f87bca5c33d69ef224
 		 */
 		private boolean isRightChildProcessed;
 
