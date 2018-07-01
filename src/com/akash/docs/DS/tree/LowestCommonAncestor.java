@@ -6,12 +6,20 @@ package com.akash.docs.DS.tree;
  * recursively find full path of a node in a tree and capture it in a list. <br>
  * time = O(n) <br>
  * memory = O(n) <br>
+ * 
  * 2. do any traversal on tree and store parent of each node in a hashmap <br>
  * time = O(n) <br>
  * memory = O(n) <br>
+ * 
  * 3. Every node should return a status object of two boolean variables <br>
  * every node should tell if its subtree(including itself), contains both nodes
  * <br>
+ * 
+ * 4. Build Euler path of tree with level of nodes <br>
+ * find minimum level bw the two nodes <br>
+ * 
+ * Segment tree <br>
+ * https://kartikkukreja.wordpress.com/2014/11/09/a-simple-approach-to-segment-trees/
  */
 public class LowestCommonAncestor {
 
