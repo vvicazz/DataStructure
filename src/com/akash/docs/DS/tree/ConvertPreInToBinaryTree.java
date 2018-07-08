@@ -25,6 +25,12 @@ class ConvertPreInToBinaryTree {
 	// Approach : find root node in Inorder array,
 	// then find right most node in left subtree in Inorder array
 	// search that element in PreOrder
+	//
+	// Similar approach can be used to create binary tree
+	// using Inorder and Postorder traversal
+	// find root in inorder,then find left most node in right subtree
+	// search that element in Post order
+	//
 	// worst case time complexity will be O(n2), for example when tree is left
 	// skewed
 	private Node create(int inStart, int inEnd, int preStart, int preEnd) {
