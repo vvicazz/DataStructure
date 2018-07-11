@@ -18,15 +18,41 @@ Inorder traversal of binary tree without recursion without stack
 Delete binary tree
 check if two binary trees are identical
 check if two binary trees are isomorphic
-check if two binary trees are mirror
+check if two trees are mirror
+	->recursive
+		->node.data, left==right, right==left
+	->iterative
+		->level order traversal with isLeft varaible
+		->compare LNR and RNL
 convert a binary tree into its mirror
+--sorted linked list to BST
+	->O(nlog(n)) mid of linked list will be root, use recursive for left and right
+	->O(n) 
+sorted array to balanced BST
+	->mid of array will be root, use recursive for left and right
+BST to min heap
+	->inorder traversal of BST is min heap
+normal BST to balanced BST
+	->inorder of BST, sorted array to balanced BST
+find median in BST
+	->check no of nodes in BST,do inorder traversal and stop at n/2
+BST from preorder
+	->first element will be root, find first number in array greater than root,right subtree starts from there.Recursive
+BST from postorder
+Construct Tree from given Inorder and Preorder traversals
+Construct a tree from Inorder and Level order traversals
+Construct Tree from given Inorder and Postorder traversals
+binary tree to doubly linked list
+
+--check if binary tree is heap
+--merge k sorted arrays
+--given level order traversal of binary tree, check if min heap
 --check if two nodes are swapped in BST
 --Diameter of a binary tree
-floor and ceiling of a BST
---Convert sorted linked list to BST
---Convert sorted array to BST
+--floor and ceiling of a BST
+
 --path with max sum in binary tree
-Check if all leaves are at same level
+--Check if all leaves are at same level
 print perfect binary tree in below form:
 	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
 	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
@@ -39,14 +65,22 @@ print all ancestors of a node with recursion
 print all ancestors of a node without recursion		-- create a map for maintain parent of each node
 
 Check for Children Sum Property in a Binary Tree 
-
---Construct binary tree from 2 traversals :
-	Hint : binary tree can only be constructed if one of the traversal is inorder
-	->Inorder and Postorder
-	->Inorder and preorder
-	->Inorder and levelorder
 	
 --------------------------------------------------
+
+--binary tree
+--BST
+--AVL tree
+--Segment tree
+	https://kartikkukreja.wordpress.com/2014/11/09/a-simple-approach-to-segment-trees/
+
+red black tree
+interval tree
+threaded binary tree
+
+--Heap
+
+-------------------------------------------------
 
 
 public void printVerticalNodes() {
