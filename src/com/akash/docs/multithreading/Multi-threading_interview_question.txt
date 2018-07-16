@@ -29,7 +29,7 @@ Multi-threading interview question
 20) Executor framework
 21) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
 22)-- ways to avoid deadlock
-23)-- CountDownLatch, CyclicBarrier, Semaphore
+23) CountDownLatch, CyclicBarrier, Semaphore
 24) How ThreadPoolExecutor works? How FutureTask works ?
 	What are various types of pool executors in java, 
 	i.e. various implementations of ExecutorService interface in java
@@ -42,3 +42,47 @@ Multi-threading interview question
 	
 28)-- fork-join framework in java
 29)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
+30) CompletableFuture
+
+----------------------------------------------
+
+
+ReentrantLock advantage over synchronized block
+->try
+->interruptibly  -- wait unconditionaly until interrupted
+->condition queues
+
+Semaphore 		//similar to monitor with more than one permits
+	acquire()
+	release()
+	
+CountDownLatch	//like a gate
+	await()
+	countDown()
+
+CyclicBarrier
+	await()
+	
+CyclicBarrier is similar to CountDownLatch in functionality.
+but there are few difference:
+-> CountDownLatch can not be reset, however, CyclicBarrier can (cyclic because it can be re-used)
+-> we can trigger a runnable object at the end of last thread execution
+-> (all-or-none breakage model) A barrier exception in any thread can result in faluire of all threads
+
+When all threads finish performing their action, one of them (typically the last one that trips the barrier)
+ starts processing the data that was fetched by each of these.
+eg: MapReduce
+
+
+BlockingQueue  ---  interface that offers various methods of threadsafe Queue
+	various operations : 
+	->block
+	->throw exception
+	->return a special value
+
+ArrayBlockingQueue
+LinkedBlockingQueue
+
+DelayQueue --- elements are inserted in queue with a specified delay and released from queue order by their delay.
+
+Exchanger  --- exchange data between two threads
