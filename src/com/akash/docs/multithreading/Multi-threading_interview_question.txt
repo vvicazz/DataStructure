@@ -1,53 +1,44 @@
 Multi-threading interview question
 
-1) what are the ways to create a thread and which is better: Thread,Runnable
-2) why wait, notify and notifyAll are in object class? why they called inside syncronized ?
-3) diff bw sleep and wait
-4) ThreadLocal : set(), get(), initialValue()
-5) ThreadGroup
-6) what is ThreadPool ? How to create our own ThreadPool
-7) diff bw syncronized method and block
-8) daemon thread
-9)-- Java Timer classes
-10) diff bw Lock api and syncronized keyword -> 
-		try methods, interruptible, fair-unfair, 
-		separate Condition object for different diff condition queues.
-11) Executor framework
+1) Thread, Runnable, run, start, ThreadGroup
+2) what are the ways to create a thread and which is better: Thread,Runnable,Executor framework
+3) why wait, notify and notifyAll are in object class? why they called inside syncronized ?
+4) diff bw sleep and wait
+5) join()
+6) ThreadLocal : set(), get(), initialValue()
+7) ThreadGroup
+8) diff bw syncronized method and block
+9) daemon thread
+10)-- Java Timer classes
+11) How to count no of request to a servlet -- AtomicLong
 12) Why atomic class are better than Lock api - 
 	CAS -> compare and swap , it opportunisticly updates the variable
 	These operations are implemented atomically at processor level
 	client api has to deal with contention
 	AtomicLong, AtomicInteger, AtomicBoolean, AtomicReference
-	
-13) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
-14)-- ways to avoid deadlock
-15)-- CountDownLatch, CyclicBarrier, Semaphore
-16) volatile keyword
-17) Why suspend() and resume() methods are deprecated
-18) how to stop a thread 
-Q) How ThreadPoolExecutor works? How FutureTask works ?
+13) volatile keyword
+14) Why suspend(), resume() and stop() methods are deprecated
+15) how to stop a thread
+16) Strong References, WeakReference, SoftReference
+17) escaping this object during construction -- start a thread in constructor, event listener in constructor
+
+18) what is ThreadPool ? How to create our own ThreadPool
+19) diff bw Lock api and syncronized keyword -> 
+		try methods, interruptible, fair-unfair, 
+		separate Condition object for different diff condition queues.
+20) Executor framework
+21) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
+22)-- ways to avoid deadlock
+23)-- CountDownLatch, CyclicBarrier, Semaphore
+24) How ThreadPoolExecutor works? How FutureTask works ?
 	What are various types of pool executors in java, 
 	i.e. various implementations of ExecutorService interface in java
 	How state of pool is managed and how state of threads inside pool is managed ?
 	Advantages of executor framework ?
-19) create your own ThreadPoolExecutor ?
-20)-- ReadWriteLock
-21) diff bw volatile and atomic 
+25) create your own ThreadPoolExecutor ?
+26)-- ReadWriteLock
+27) diff bw volatile and atomic 
 	-> volatile provides visibility guaranty, but not atomicity
 	
-22)-- fork-join framework in java
-23)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
-
-
- 
-lambda
-collection framework - register
-design patterns
-references in java
-hibernate questions
-spring questions
-DP
-array
-BST
-graph
-
+28)-- fork-join framework in java
+29)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
