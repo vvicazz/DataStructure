@@ -1,8 +1,23 @@
-Runnable - run()
-Callable - call()
+**Example :
+					
+Class MyCallable implements Callable<String> {
+	public String call() {
+		return "hello";
+	}
+}
 
-1. call() can return a value but run() cannot
-2. call() can throw exception but run() cannot
+ExecutorService es = Executors.newFixedThreadPool(10);
+Future<String> fut = es.submit(new MyCallable());
+String result = fut.get();
+
+======================================================
+Advantages :
+
+-> Asynchronous task execution
+-> Decoupling task submission from task execution
+-> Scalable configuration
+
+======================================================
 
 ExecutorService es = Executors.newFixedThreadPool(...);
 
@@ -32,7 +47,11 @@ ThreadPoolExecutor.java (C)
 
 Future		(I)			--> get() , cancel() , isDone() , isCancel()
 	|
-RunnableFuture	(I)		--> run()	//Runnable version of Future
+	|	  Runnable (I)
+	|		|
+	|		|
+  RunnableFuture	(I)		--> run()	//Runnable version of Future
+	|
 	|
 FutureTask		(C)
 
@@ -45,20 +64,23 @@ FutureTask		(C)
 					else if interrupted return InterruptedException
 					else return the actual exception occurred
 					
-	
----------------	
-		
-**Example :
-					
-Class MyCallable implements Callable<String> {
-	public String call() {
-		return "hello";
-	}
-}		
-ExecutorService es = Executors.newFixedThreadPool(10);
-Future<String> fut = es.submit(new MyCallable());
-String result = fut.get();
 
+================================================================
+run() method of FutureTask only takes Callable implementation.
+If you want to use Runnable, cast Runnable to Callable using RunnableAdapter.
+
+when executorService.submit() is called
+new Worker is created and added to queue,
+here worker is new thread created by threadPoolExecutor
+worker.start() initiated
+
+internally ,worker.start() directly calls callable.run() of FutureTask
+
+output of futureTask is stored in FutureTask object itself.
+
+Difference b/w run() and call()
+-> call() can return a value but run() cannot
+-> call() can throw exception but run() cannot
 
 ================================================================
 
