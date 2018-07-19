@@ -114,6 +114,7 @@ If no name is specified explicitly, the default name is derived from the field n
 
 (Q) Can @Repository, @Service, and @Controller be interchangeably used?
 @Controller supports mvc related annotations
+	https://stackoverflow.com/questions/15922991/is-spring-annotation-controller-same-as-service
 @Repository supports persistence exception translation
 	http://www.javapractices.com/topic/TopicAction.do?Id=120
 
@@ -236,14 +237,14 @@ Spring AOP is proxy-based.
 (2)CGLIB							=> when not implementing interfaces (proxies are created by classes)
 
 **NOTE** : CGLIB is used by default if a business object does not implement an interface.
-It is possible to force the use of CGLIB, in those (hopefully rare) cases where you need to advise a method that is not declared
+It is possible to force the use of CGLIB, in those (hopefully rare) cases where you need to advice a method that is not declared
  on an interface, or where you need to pass a proxied object to a method as a concrete type.
 If the target object to be proxied implements at least one interface then a JDK dynamic proxy will be used
  
  Spring AOP based on @AspectJ
  Spring AOP schema based  i.e. xml based
  
-==>By autoproxying we mean that if Spring determines that a bean is advised by one or more aspects, 
+==>By autoproxying we mean that if Spring determines that a bean is adviced by one or more aspects, 
 it will automatically generate a proxy for that bean to intercept method invocations and ensure that advice is executed as needed.
 
 @Configuration
@@ -253,7 +254,7 @@ public class AppConfig {........}
 <aop:aspectj-autoproxy/>
 
 
-=>final methods cannot be advised, as they cannot be overridden.
+=>final methods cannot be adviced, as they cannot be overridden.
 =>The constructor of your proxied object will be called twice when implemented via CGLIB.
 Using JDK dynamic proxies one constructor call will be done but in case of CGLIB two instances will be created.
 
