@@ -43,13 +43,15 @@ Life cycle of a bean:
 (2)constructor
 (3)setter
 
+BeanNameAware				--	(4)setter
+BeanFactoryAware			--	(5)setter
+ApplicationContextAware		--	(6)setter
+
 InitializingBean			--	(8)afterPropertiesSet()			--	@PostConstruct
 DisposableBean				--	(10)destroy()					--	@PreDestroy
 BeanPostProcessor			--	(7)postProcessBeforeInitialization(Object bean, String beanName)
 								(9)postProcessAfterInitialization(Object bean, String beanName)
-ApplicationContextAware		--	(6)setter
-BeanNameAware				--	(4)setter
-BeanFactoryAware			--	(5)setter
+
 ServletContextAware 		--	setter
 ServletConfigAware			--	setter
 					
@@ -104,6 +106,8 @@ If no name is specified explicitly, the default name is derived from the field n
 
 (3) @Autowired applies to fields, constructors, and multi-argument methods
 	@Resource is supported only for fields and bean property setter methods with a single argument
+
+***https://www.sourceallies.com/2011/08/spring-injection-with-resource-and-autowired/
 
 @Component is a generic stereotype for any Spring-managed component. 
 @Repository, @Service, and @Controller are specializations of @Component for more specific use cases
