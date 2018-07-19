@@ -1,0 +1,32 @@
+http://gee.cs.oswego.edu/dl/papers/fj.pdf
+
+
+In a work stealing scheduler, each processor in a computer system has a queue of work items 
+(computational tasks, threads) to perform. Each work item consists of a series of instructions,
+ to be executed sequentially, but in the course of its execution, a work item may also spawn new work items
+ that can feasibly be executed in parallel with its other work.
+ These new items are initially put on the queue of the processor executing the work item. 
+ When a processor runs out of work, it looks at the queues of other processors and "steals" their work items
+
+processors needing work steal computational threads from other processors
+
+
+Two scheduling paradigms have arisen to address the problem of scheduling multithreaded
+computations: work sharing and work stealing. In work sharing, whenever a processor
+generates new threads, the scheduler attempts to migrate some of them to other processors
+in hopes of distributing the work to underutilized processors. In work stealing, however,
+underutilized processors take the initiative: they attempt to \steal" threads from other
+processors.
+
+the migration of threads occurs less frequently with work stealing
+than with work sharing, since when all processors have work to do, no threads are migrated
+by a work-stealing scheduler, but threads are always migrated by a work-sharing scheduler.
+
+
+The fork operation starts a new parallel fork/join subtask. The
+join operation causes the current task not to proceed until the
+forked subtask has completed. Fork/join algorithms, like other
+divide−and−conquer algorithms, are nearly always recursive,
+repeatedly splitting subtasks until they are small enough to solve
+using simple, short sequential methods.
+
