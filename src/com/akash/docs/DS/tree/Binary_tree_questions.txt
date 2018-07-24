@@ -44,9 +44,23 @@ Construct a tree from Inorder and Level order traversals
 Construct Tree from given Inorder and Postorder traversals
 binary tree to doubly linked list
 
---check if binary tree is heap
+Lowest Common Ancestor(LCA)
+	->findPath(Node,Node,List<Node>)
+			recursively find full path of a node in a tree and capture it in a list.
+			time = O(n),  memory = O(n) 
+	-> do any traversal on tree and store parent of each node in a hashmap 
+			time = O(n),  memory = O(n) 
+	-> Every node should return a status object of two boolean variables
+		every node should tell if its subtree(including itself), contains both nodes
+	-> Build Euler path of tree with level of nodes
+		find minimum level bw the two nodes
+
+check if binary tree is heap   -> level order traversal, check parent child relation (0 to n/2)
+given level order traversal of binary tree, check if min heap
+
+--Construct all possible BSTs for keys 1 to N
+--Find all possible binary trees with given Inorder Traversal
 --merge k sorted arrays
---given level order traversal of binary tree, check if min heap
 --check if two nodes are swapped in BST
 --Diameter of a binary tree
 --floor and ceiling of a BST
@@ -60,9 +74,6 @@ print perfect binary tree in below form:
 --Remove all nodes which don’t lie in any path with sum>= k
 --Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
-
-print all ancestors of a node with recursion
-print all ancestors of a node without recursion		-- create a map for maintain parent of each node
 
 Check for Children Sum Property in a Binary Tree 
 	
