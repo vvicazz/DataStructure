@@ -29,20 +29,27 @@ Multi-threading interview question
 20) Executor framework
 21) Runnable, Future (get,isDone,cancel), Callable(call) , RunnableFuture, FutureTask (RunnableFuture)
 22)-- ways to avoid deadlock
-23) CountDownLatch, CyclicBarrier, Semaphore
-24) How ThreadPoolExecutor works? How FutureTask works ?
+23) How to make threads as deamon, which are created using executor service
+24) How to handle exceptions in threads(like retry if exception occurs etc), while using executors 
+25) CountDownLatch, CyclicBarrier, Semaphore
+	-> Difference b/w CountDownLatch and CyclicBarrier
+		-> CountDownLatch can not be reset, however, CyclicBarrier can (cyclic because it can be re-used)
+			CyclicBarrier can be used when thread gates are at multiple states, like map-reduce
+		-> we can trigger a runnable object at the end of last thread execution
+		-> (all-or-none breakage model) A barrier exception in any thread can result in faluire of all threads
+26) How ThreadPoolExecutor works? How FutureTask works ?
 	What are various types of pool executors in java, 
 	i.e. various implementations of ExecutorService interface in java
 	How state of pool is managed and how state of threads inside pool is managed ?
 	Advantages of executor framework ?
-25) create your own ThreadPoolExecutor ?
-26)-- ReadWriteLock
-27) diff bw volatile and atomic 
+27) create your own ThreadPoolExecutor ?
+28)-- ReadWriteLock
+29) diff bw volatile and atomic 
 	-> volatile provides visibility guaranty, but not atomicity
 	
-28)-- fork-join framework in java
-29)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
-30) CompletableFuture
+30)-- fork-join framework in java
+31)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
+32) CompletableFuture
 
 ----------------------------------------------
 
@@ -66,8 +73,10 @@ CyclicBarrier
 CyclicBarrier is similar to CountDownLatch in functionality.
 but there are few difference:
 -> CountDownLatch can not be reset, however, CyclicBarrier can (cyclic because it can be re-used)
+	CyclicBarrier can be used when thread gates are at multiple states, like map-reduce
 -> we can trigger a runnable object at the end of last thread execution
 -> (all-or-none breakage model) A barrier exception in any thread can result in faluire of all threads
+	
 
 When all threads finish performing their action, one of them (typically the last one that trips the barrier)
  starts processing the data that was fetched by each of these.
