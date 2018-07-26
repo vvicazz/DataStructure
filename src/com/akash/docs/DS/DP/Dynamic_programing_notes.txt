@@ -42,7 +42,10 @@ it does not have overlapping subproblems property.
 6)median of two sorted arrays
 7)Closest pair of points
 
+==================================================
+
 =>Dynamic Programming examples :
+
 ugly mumbers
 fibonacci
 Catalan number
@@ -78,3 +81,224 @@ Min Cost Path
 --Text justification problem
 --parenthesis problem
 --blackjack problem
+
+
+==================================================
+
+int fibonacci(int n) {
+	if(n==0 || n==1) {
+		return n;
+	}
+	int fib[] = new int[n+1];
+	fib[0] = 0;
+	fib[1] = 1;
+	for(int i=2; i<=n; i++) {
+		fib[i] = fib[i-1] + fib[i-2];
+	}
+	return fib[n];
+}
+
+
+//2,3,5
+int uglyNumber(int n) {
+	int uglyNum[] = new int[n];
+	uglyNum[0] = 1;
+	if(n == 1) {
+		return 1;
+	}
+	int pos1, pos2, pos3 = 0;
+	int i1 = uglyNum[pos1] * 2;
+	int i2 = uglyNum[pos2] * 3;
+	int i3 = uglyNum[pos3] * 5;
+	for(int i=1; i<n; i++) {
+		if(i1 < i2 && i1 < i3) {
+			uglyNum[i] = i1;
+			pos1++;
+			i1 = uglyNum[pos1] * 2;
+		} else if(i2 < i1 && i2 < i3) {
+			uglyNum[i] = i2;
+			pos2++;
+			i2 = uglyNum[pos2] * 3;
+		} else {
+			uglyNum[i] = i3;
+			pos3++;
+			i3 = uglyNum[pos3] * 5;
+		}
+	}
+	return uglyNum[n-1];
+}
+
+
+
+//no of BSTs of a sorted array
+//total number of ways to make n opening and closing braces
+//total number of full binary trees by n nodes
+int catalanNumber(int n) {
+	int catalan[] = new int[n+1];
+	catalan[0] = 1;
+	catalan[1] = 1;
+	for(int i=2; i<=n; i++) {
+		for(int j=0; j<i; j++) {
+			catalan[i] += catalan[j]*catalan[i-j-1];
+		}
+	}
+	return catalan[n];
+}
+
+
+//2xN dashboard, 2x1 tiles
+int tillingProblem(int n) {
+	if(n == 1 || n == 2) {
+		return n;
+	}
+	int tiling[] = new int[n];
+	tiling[0] = 1;
+	tiling[1] = 2;
+	for(int i=2; i<n; i++) {
+		tiling[i] = tiling[i-1] + tiling[i-2];
+	}
+	return tiling[n-1];
+}
+
+
+
+int friendPairProblem(int n) {
+	if(n==1 || n==2) {
+		return n;
+	}
+	int friendPair[] = new int[n];
+	friendPair[0] = 1;
+	friendPair[1] = 2;
+	for(int i=2; i<n; i++) {
+		friendPair[i] = friendPair[i-1] + (i-1) * friendPair[i-2];
+	}
+	return friendPair[n-1];
+}
+
+
+
+
+//coin change problem
+//min number of coins to make a sum
+int minCoinChangeProblem(int sum, int coins[]) {
+	int MAX_INT = Integer.MAX_VALUE;
+	int minCoin[] = new int[sum+1];
+	minCoin[0] = 0;
+	for(int i=1; i<=sum; i++) {
+		minCoin[i] = MAX_INT;
+	}
+	for(int i=1; i<=sum; i++) {
+		for(int j=0; j<coins.length; j++) {
+			if(i > coins[j] && MAX_INT != minCoin[i - coins[j]] ) {
+				minCoin[i] = min( minCoin[i - coins[j]] + 1, minCoin[i]);
+			}
+		}
+	}
+	if(minCoin[n] == MAX_INT) {
+		return 0;
+	}
+	return minCoin[n];
+}
+
+
+
+
+//coin change problem
+//total number of ways to make a sum
+int totalWaysCoinChangeProblem(int sum, int coins[]) {
+	int totalWays[][] = new int[sum+1][coins.length+1];
+	for(int i=0; i<=sum; i++) {
+		totalWays[0][i] = 0;
+	}
+	for(int i=0; i<=coins.length; i++) {
+		totalWays[i][0] = 1;
+	}
+	for(int i=0; i<coins.length; i++) {
+		for(int j=1; j<=sum; j++) {
+			if(j >= coins[i]) {
+				totalWays[i][j] = MAX(totalWays[i][j-coins[i]] + 1, totalWays[i][j-1]);
+			} else {
+				totalWays[i][j] = totalWays[i][j-1];
+			}
+		}
+	}
+	return totalWays[sum][coins.length];
+}
+
+
+
+//check if Set of non-negative numbers,contains a subset with given sum
+
+isSubsetSum(arr, sum, n) = isSubsetSum(arr, sum - arr[n-1], n-1) || isSubsetSum(arr, sum, n-1)
+
+if n=0, sum>0 , false
+if sum=0 , true
+
+printing all subsets can be done, as in case of LCS
+
+boolean setContainsSubsetWithSum(int set[], int sum) {
+	boolean memo[][] = new boolean[set.length+1][sum+1];
+	for(int i=0; i<=sum; i++) {
+		memo[0][i] = false;
+	}
+	for(int i=0; i<=set.length; i++) {
+		memo[i][0] = true;
+	}
+	for(int i=1; i<=set.length; i++) {
+		for(int j=0; j<=sum; j++) {
+			if(j < set[i]) {
+				memo[i][j] = memo[i-1][j];
+			} else {
+				memo[i][j] = memo[i-1][j-set[i]] || memo[i-1][j];
+			}
+		}
+	}
+	for(int i=1; i<=set.length; i++) {
+		if(memo[i][sum]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+int goldMineProblem(int golds[][]) {
+	int n = golds.length;
+	int m = golds[0].length;
+	int maxGolds[][] = new int[n][m];
+	for(int j=0; j<m; j++) {
+		for(int i=0; i<n; i++) {
+			maxGolds[i][j] = getMaxGoldValue(i, j, golds);
+		}
+	}
+	int max = 0;
+	for(int i=0; i<n; i++) {
+		if(max > maxGolds[i][m-1]) {
+			max = maxGolds[i][m-1];
+		}
+	}
+	return max;
+}
+
+int getMaxGoldValue(int i, int j, int golds[][]) {
+	int max1 = getValue(i-1,j-1,golds);
+	int max2 = getValue(i-1,j,golds);
+	int max3 = getValue(i-1,j+1,golds);
+	if(max1 >= max2 && max1 >= max3) {
+		return max1;
+	} else if(max2 >= max1 && max2 >= max3) {
+		return max2;
+	} else {
+		return max3;
+	}
+}
+
+int getValue(int i, int j, int golds[][]) {
+	if(i<0 || j<0 || i>=golds.length || j>=golds[0].length) {
+		return 0;
+	}
+	return golds[i][j];
+}
+
+
+
