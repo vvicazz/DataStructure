@@ -280,7 +280,7 @@ int goldMineProblem(int golds[][]) {
 	return max;
 }
 
-int getMaxGoldValue(int i, int j, int golds[][]) {
+private int getMaxGoldValue(int i, int j, int golds[][]) {
 	int max1 = getValue(i-1,j-1,golds);
 	int max2 = getValue(i-1,j,golds);
 	int max3 = getValue(i-1,j+1,golds);
@@ -293,12 +293,35 @@ int getMaxGoldValue(int i, int j, int golds[][]) {
 	}
 }
 
-int getValue(int i, int j, int golds[][]) {
+private int getValue(int i, int j, int golds[][]) {
 	if(i<0 || j<0 || i>=golds.length || j>=golds[0].length) {
 		return 0;
 	}
 	return golds[i][j];
 }
 
+
+
+Check if set Contains Sum Divisible By m
+Approach 1:
+//check if set contains sum divisible by m
+//create boolean array of [0..m-1]
+//save sum of every combination of elemnts as true in this array
+//if 0th elemnt is true, then subset found
+
+Approach 2:
+//create new array with modulus of each number and then do subset sum problem
+boolean setContainsSumDivisibleBy(int set[], int m) {
+	boolean memo[] = new boolean[m];
+	for(int i=0; i<set.length; i++) {
+		memo[set[i] % m] = true;
+		for(int j=0; j<m; j++) {
+			if(memo[j] && set[i] != j) {
+				memo[(set[i] + j) % m] = true;
+			}
+		}
+	}
+	return memo[0];
+}
 
 
