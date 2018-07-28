@@ -62,14 +62,13 @@ check if Set of non-negative numbers,contains a subset with given sum
 gold mine problem
 Rod cutting problem
 zero one knapsack
-Longest common subarray
+Longest common substring
 	->suffix tree can also be used(Compressed Trie)
 Longest common subsequence
 Longest Palindromic Subsequence, 	print Subsequence
 Longest palindromic substring, 		print substring
 	->suffix tree can also be used(Compressed Trie)
 Longest increasing subsequence
---Longest common substring in two arrays
 --longest repeated substring
 	->DP
 	->suffix tree can also be used(Compressed Trie)
