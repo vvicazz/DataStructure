@@ -1,0 +1,29 @@
+CompletionStage
+A stage of a possibly asynchronous computation, that performs an action or computes a value when another CompletionStage completes.
+ A stage completes upon termination of its computation, but this may in turn trigger other dependent stages.
+ 
+ 
+ The computation performed by a stage may be expressed as a Function, Consumer, or Runnable
+ 
+ 
+https://stackoverflow.com/questions/27723546/completablefuture-supplyasync-and-thenapply
+https://blog.krecan.net/2013/12/25/completablefutures-why-to-use-async-methods/
+
+
+supplyAsync(Supplier)
+	.thenApply(Funtion)
+	.thenApplyAsync(Funtion)
+	
+	.thenAccept(Consumer)
+	.thenAcceptAsync(Consumer)
+	
+	.thenRun(Runnable)
+	.thenRunAsync(Runnable)
+	
+	.thenCombine(CompletionStage, BiFunction)
+	.thenCombineAsync(CompletionStage, BiFunction)
+	
+	.thenAcceptBoth(CompletionStage, BiConsumer)
+	.thenAcceptBothAsync(CompletionStage, BiConsumer)
+	
+	
