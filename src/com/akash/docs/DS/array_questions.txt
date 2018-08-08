@@ -27,7 +27,12 @@ Rearrange array in alternating positive & negative items with O(1) extra space  
 Rearrange array such that even positioned are greater than odd
 Rearrange an array such that ‘arr[j]’ becomes ‘i’ if ‘arr[i]’ is ‘j’
 Arrange given numbers to form the biggest number
---Longest Bitonic Subsequence
+Longest Bitonic Subsequence  -> DP
+Longest Bitonic SubArray	-> O(n) time, O(1) space
+Maximum Sum Increasing Subsequence (positive numbers)
+	->similar to longest increasing subsequence
+--Largest Sum Contiguous Subarray	(negative and positive both)
+
 --Minimum swaps required to bring all elements less than or equal to k together
 --Find a sorted subsequence of size 3 in linear time
 --Largest subarray with equal number of 0s and 1s
@@ -127,6 +132,7 @@ void replaceInternal(int arr[], int i) {
 }
 
 
+
 //print longest increasing substring 
 int longestIncreasingSubstring(int arr[]) {
 	int max = 1;
@@ -171,8 +177,10 @@ MAX :	1	2	2	3	3	4	4	5	6
 
 int longestIncreasingSubsequence(int arr[]) {
 	int max = 1;
-	int lis[] = new int[arr.length];
-	lis[0] = 1;
+	int LIS[] = new int[arr.length];
+	for(int i=0; i<LIS.length; i++) {
+		LIS[i] = 1;
+	}
 	for(int i=1; i<arr.length; i++) {
 		for(int j=i-1; j>=0; j--) {
 			if(arr[i] > arr[j]) {
@@ -185,4 +193,104 @@ int longestIncreasingSubsequence(int arr[]) {
 	}
 	return max;
 }
+
+
+
+//Longest Bitonic Subsequence
+//this is based on longest increasing subsequence
+int longestBitonicSubsequence(int arr[]) {
+	int lis[] = new int[arr.length];
+	int lds[] = new int[arr.length];
+	for(int i=0; i<lis.length; i++) {
+		lis[i] = 1;
+	}
+	for(int i=0; i<lds.length; i++) {
+		lds[i] = 1;
+	}
+	for(int i=1; i<lis.length; i++) {
+		for(int j=i-1; j>=0; j--) {
+			if(arr[i] > arr[j]) {
+				lis[i] = lis[j] + 1;
+			}
+		}
+	}
+	for(int i=n-2; i>=0; i--) {
+		for(int j=i+1; j<arr.length; j++) {
+			if(arr[i] > arr[j]) {
+				lds[i] = lds[j] + 1;
+			}
+		}
+	}
+	int max = 0;
+	for(int i=0; i<arr.length; i++) {
+		if(lis[i] + lds[i] - 1 > max) {
+			max = lis[i] + lds[i] - 1;
+		}
+	}
+	return max;
+}
+
+
+
+//Longest Bitonic Subarray
+//	time = O(n)
+//	memory = O(n)
+int longestBitonicSubarray(int arr[]) {
+	int lis[] = new int[arr.length];
+	int lds[] = new int[arr.length];
+	for(int i=0; i<lis.length; i++) {
+		lis[i] = 1;
+	}
+	for(int i=0; i<lds.length; i++) {
+		lds[i] = 1;
+	}
+	for(int i=1; i<lis.length; i++) {
+		if(arr[i] > arr[i-1]) {
+			lis[i] = lis[i-1] + 1;
+		}
+	}
+	for(int i=n-2; i>=0; i--) {
+		if(arr[i] > arr[i+1]) {
+			lds[i] = lds[i+1] + 1;
+		}
+	}
+	int max = 0;
+	for(int i=0; i<arr.length; i++) {
+		if(lis[i] + lds[i] - 1 > max) {
+			max = lis[i] + lds[i] - 1;
+		}
+	}
+	return max;
+}
+
+
+
+//Longest Bitonic Subarray
+//	time = O(n)
+//	memory = O(1)
+int longestBitonicSubarray(int arr[]) {
+	int j=0;
+	int n = arr.length;
+	int start = 0;
+	int startNext = 0;
+	int max = 0;
+	while(j < n) {
+		while(j < n-1 && arr[j] <= arr[j+1]) {
+			j++;
+		}
+		while(j < n-1 && arr[j] >= arr[j+1]) {
+			if(j < n-1 && arr[j] > arr[j+1]) {
+				startNext = j + 1;
+			}
+			j++;
+		}
+		if(j - start + 1 > max) {
+			max = j - start + 1;
+		}
+		start = startNext;
+	}
+	return max;
+}
+
+
 

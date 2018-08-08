@@ -70,6 +70,12 @@ Longest palindromic substring, 		print substring
 	->suffix tree can also be used(Compressed Trie)
 Longest increasing subArray
 Longest increasing subsequence
+Longest Bitonic Subsequence  -> DP
+Longest Bitonic SubArray	-> O(n) time, O(1) space
+Maximum Sum Increasing Subsequence (positive numbers)
+	->similar to longest increasing subsequence
+--Largest Sum Contiguous Subarray	(negative and positive both)
+
 --longest repeated substring
 	->DP
 	->suffix tree can also be used(Compressed Trie)
@@ -479,8 +485,10 @@ MAX :	1	2	2	3	3	4	4	5	6
 
 int longestIncreasingSubsequence(int arr[]) {
 	int max = 1;
-	int lis[] = new int[arr.length];
-	lis[0] = 1;
+	int LIS[] = new int[arr.length];
+	for(int i=0; i<LIS.length; i++) {
+		LIS[i] = 1;
+	}
 	for(int i=1; i<arr.length; i++) {
 		for(int j=i-1; j>=0; j--) {
 			if(arr[i] > arr[j]) {
