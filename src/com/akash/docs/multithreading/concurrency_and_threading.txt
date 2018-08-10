@@ -135,7 +135,7 @@ Race condition can be understood as a problem in which
 reaching the desired outcome depends on the relative timing of events.
 
 This type of race condition
-is called check-then-act: you observe something to be true (file X doesnít
+is called check-then-act: you observe something to be true (file X doesn‚Äôt
 exist) and then take action based on that observation (create X); but in fact the
 observation could have become invalid between the time you observed it and the
 time you acted on it (someone else created X in the meantime), causing a problem
@@ -284,10 +284,10 @@ public class LoggingWidget extends Widget {
 
 A common locking convention is to encapsulate all mutable state within an
 object and to protect it from concurrent access by synchronizing any code path
-that accesses mutable state using the objectís intrinsic lock. This pattern is used
+that accesses mutable state using the object‚Äôs intrinsic lock. This pattern is used
 by many thread-safe classes, such as Vector and other synchronized collection
 classes.
-Not all data needs to be guarded by locksóonly mutable data that will be
+Not all data needs to be guarded by locks‚Äîonly mutable data that will be
 accessed from multiple threads.
 
 
@@ -326,7 +326,7 @@ public class CachedFactorizer implements Servlet {
 
 =====Chapter 3======
 
-synchronized is not only about atomicity or demarcating ìcritical sectionsî. Synchronization also
+synchronized is not only about atomicity or demarcating ‚Äúcritical sections‚Äù. Synchronization also
 has another significant, and subtle, aspect: memory visibility. We want not only to
 prevent one thread from modifying the state of an object when another is using it,
 but also to ensure that when a thread modifies the state of an object, other threads
@@ -644,7 +644,7 @@ class ThreadLocal {
 }
 
 It is easy to abuse ThreadLocal by treating its thread confinement property as
-a license to use global variables or as a means of creating ìhiddenî method arguments.
+a license to use global variables or as a means of creating ‚Äúhidden‚Äù method arguments.
 Like global variables, thread-local variables can detract from reusability
 and introduce hidden couplings among classes, and should therefore be used
 with care.
@@ -750,6 +750,174 @@ Refrences in java
 ============Chapter 4===========
 
 The design process for a thread-safe class should include these three basic elements:
-ï Identify the variables that form the objectís state;
-ï Identify the invariants that constrain the state variables;
-ï Establish a policy for managing concurrent access to the objectís state.
+‚Ä¢ Identify the variables that form the object‚Äôs state;
+‚Ä¢ Identify the invariants that constrain the state variables;
+‚Ä¢ Establish a policy for managing concurrent access to the object‚Äôs state.
+
+
+
+==========================================================================================================
+
+============Chapter 5===========
+
+=>Problems with synchronised collections
+
+when there is a gap b/w locking state of object and synchronization methods
+
+=>Iterators and ConcurrentModificationException
+
+The standard way to iterate a Collection is with an Iterator, 
+either explicitly or through the for-each loop syntax introduced in Java 5.0.
+
+The iterators returned by the synchronized collections are not designed to deal with concurrent modiÔ¨Åcation,
+ and they are fail-fast‚Äîmeaning that if they detect that the collection has changed since iteration began,
+ they throw the unchecked ConcurrentModificationException. 
+
+classes like Vector has fail fast iterators
+to avoid ConcurrentModificationException, a lock should be applied before iterator
+Another way of iterating is to first make a copy of collection
+
+copy cost performance
+locking cost time wait for other threads
+
+=>Hidden iterators
+
+greater the distance between the state and the synchronization that guards it, 
+the more likely that someone will forget to use proper synchronization when accessing that state. 
+
+methods like toString(), equals(), hashcode() or any other
+
+
+=>Concurrent Collection
+
+ Synchronized collections achieve their thread safety by serializing all access to the collection‚Äôs state. 
+ The cost of this approach is poor concurrency; 
+ when multiple threads contend for the collection-wide lock, throughput suffers. 
+
+ConcurrentHashMap  -- synchronised hashMap -- hashMap
+CopyOnWriteArrayList  --  synchronised list  -- ArrayList
+ConcurrentSkipListMap  --  TreeMap
+ConcurrentSkipListSet  --  TreeSet
+
+Queue -- operations and not blocked
+	linkedList
+BlockingQueue  -- operations are blocked
+	LinkedBlockingQueue
+
+
+=>ConcurrentHashMap
+
+
+Types of Iterators :
+
+fail fast
+	-> iterators throw ConcurrentModificationException when any modification done in 
+		collection after creating iterator.
+	-> eg: ArrayList, LinkedList
+fail safe 
+	-> The term "fail-safe" isn't used anywhere in official Java documentation
+	-> iterators do not throw ConcurrentModificationException
+	-> CopyOnWriteArrayList, CopyOnWriteArraySet
+	-> whenever collection is modified(element added or removed), a new copy is created
+		and while creating an iterator, snapshot of collection is taken
+		so any modification on collection will not impact on this snapshot 
+	-> The only guarantee is that the elements seen by the iteration were present in the input at some point.
+		That's a pretty weak guarantee.
+		
+weakly consistent
+	-> iterators do not throw ConcurrentModificationException
+	-> ConcurrentHashMap
+	-> they are guaranteed to traverse elements as they existed upon construction exactly once, 
+		and may (but are not guaranteed to) reflect any modifications subsequent to construction.
+		
+		
+		
+**fail fast iteration
+	List<String> input = Arrays.asList("a", "b", "c", "d", "e");
+	List<String> output = new ArrayList<>();
+
+	Deque<String> deque = new LinkedList<>(input);
+	for (String s : deque) {
+		output.add(s);
+		if (s.equals("c")) {
+			deque.addFirst("XXX");
+			deque.removeLast();
+		}
+	}
+	
+	//ConcurrentModificationException at runtime
+	
+**weakly consistent iteration
+	List<String> input = Arrays.asList("a", "b", "c", "d", "e");
+	List<String> output = new ArrayList<>();
+
+	Deque<String> deque = new ConcurrentLinkedDeque<>(input);
+	for (String s : deque) {
+		output.add(s);
+		if (s.equals("c")) {
+			deque.addFirst("XXX");
+			deque.removeLast();
+		}
+	}
+	
+	//the output list is [a, b, c, d]
+	 the output list reflects only some of the modifications that were made to the input during the iteration
+
+**for loop with index (different from iterator)
+	List<String> input = Arrays.asList("a", "b", "c", "d", "e");
+    List<String> output = new ArrayList<>();
+
+    List<String> arrayList = new ArrayList<>(input);
+    for (int i = 0; i < arrayList.size(); i++) {
+        String s = arrayList.get(i);
+        output.add(s);
+        if (i == 2) {                   // <<< MODIFY
+            arrayList.add(0, "XXX");
+        }
+    }
+	
+	// the output list is [a, b, c, c, d, e]
+	
+	 
+	Weakly consistent iteration provides guarantees against repeated elements and 
+	against a variety of errors or infinite loops that can occur. 
+	The "weakness" is that they provide few guarantees about exactly which elements are observed during iteration.
+	
+https://stackoverflow.com/questions/28915215/iterator-type-in-java-weakly-consistent?rq=1
+https://stackoverflow.com/questions/20142493/fail-safe-iterators-and-weakly-consistent-iterators
+
+
+(Q) How ConcurrentHashMap calculates its size?
+It can use AtomicLong for this operation
+but it uses CounterCell which is adapted for LongAdder and Striped64
+
+
+=>CopyOnWriteArrayList 
+
+copy-on-write collections
+	->when traversal operations vastly outnumber mutations
+	->when you cannot or don't want to synchronize traversals
+	->"snapshot" style iterator method, reference to the state of the collection at the point that the iterator was created
+	->iterator will never throw ConcurrentModificationException
+	->Not good for frequent modification in collection
+	
+
+This criterion exactly describes many event-notiÔ¨Åcation systems:
+ delivering a notiÔ¨Åcation requires iterating the list of registered listeners and calling each one of them,
+ and in most cases registering or unregistering an event listener is far less 
+ common than receiving an event notiÔ¨Åcation. 
+ 
+ 
+=>Blocking queues and the producer-consumer pattern
+
+ The producer consumer pattern simpliÔ¨Åes development because it removes code dependencies
+ between producer and consumer classes, and simpliÔ¨Åes workload management by
+ decoupling activities that may produce or consume data at different or variable rates. 
+
+Bounded queues are a powerful resource management tool for building reliable applications: 
+they make your program more robust to overload by throttling activities that threaten 
+to produce more work than can be handled.
+
+
+==========================================================================================================
+
