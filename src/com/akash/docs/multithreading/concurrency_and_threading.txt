@@ -919,5 +919,137 @@ they make your program more robust to overload by throttling activities that thr
 to produce more work than can be handled.
 
 
+
+=>Blocking and interruptible methods
+
+
+public void interrupt() {
+	synchronized (blockerLock) {
+		Interruptible b = blocker;
+		if (b != null) {
+			interrupt0();           // Just to set the interrupt flag
+			b.interrupt(this);
+			return;
+		}
+	}
+	interrupt0();
+}
+
+->If this thread is blocked in an invocation of the wait(), join(), sleep(long) methods,
+	then its interrupt status will be cleared and it will receive an InterruptedException.
+->If this thread is blocked in an I/O operation upon an InterruptibleChannel then
+	the channel will be closed, the thread's interrupt status will be set, and 
+	the thread will receive a java.nio.channels.ClosedByInterruptException. 
+->If none of the previous conditions hold then this thread's interrupt status will be set. 
+
+=====================================================
+
+//true if this thread has been interrupted; false otherwise.
+//The interrupted status of the thread is cleared by this method.
+//if there is an interrupt, then first call will return true and status is cleared
+//second call will return false.
+
+public static boolean interrupted() {
+	return currentThread().isInterrupted(true);
+}
+
+=====================================================
+
+//true if this thread has been interrupted; false otherwise.
+//The interrupted status of the thread is unaffected by this method
+
+public boolean isInterrupted() {
+	return isInterrupted(false);
+}
+
+=====================================================
+
+/**
+ * Tests if some Thread has been interrupted.  The interrupted state
+ * is reset or not based on the value of ClearInterrupted that is
+ * passed.
+ */
+private native boolean isInterrupted(boolean ClearInterrupted);
+
+=====================================================
+
+private native void interrupt0();
+
+=====================================================
+
+When a method can throw InterruptedException, it is telling you that it is a blocking method,
+ and further that if it is interrupted, it will make an effort to stop blocking early.
+ Thread provides the interrupt method for interrupting a thread
+ and for querying whether a thread has been interrupted.
+ Each thread has a boolean property that represents its interrupted status;
+ interrupting a thread sets this status.
+ Interruption is a cooperative mechanism.
+ One thread cannot force another to stop what it is doing and do something else;
+ when thread A interrupts thread B, A is merely requesting that B stop what it is doing
+ when it gets to a convenient stopping point—if it feels like it. 
+ 
+ When your code calls a method that throws InterruptedException, 
+ then your method is a blocking method too, and must have a plan for responding to interruption.
+ For library code, there are basically two choices
+ 1) Propagate the InterruptedException
+	just propagate the InterruptedException to your caller. 
+	->not catching InterruptedException
+	->catching it and throwing it again after performing some brief activity-speciﬁc cleanup
+2) Restore the interrupt
+	you must catch InterruptedException and restore the interrupted status by calling interrupt
+	on the current thread, so that code higher up the call stack can see that an interrupt was issued
+
+	public class TaskRunnable implements Runnable {
+		...
+		public void run() {
+			try {
+				processTask(queue.take()); 
+			} catch (InterruptedException e) { 
+				// restore interrupted status 
+				Thread.currentThread().interrupt(); 
+			} 
+		}
+	}
+	
+
+
+=>Synchronizers
+
+--->Latches
+A latch is a synchronizer that can delay the progress of threads until it reaches its terminal state. 
+A latch acts as a gate:
+Once the latch reaches the terminal state, it cannot change state again, so it remains open forever
+
+eg :
+ ->Waiting until all the parties involved in an activity, 
+ for instance the players in a multi-player game, are ready to proceed
+ 
+ ->how long it takes to run a task n times concurrently
+ 
+The countDown() method decrements the counter, indicating that an event has occurred, 
+and the await() methods wait for the counter to reach zero, 
+which happens when all the events have occurred. 
+If the counter is nonzero on entry, await blocks until the counter reaches zero,
+ the waiting thread is interrupted, or the wait times out. 
+ 
+ 
+--->FutureTask
+
+states : 	waiting to run
+			Running
+			Completed
+				->completion
+				->cancellation
+				->Exception
+				
+ Once a FutureTask enters the completed state, it stays in that state forever. 
+ FutureTask is used by the Executor framework to represent asynchronous tasks.
+ 
+
+--->Semaphores 
+
+--->Barriers 
+
 ==========================================================================================================
+
 
