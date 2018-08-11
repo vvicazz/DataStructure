@@ -1190,7 +1190,7 @@ public class Factorizer implements Servlet {
 
 
 
-=>Summary 
+=>Concurrency Cheat Sheet
 
 • It’s the mutable state, stupid.1 All concurrency issues boil down to coordinating access to mutable state.
  The less mutable state, the easier it is to ensure thread safety.
