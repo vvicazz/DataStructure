@@ -25,6 +25,11 @@ best way to make an hibernate entity
 JoinTable and JoinColumn
 advantages of hibernate over jdbc
 NamedEntityGraph
+diff b/w beginTransaction() and getTransaction()
+
+OneToOne
+OneToMany
+ManyToMany
 
 -----------------------------------------------
 
@@ -79,7 +84,9 @@ public Object merge(Object object);
 (Q)Difference b/w get() and load() ?
 Ans :
 When an entity already exists in DB we should use load()
-It first checks in session cache then in DB.
+It first checks in session-level cache. If not found there, 
+an attempt is made to locate it in second-level cache. 
+Lastly, an attempt is made to load it directly from the datasource.
 if not found it throws exception
 load() will return a proxied object.
 
@@ -90,6 +97,7 @@ A consequence of this is that you may get an ObjectNotFoundException later,
  as soon as you try to access the returned placeholder and force its initialization.
 
 get() can be used to check if entity exists in DB or not.
+return actual DB object
 It returns null if not found
 
 session.get(MyEntity.class, 1L);							//sql query is fired
@@ -139,7 +147,7 @@ Things that save data to DB :
 (1)session.flush()
 (2)transaction.commit()
 (3)fire a DDL command, all queries before DDL command will be committed.
-(4)fire HQL select command, all previous queries that include in SELECT HQL are commited.
+(4)When HQL select query(NamedQuery) is fired, all managed data is flushed 
 
 
 Object is part of persistent context and tracked for any changes:
@@ -253,12 +261,9 @@ user.getAddrs().get(0).getCity();
 entity = (T)((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
 
 
-
 Related entity or collections in (OneToOne,OneToMany,ManyToMany) are not loaded when actual entity is loaded.
 These are loaded by calling getters of proxy classes.
 calling getter from proxy classes out of session will throw LazyInitializationException.
-We can get actual implementation for proxy class.
-entity = (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
 
 (Q)sorted and ordered collection
 
@@ -275,10 +280,6 @@ entity = (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplemen
 -override equals() hashcode()
 -create no-argument constructor
 -do not make class as final,because hibernate will create proxy class
-
-(Q)first level cache - second level cache
-http://www.javalobby.org/java/forums/t48846.html
-
 
 (Q)Different fetching strategies
 (Q)Different cache strategies
@@ -311,20 +312,6 @@ https://stackoverflow.com/questions/408051/ordering-return-of-child-objects-in-j
 http://blog.jhades.org/setup-and-gotchas-of-the-hibernate-second-level-and-query-caches/
 http://www.javalobby.org/java/forums/t48846.html
 
-
-Difference bw get() and load()
-
-get() : 
-will fire SQL SELECT query
-return actual object
-if not found return null
-
-load() :
-it will return a proxy object, if you initialize the data for that object only then SELECT will be fired
-only by calling load() method will not fire any sql
-it will throw ObjectNotFoundException if entry not found
-
-
 Hibernate Cache :
 
 (1)First Level Cache :
@@ -349,14 +336,17 @@ TRANSACTIONAL
 
 (3)Query Cache :
 Query cache is used when data is actually fetched from DB via NamedQuery or Criteria
-setCachable(true)
-Internally it stores query (i.e. preparedStatement and its dynamic data) as key and values as id of entity
-If a query is present in cache then fetches all its IDs
-These IDs are first checked in Second level cache, if found then data is hydrated
-if data not found in second level cache then SQL SELECT is fired for each ID .
+works for those queries where setCachable(true)
+First time when query is fired, data is fetched from DB and 
+a query cache is created for the results of that NamedQuery
+key of the cache = preparedStatement and its dynamic data
+value of the cache = EntityName and Ids
 
-hence it is necessary to use Query cache with second level cache .
+It first checks these Ids in first level cache
+If any/all Ids not found, then it check in second level cache, if found then data is hydrated
+Still if some Ids are not found, then Sql Select query is fired for each ID.
 
+hence it is necessary to use Query cache with second level cache.
 
 -------------------------------------------
 
@@ -381,3 +371,35 @@ Table Per Subclass
 	@PrimaryKeyJoinColumn
 	Common columns are only present in parent class and not in child
 	fetching data from table requires join
+	
+	
+===================================================
+
+=>OneToOne
+->mapping in java can be unidirectional or bidirectional
+->there will be only one owner table in relational database
+
+	bidirectional mapping
+		mappedBy  attribute in annotation
+		@JoinColumn 		--owner table will use this annotation to define foreign key 
+		
+	unidirectional mapping
+		@JoinColumn
+		
+->when you fetch relation from non owner table, lazy will not work
+	lazy will only work when relation is fetched from owner table
+	
+@Entity
+public class Worker {
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "profile_id")		//owner table 
+	private WorkerProfile profile;
+}
+
+@Entity
+class WorkerProfile {
+
+	@OneToOne(fetch=FetchType.LAZY, mappedBy="profile")		// bidirectional mapping in java
+	private Worker worker;									//lazy wont work here
+}
