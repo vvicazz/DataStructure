@@ -1,0 +1,55 @@
+information is stored in documents
+Document -- flat structure
+
+full text index
+full text search
+
+Analysing Raw Content
+	-> words are converted to tokens
+	-> these tokens can be similar in sound,grammer,singular/plural
+	-> this process of creating tokens is done by Analyser
+	-> Analysers can also be applied in a chain, one after the other
+
+Searching in index
+	->precision and recall
+	->single and multiterm queries
+	->phrase queries, fuzzy queries, wildcards
+	->result ranking, sorting
+	
+QueryParser is used to make queries in lucene search
+We can also boost some fields while making a query
+
+3 models for Search
+
+1) Pure Boolean model : either it will match fully or not.
+						no score is associated with document
+2) Vector Space model
+
+3) Probabilistic model : probability is computed for a document to match with query.
+
+Admin Configurations:
+-ram buffer size
+-how many segments to merge at once
+-how often commit changes
+-how often to delete unused indexes
+
+lucene do not provide scaling
+solr provides both sharding and replication
+
+============================
+
+Document (Field)   -->  Analyser  -->  IndexWriter  -->  Directory
+
+Document - Collection of fields
+Analyser  -> stop words, lower/upper case, 
+
+
+Lucene understands -> String and numeric values like int and float
+
+Search classes :
+	IndexSearcher
+	Term
+	Query
+		TermQuery, BooleanQuery, PhraseQuery, TermRangeQuery, NumericRangeQuery
+		setBoost()
+	TopDocs

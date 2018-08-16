@@ -27,6 +27,9 @@ advantages of hibernate over jdbc
 NamedEntityGraph
 diff b/w beginTransaction() and getTransaction()
 
+refresh
+replicate
+
 OneToOne
 OneToMany
 ManyToMany
@@ -294,13 +297,18 @@ calling getter from proxy classes out of session will throw LazyInitializationEx
 	//both Set and List can be used with annotation above
 
 -> List without any order annotation is a bag
+	That means if you persist a bag with some order of elements, 
+	you cannot expect the same order retains when the collection is retrieved.
 	bag is an unordered list which supports duplicate
 	Set in java cannot support duplicate, but it depends on equals/hashcode impl
 	
 -> You must have an immutable key of Set implementation
-	generally ids are taken as key but they are not immutable
+	generally ids are taken as key but generally they are not immutable
 	
--> We cannot fetch full entity having multiple List in hibernate
+-> We cannot fetch two different lists in a single query, 
+	multiple sets can be fetch in a single query
+
+-> List can support @OrderBy, Set cannot support @OrderBy
 
 http://stackoverflow.com/questions/6562673/onetomany-list-vs-set-difference
 http://stackoverflow.com/questions/13812283/difference-between-set-and-bag-in-hibernate
