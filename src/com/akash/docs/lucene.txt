@@ -53,3 +53,112 @@ Search classes :
 		TermQuery, BooleanQuery, PhraseQuery, TermRangeQuery, NumericRangeQuery
 		setBoost()
 	TopDocs
+	
+===============================
+
+A field must be indexed if you want to search on it.
+if indexed , a field may also contain term vector
+even if not indexed, a field may be stored in index and not used in search.
+
+When we get a document, only stored fields are fetched, indexed and not stored fields are not fetched.
+
+->Schema less design
+->multiple entities can be stored in single document
+->two same documents can have different schema(one is old and one is new)
+->flat structure , denormalized data
+
+=>Indexing Process
+
+raw text taken from source
+	|
+	|
+text is analysed by chain of analysers and converted into stream of tokens
+	|
+	|
+tokens are stored as index
+
+
+Analysis
+	->Analysers
+	->Filter
+		->stop filter, lowercase filter,stem filter
+		
+
+Inverted Index structure
+	->tokens are treated as keys for document
+	->key=token and value=document
+	->which document contain X
+	
+	
+addDocument(Document)
+	->takes default analser provided by IndexWriter
+addDocument(Document, Analyser)
+
+NOTE : make sure that analyser provided during indexing must match analser during search.
+
+Analyser
+	WhiteSpaceAnalyser
+
+Index
+	NO
+	ANALYZED		--> analyser is used to break the content into tokens
+	NOT_ANALYZED	--> analser is not used, content is used as it is, 
+						used for those data that should not be broken
+	NOT_ANALYZED_NO_NORMS
+	ANALYZED_NO_NORMS
+	
+Store
+	NO
+	YES
+	
+TermVector
+	NO
+	YES
+	WITH_POSITIONS
+	WITH_OFFSETS
+	WITH_POSITIONS_OFFSETS
+	
+
+---------------------
+	
+Term Vector
+
+A term vector is a list of the document's terms and their number of occurrences in that document.
+A term is the basic unit searchable in Lucene
+
+Term t = new Term( "field" , "TermText");
+
+when you search Lucene index, you are searching terms
+If a field of the document enabled term vector, all terms in that field will be added to document's term vector.
+
+Index
+	key --> document id
+	
+Term Vector 
+	term --> (frequency, position, offset)
+	
+Document Term Vector contains
+	->the document id
+	->the field name
+	->the text of term
+	->the frequency
+	->position and offsets
+	
+Applications of Term vector :
+-> search result highlighting
+-> "related posts" feature in a blog entry
+
+Disadvantage :
+->They store a lot of information and often take up a lot of disk space
+-> make indexing and searching slower
+
+http://makble.com/what-is-term-vector-in-lucene
+http://blog.jpountz.net/post/41301889664/putting-term-vectors-on-a-diet
+
+------------------------
+
+Field options for sorting :
+
+While fetching documents , documents are sorted according to their score by default.
+To make these results, sorted by a column , we need to index that column.
+
