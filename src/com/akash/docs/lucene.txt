@@ -1,8 +1,17 @@
-information is stored in documents
-Document -- flat structure
+Solr
+ElasticSearch
+Hibernate Search
 
-full text index
-full text search
+
+Advantages of using ElasticSearch over Lucene
+(1) Using pure Lucene is challenging as it is a library.
+(2) Not have distributed support
+(3) ElasticSearch Supports Http and JSON
+(4) ElasticSearch will work in Distributed and sharded environment
+
+https://stackoverflow.com/questions/2271600/elasticsearch-sphinx-lucene-solr-xapian-which-fits-for-which-usage
+
+=====================Chapter 1=====================
 
 Analysing Raw Content
 	-> words are converted to tokens
@@ -36,7 +45,7 @@ Admin Configurations:
 lucene do not provide scaling
 solr provides both sharding and replication
 
-============================
+--------------------------
 
 Document (Field)   -->  Analyser  -->  IndexWriter  -->  Directory
 
@@ -54,7 +63,7 @@ Search classes :
 		setBoost()
 	TopDocs
 	
-===============================
+=====================Chapter 2=====================
 
 A field must be indexed if you want to search on it.
 if indexed , a field may also contain term vector
@@ -162,3 +171,194 @@ Field options for sorting :
 While fetching documents , documents are sorted according to their score by default.
 To make these results, sorted by a column , we need to index that column.
 
+
+multi values fields :
+
+Document doc = new Document();
+for (String author : authors) {
+	doc.add(new Field("author", author,
+	Field.Store.YES,
+	Field.Index.ANALYZED));
+}
+
+=>Boosting
+Boosting may be done during indexing or during searching.
+
+Search-time boosting is more dynamic , but consumes more CPU
+ allows you to expose the choice to the user
+do not perform much boosting
+
+document.setBoost(1.5F); 
+default factor is 1.0 
+
+Field subjectField = new Field("subject", subject, Field.Store.YES, Field.Index.ANALYZED);
+subjectField.setBoost(1.2F);
+
+
+Norms :
+
+All boosts of document and field are combined and then compactly encoded (quantized) 
+into a single byte, which is stored per field per document. 
+During searching, norms for any field being searched are loaded into memory,
+ decoded back into a floating-point number, and
+used when computing the relevance score.
+
+Norms for lucene index can be disabled.
+
+
+=>Indexing Numbers dates and time
+(1)
+when you want to include numbers as string tokens : WhitespaceAnalyzer and StandardAnalyzer 
+when you want to exclude numbers from text while making tokens : SimpleAnalyzer and StopAnalyzer
+
+eg : “Be sure to include Form 1099 in your tax return”
+
+(2)
+Numbers where you want precise (equals) matching, range searching, and/or sorting
+adding double value to document :
+	doc.add(new NumericField("price").setDoubleValue(19.99));
+
+Each numeric value is indexed using a trie structure.
+NumericField can also easily handle dates and times by converting them to equivalent ints or longs.
+
+adding timestamp to document :
+	doc.add(new NumericField("timestamp").setLongValue(new Date().getTime()));
+adding date to document : 
+	doc.add(new NumericField("day").setIntValue((int) (new Date().getTime()/24/3600))); 
+
+	
+=> Field Truncation :
+
+IndexWriter allows you to truncate per-Field
+indexing so that only the first N terms are indexed for an analyzed field.
+ text beyond the Nth term is completely ignored
+
+MaxFieldLength.UNLIMITED
+MaxFieldLength.LIMITED
+
+=> Directory classes :
+
+SimpleFSDirectory
+NIOFSDirectory
+MMapDirectory
+RAMDirectory
+FileSwitchDirectory
+
+
+
+=> Concurrency, thread safety, and locking issues
+
+-> accessing an index from multiple JVMs,
+-> thread safety of IndexReader and IndexWriter, and 
+-> the locking mechanism that Lucene uses to enforce these rules
+
+
+(1) Any number of read-only IndexReaders may be open at once on a single index.
+within a single JVM it’s best for resource utilization 
+ and performance reasons to share a single IndexReader instance
+
+(2) Only a single writer may be open on an index at once.
+As soon as an IndexWriter is created, a write lock is obtained. 
+Only when that IndexWriter is closed is the write lock released
+
+(3) When IndexWriter is open for an index, 
+ IndexReader will read document data at the state which was just before taking lock.
+ 
+(4) All threads should share single instance of IndexReader and IndexWriter.
+These classes are :
+	Thread safe
+	Thread friendly
+	
+
+=> Buffering and flushing
+
+Documents are initially buffered in memory instead of being immediately written to the disk.
+This buffering is done for performance reasons to minimize disk I/O. 
+Periodically, these changes are flushed to the index Directory as a new segment.
+
+
+
+=====================Chapter 3=====================
+
+ When you’re querying a Lucene index, a TopDocs instance, containing an ordered
+array of ScoreDoc, is returned. The array is ordered by score by default
+
+The ScoreDocs themselves aren’t the actual matching documents, but rather references, via
+an integer document ID, to the documents matched.
+
+
+=>programmatically constructing your query
+
+	Term t = new Term("subject", "ant");
+	Query query = new TermQuery(t);
+	TopDocs docs = searcher.search(query, 10);
+
+
+=>using QueryParser to translate text entered by the user 
+
+	QueryParser parser = new QueryParser(Version.LUCENE_30, "contents", new SimpleAnalyzer());
+	Query query = parser.parse("+JUNIT +ANT -MOCK");
+	TopDocs docs = searcher.search(query, 10);
+
+
+Expression examples that QueryParser handles :
+
+(1)
+java			Contain the term java in the default field
+
+(2)
+java junit
+java OR junit
+				Contain the term java or junit, or both, in the default fielda
+(3)
++java +junit
+java AND junit
+				Contain both java and junit in the default field
+
+(4)				
+title:ant 		Contain the term ant in the title field
+
+(5)
+title:extreme
+–subject:sports
+
+title:extreme
+AND NOT subject:sports
+				Contain extreme in the title field and don’t have sports in the subject field
+					
+(6)
+(agile OR extreme) AND
+methodology
+				Contain methodology and must also contain agile and/or extreme, all in the default field
+
+(7)
+title:"junit in action"
+				Contain the exact phrase “junit in action” in the title field
+					
+(8)					
+java* 			Contain terms that begin with java, like javaspaces, javaserver, java.net, and the exact tem java itself.
+
+(9)
+java~ 			Contain terms that are close to the word java, such as lava
+
+
+----------------
+
+**QueryParser requires an analyzer to break pieces of the query text into terms.
+QueryParser is the only searching piece that uses an analyzer, 
+other searching APIs do not require analser.
+They analyse on the basis of data provided in the API.
+
+
+Directory dir = FSDirectory.open(new File("/path/to/index"));
+IndexReader reader = IndexReader.open(dir);
+IndexSearcher searcher = new IndexSearcher(reader);
+
+
+=> Using explain() to understand hit scoring
+	
+	TopDocs topDocs = searcher.search(query, 10);
+	for (ScoreDoc match : topDocs.scoreDocs) {
+		Explanation explanation = searcher.explain(query, match.doc);
+	}
+	
