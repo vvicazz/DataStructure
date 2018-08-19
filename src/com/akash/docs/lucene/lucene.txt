@@ -329,17 +329,17 @@ AND NOT subject:sports
 (6)
 (agile OR extreme) AND
 methodology
-				Contain methodology and must also contain agile and/or extreme, all in the default field
+				(BooleanQuery) Contain methodology and must also contain agile and/or extreme, all in the default field
 
 (7)
 title:"junit in action"
 				Contain the exact phrase “junit in action” in the title field
 					
 (8)					
-java* 			Contain terms that begin with java, like javaspaces, javaserver, java.net, and the exact tem java itself.
+java* 			(PrefixQuery) Contain terms that begin with java, like javaspaces, javaserver, java.net, and the exact tem java itself.
 
 (9)
-java~ 			Contain terms that are close to the word java, such as lava
+java~ 			(FuzzyQuery) Contain terms that are close to the word java, such as lava
 
 
 ----------------
@@ -409,4 +409,194 @@ PhraseQuery
 
 The maximum allowable positional distance between terms to be considered a match is called slop. 
 Distance is the number of positional moves of terms used to reconstruct the phrase in order.
+
+slop = 0 , quick fox
+slop = 1 , quick [irrelevant] fox
+
+By default, a PhraseQuery has its slop factor set to zero.
+
+(7)
+WildCardQuery
+
+* for zero or more characters
+? for zero or one character
+
+
+Query query = new WildcardQuery(new Term("contents", "?ild*"));
+
+Performance degradations can occur when you use WildcardQuery
+
+(8) FuzzyQuery
+FuzzyQuery matches terms similar to a specified term
+
+Levenshtein distance algorithm , edit distance algorithm
+
+FuzzyQuery uses a threshold rather than a pure edit distance.
+The threshold is a factor of the edit distance divided by the string length.
+
+
+=> QueryParser
+
+(1)
++pubdate:[20100101 TO 20101231] Java AND (Lucene OR Apache)
+
+This query searches for all books about Java that also include Lucene or Apache in their
+contents and were published in 2010.
+
+(2)
+BooleanQuery query = new BooleanQuery();
+query.add(new FuzzyQuery(new Term("field", "kountry")), BooleanClause.Occur.MUST);
+query.add(new TermQuery(new Term("title", "western")), BooleanClause.Occur.SHOULD);
+
+
+"+kountry~0.5 title:western"
+
+
+(3)
+TermRangeQuery
+
+Query query = new QueryParser(Version.LUCENE_30, "subject", analyzer).parse("title2:[Q TO V]");
+
+(4)
+BooleanQuery
+
+Boolean Operators :
+
+Verbose syntax	| Shortcut syntax
+				|
+a AND b			| +a +b
+a OR b			| a b
+a AND NOT b		| +a –b
+
+
+By default OR operation is used
+
+
+(5)
+FuzzyQuery
+
+Query query = parser.parse("kountry~");
+	 subject:kountry~0.5
+	 
+query = parser.parse("kountry~0.7");
+	 subject:kountry~0.7
+	 
+
+
+	 
+=====================Chapter 4=====================
+
+An analyzer tokenizes text by performing any number of operations on it, which could include
+	extracting words,
+	discarding punctuation, 
+	removing accents from characters, 
+	lowercasing (also called normalizing), 
+	removing common words, 
+	reducing words to a root form (stemming), or 
+	changing words into the basic form (lemmatization).
+
+This process is also called tokenization, and the chunks of text pulled from a
+stream of text are called tokens
+
+
+Analysis occurs any time text needs to be converted into terms, 
+which in Lucene’s core is at two spots: 
+->during indexing and 
+->when using QueryParser for searching
+
+
+Analyzing "The quick brown fox jumped over the lazy dog"
+ WhitespaceAnalyzer:
+ [The] [quick] [brown] [fox] [jumped] [over] [the] [lazy] [dog]
+ SimpleAnalyzer:
+ [the] [quick] [brown] [fox] [jumped] [over] [the] [lazy] [dog]
+ StopAnalyzer:
+ [quick] [brown] [fox] [jumped] [over] [lazy] [dog]
+ StandardAnalyzer:
+ [quick] [brown] [fox] [jumped] [over] [lazy] [dog] 
+ 
+ 
+ Analyzing "XY&Z Corporation - xyz@example.com"
+ WhitespaceAnalyzer:
+ [XY&Z] [Corporation] [-] [xyz@example.com]
+ SimpleAnalyzer:
+ [xy] [z] [corporation] [xyz] [example] [com]
+ StopAnalyzer:
+ [xy] [z] [corporation] [xyz] [example] [com]
+ StandardAnalyzer:
+ [xy&z] [corporation] [xyz@example.com]
+ 
+ 
+(1) WhitespaceAnalyzer
+	split text on by whitespace
+	doesn’t lowercase each token
+
+(2) SimpleAnalyzer
+	splits tokens at nonletter characters
+	lowercases each token
+	discards numeric characters
+
+(3) StopAnalyzer
+	Same as SimpleAnalyzer 
+	removes common words (a, an, the)
+
+(4) StandardAnalyzer
+	lowercases each token
+	removes stop words and punctuation
+	identify certain tokens like company name, email, hostname
+	
+
+=> What’s inside an analyzer?
+
+A stream of tokens is the fundamental output of the analysis process.
+stream of words are divided into stream of characters with start and offset positioning.
+
+
+TokenStreams: 
+	->Tokenizer
+	->TokenFilter
+
+A Tokenizer reads characters from a java.io.Reader and creates tokens
+A TokenFilter takes tokens in, and produces 
+	new tokens by either adding or 
+	removing whole tokens or 
+	altering the attributes of the incoming tokens
+	
+
+
+TokenStream = Tokenizer + chain of TokenFilter 
+
+Reader -> Tokenizer -> TokenFilter -> TokenFilter -> TokenFilter -> Tokens
+
+
+--Tokenizer
+
+CharTokenizer
+WhitespaceTokenizer
+KeywordTokenizer
+LetterTokenizer
+LowerCaseTokenizer
+SinkTokenizer
+StandardTokenizer
+
+Sound like quering -- MetaphoneReplacementAnalyzer
+synonym - SynonymAnalyser
+	
+--TokenFilter
+
+LowerCaseFilter
+StopFilter			-- removing stop words and punctuation
+PorterStemFilter	-- Stemming, country and countries both stem to countri
+TeeTokenFilter
+ASCIIFoldingFilter
+CachingTokenFilter
+LengthFilter
+StandardFilter
+
+
+
+=> Visualizing Analysers :
+
+AnalyzerUtils.displayTokens(analyzer, text);
+AnalyzerUtils.displayTokensWithFullDetails(analyzer, text);
 
