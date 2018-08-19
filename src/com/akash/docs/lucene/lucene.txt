@@ -362,3 +362,51 @@ IndexSearcher searcher = new IndexSearcher(reader);
 		Explanation explanation = searcher.explain(query, match.doc);
 	}
 	
+
+
+=> Lucene’s diverse queries
+
+TermQuery,TermRangeQuery,NumericRangeQuery,PrefixQuery,BooleanQuery,PhraseQuery,WildcardQuery,FuzzyQuery
+
+(1)
+Term t = new Term("isbn", "9781935182023");
+Query query = new TermQuery(t);
+
+(2)
+//searching for all books whose title begins with any letter from d to j
+TermRangeQuery query = new TermRangeQuery("title2", "d", "j", true, true);
+
+(3)
+//  201,003  == march 2010
+NumericRangeQuery query = NumericRangeQuery.newIntRange("pubmonth", 200605, 200609, true, true);
+
+
+(4)
+Term term = new Term("category", "/technology/computers/programming"); 
+PrefixQuery query = new PrefixQuery(term);
+
+
+(5)
+BooleanQuery
+	->BooleanClause.Occur.MUST		-- only that matching documents are considered
+	->BooleanClause.Occur.SHOULD	-- term is optional
+	->BooleanClause.Occur.MUST_NOT 	--  any documents matching this clause are excluded
+	
+
+	TermQuery searchingBooks = new TermQuery(new Term("subject", "search"));
+	Query books2010 = NumericRangeQuery.newIntRange("pubmonth", 201001, 201012, true, true);
+	
+	BooleanQuery searchingBooks2010 = new BooleanQuery();
+	searchingBooks2010.add(searchingBooks, BooleanClause.Occur.MUST);
+	searchingBooks2010.add(books2010, BooleanClause.Occur.MUST);
+	
+restricted to a maximum number of clauses : 1,024
+	
+(6)
+PhraseQuery 
+ It uses this information to locate documents
+  where terms are within a certain distance of one another
+
+The maximum allowable positional distance between terms to be considered a match is called slop. 
+Distance is the number of positional moves of terms used to reconstruct the phrase in order.
+
