@@ -1,11 +1,24 @@
 =>Array Rotations :
 
-rotate array by d elements
+rotate array by d elements 
 	->gcd way
 	->left reversal algo
 	->right reversal algo
 find pivot element in sorted and rotated array
 find sum of pair of numbers in sorted and rotated array
+	->sorting  --	O(n^2)
+	->hashing  --	O(n)
+Find a triplet that sum to a given value
+Find all triplets with zero sum
+	->sorting then pick one and do sorting approach of 2  --	O(n^2)
+	->store sum-A[i] in hashset, check if sum of every pair exist in hashset  --	O(n^2)
+Find four elements that sum to a given value
+	->create an array of sum of each pair,sort it,approach of 2 -- O(n^2.log n)
+
+find pair of number having sum less than K
+find triplets having sum less than k
+Closest product pair in an array	
+
 majority element	-> hashmap, moore voting algo
 Lexicographically minimum string rotation	-> array of size 26,count occurence of character from A-Z
 --Rotate Matrix Elements (shift all elements by 1)
@@ -15,6 +28,7 @@ Lexicographically minimum string rotation	-> array of size 26,count occurence of
 Check if all rows of a matrix are circular rotations of each other -> append array to array itself
 Minimum rotations required to get the same string -> same as above
 Check if strings are rotations of each other or not
+	->kmp
 Count rotations divisible by 4
 
 
@@ -61,19 +75,23 @@ private findPivot(int arr[], int start, int end) {
 	if(start > end) {
 		return -1;
 	}
+	if(arr[start] < arr[end]) {
+		return -1;
+	}
 	if(start == end) {
 		return start;
 	}
 	int mid = (end-start)/2 + start;
-	if( (arr[mid-1] < arr[mid]) && (arr[mid] > arr[mid+1]) ) {
+	if(arr[mid-1] < arr[mid] && arr[mid] > arr[mid+1]) {
 		return mid;
 	}
-	if(arr[mid-1] < arr[mid] < arr[mid+1]) {
+	if(arr[mid-1] > arr[mid] && arr[mid] < arr[mid+1]) {
+		return mid-1;
+	}
+	if(arr[mid-1] < arr[mid] && arr[mid] < arr[mid+1]) {
 		return findPivot(arr, mid+1, end);
 	}
-	else {
-		return findPivot(arr, start, mid-1);
-	}
+	return findPivot(arr, start, mid-1);
 }
 
 
