@@ -56,8 +56,8 @@ coin change problem :
 	-> Total number of ways to make sum
 	-> min number of coins to make given sum
 check if Set of non-negative numbers,contains a subset with given sum
---Set of non-negative numbers,Print all subsets with given sum
---check if Set of non-negative numbers,contains a subset with sum divisible by m
+Set of non-negative numbers,Print all subsets with given sum
+check if Set of non-negative numbers,contains a subset with sum divisible by m
 --Count all sub-arrays having sum divisible by k
 gold mine problem
 Rod cutting problem
@@ -231,7 +231,7 @@ int totalWaysCoinChangeProblem(int sum, int coins[]) {
 	for(int i=0; i<coins.length; i++) {
 		for(int j=1; j<=sum; j++) {
 			if(j >= coins[i]) {
-				totalWays[i][j] = MAX(totalWays[i][j-coins[i]] + 1, totalWays[i][j-1]);
+				totalWays[i][j] = totalWays[i][j-coins[i]] + totalWays[i][j-1];
 			} else {
 				totalWays[i][j] = totalWays[i][j-1];
 			}
@@ -321,8 +321,8 @@ Check if set Contains Sum Divisible By m
 Approach 1:
 //check if set contains sum divisible by m
 //create boolean array of [0..m-1]
-//save sum of every combination of elemnts as true in this array
-//if 0th elemnt is true, then subset found
+//save sum of every combination of elements as true in this array
+//if 0th element is true, then subset found
 
 Approach 2:
 //create new array with modulus of each number and then do subset sum problem
