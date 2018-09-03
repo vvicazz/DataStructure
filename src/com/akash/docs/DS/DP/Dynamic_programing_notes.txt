@@ -53,8 +53,8 @@ Catalan number
 Tiling problem : 2xN dashboad, 2x1 tiles
 Friends Pairing Problem
 coin change problem : 
-	-> no of ways to make sum
-	-> min no of coins to make given sum
+	-> Total number of ways to make sum
+	-> min number of coins to make given sum
 check if Set of non-negative numbers,contains a subset with given sum
 --Set of non-negative numbers,Print all subsets with given sum
 --check if Set of non-negative numbers,contains a subset with sum divisible by m
@@ -112,6 +112,7 @@ int fibonacci(int n) {
 
 
 //2,3,5
+//numbers whose only prime factors are 2, 3 or 5
 int uglyNumber(int n) {
 	int uglyNum[] = new int[n];
 	uglyNum[0] = 1;
@@ -156,9 +157,11 @@ int catalanNumber(int n) {
 	}
 	return catalan[n];
 }
+f(n) = f(0)*f(n-1) + f(1)*f(n-2) + f(2)*f(n-3) ... + f(n-1)*f(0)
 
 
 //2xN dashboard, 2x1 tiles
+//count the number of ways to tile the given board
 int tillingProblem(int n) {
 	if(n == 1 || n == 2) {
 		return n;
