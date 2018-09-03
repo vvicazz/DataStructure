@@ -326,19 +326,6 @@ Approach 1:
 
 Approach 2:
 //create new array with modulus of each number and then do subset sum problem
-boolean setContainsSumDivisibleBy(int set[], int m) {
-	boolean memo[] = new boolean[m];
-	for(int i=0; i<set.length; i++) {
-		memo[set[i] % m] = true;
-		for(int j=0; j<m; j++) {
-			if(memo[j] && set[i] != j) {
-				memo[(set[i] + j) % m] = true;
-			}
-		}
-	}
-	return memo[0];
-}
-
 
 
 Rod Cutting problem
