@@ -61,8 +61,8 @@ Find subarray with given sum (Nonnegative Numbers)
 
 
 --Print all subarrays with 0 sum
-
-
+Largest Rectangular Area in a Histogram 
+print all permutations of a given string
 
 
 ----------------------------------------------------------------------
