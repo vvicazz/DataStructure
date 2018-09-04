@@ -8,11 +8,17 @@ public class BitOperation {
 		//1. find its one's complement by reversing all digits
 		//2. find its two's complement by adding 1 to it.
 		
+		// Integer.toBinaryString() shows 32 bits for negative and 31 bits for positives
+		
 		int x=-1;
-		System.out.println(Integer.toBinaryString(x<<5));
-		System.out.println(x<<5);	//-1
+		System.out.println(Integer.toBinaryString(x));		// 11111111111111111111111111111111
+		System.out.println(Integer.toBinaryString(x<<3));	// 11111111111111111111111111111000
+		System.out.println(Integer.toBinaryString(x<<31));	// 10000000000000000000000000000000
+		System.out.println(x<<3);	//-8
 		System.out.println(x<<31);	//-2147483648
-		System.out.println(x<<33);	//-1
+		System.out.println(x<<32);	//-1
+		System.out.println(x<<33);	//-2
+		
 		//left shift do not hold previous rotated bit from right end to left end
 		//right shift holds previous rotated bit from left end to right end
 		
@@ -20,7 +26,7 @@ public class BitOperation {
 		System.out.println(y>>1); 	//0
 		System.out.println(y>>3); 	//0
 		System.out.println(y<<30);	//1073741824
-		System.out.println(Integer.toBinaryString(y<<30));	 	//1000000000000000000000000000000
+		System.out.println(Integer.toBinaryString(y<<30));	 		//1000000000000000000000000000000
 		System.out.println(Integer.toBinaryString(2147483647)); 	//1111111111111111111111111111111	2^32-1
 		System.out.println(y<<31);	//-2147483648
 		System.out.println(y<<32);	//1
@@ -28,8 +34,8 @@ public class BitOperation {
 		//triple right shift operator has advantage only for negative numbers
 		int z=-1;
 		System.out.println(z>>>1);	//2147483647
-		System.out.println(Integer.toBinaryString(z)); 			//11111111111111111111111111111111
-		System.out.println(Integer.toBinaryString(-2147483648)); 	//10000000000000000000000000000000
+		System.out.println(Integer.toBinaryString(z)); 			// 11111111111111111111111111111111
+		System.out.println(Integer.toBinaryString(z>>>1)); 		// 1111111111111111111111111111111
 	}
 }
 
