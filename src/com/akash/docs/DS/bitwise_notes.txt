@@ -49,3 +49,37 @@ case 3 :
 10111111111111111111111111111111  >>> 2 = 00101111111111111111111111111111
 triple right shift does not hold right most bit value
 
+
+-----------------------------------------------------------------------------------------
+
+(Q)
+~x + 1 = -x
+-(~x) = x + 1
+
+(Q)Add one to a number
+	reset all 1 to 0 before rightmost 0
+	reset rightmost 0 to 1 
+
+(Q) get negative of a number
+	flip all bits
+	add one 
+	
+(Q)
+int sum(int x, int y) {
+	while(y!=0) {
+		int sum = x ^ y;
+		int carry = x & y;
+		x = sum;
+		y = carry;
+	}
+	return x;
+}
+
+(Q)
+A - B = A + (-B)
+
+(Q)
+n & (n-1) = will reset rightmost set bit
+
+(Q) Check overflow during sum
+
