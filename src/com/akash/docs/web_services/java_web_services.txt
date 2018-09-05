@@ -1,0 +1,161 @@
+=======================Chapter 1=======================
+
+JSON - javascript object notation
+SOA
+DOA
+
+JAX-WS api
+
+HttpServlet is well designed for REST style.
+	doGet, doPost, doPut, doDelete
+	support for MIME types
+	access to http headers and bodies
+	
+JAX-RS
+	Another api for REST services
+	@GET, @POST annotations
+	@PATH annotations for resource
+	Easy to send json or xml responses
+	A layer over HttpServlet
+	
+Restlet
+	Similar to JAX-RS
+	uses annotations
+	
+JAX-WS
+	xml centric API
+	@WebService
+	@WebServiceProvider
+	Generaly used for SOAP applications
+	
+Separation of concerns
+Making a web service is one concern
+publishing it is another concern
+
+Web Service
+	is a distributed software system whose components can be deployed and executed on physically distinct devices
+	
+Conversational Patterns :
+(1) Request/Response -> client sends request to server, server sends response to client
+(2) Solicit/Response -> server sends message to client, then client sends messsage to server
+(3) One way	-> A message from client to server with no response
+(4) Notification -> A message from server to client with no response
+
+------------------------------------------------------
+SOAP - Simple Object Access Protocol
+REST - Representational State Transfer
+
+
+Soap vs Rest
+
+(1)Rest is based on http protocol (get,put,post,delete) , treating everything as a resource.
+whereas SOAP is transport neutral. It can support HTTP, SMTP, UDP, TCP protocols.
+
+(2)Soap works only with xml , Rest works with json/xml both.
+
+(3)rest may/may not provide schema definition while sending messages.
+It is an architectural style which has no official standard to make messages.
+Soap will always provide schema definitions. 
+Soap follows set of predefined rules to make SOAP messages.
+It will be easy to understand request/response schema and
+ their data type constraints when viewing schema information via WSDL by any client.
+ 
+(4)Soap provides default error handling via faults.
+We can also create our own custom faults.
+In Rest we need to handle all error messages explicitly.
+
+(5)The step of wsdl creation makes it difficult to make any changes in your 
+schema classes while implementing in soap.
+Rest implementation is quite easy, we just need to make changes in pojo classes.
+
+(6)Soap provides SoapHandler to intercept request both at client/server side 
+with both request/response.
+we can use filters of j2ee or interceptors of Spring to intercept calls.
+
+(7)Soap is fixed defined set of protocol, whereas rest is architectural style.
+While implementing REST, developers can follow any rule,
+ for example 
+not using http protocol in well defined way.
+While in Soap message part is defined as envelope.
+
+one envelope = header + body + fault + attachment
+
+--------------------------------------------------------
+
+SOA -> Service Oriented Architecture
+
+(1)Services should be loosly coupled
+	S1 and S2 services should not be dependent on each other
+	Any changes to one should not effect another
+	
+(2) Stateless function call 
+	returned value by service should only depend on arguments passed to service
+	
+Marshelling => memory object -> some document
+	java object -> xml/json
+	
+
+	
+=>REST
+
+It works on HTTP protocol
+Http methods like Get, Post, Put, Delete 
+MIME type like text/html
+Response status code
+	200 success
+	404 resource not found
+	303 redirect
+	500 Internal server error
+	401 Authentication error
+	405 method not supported
+Every object in REST is treated as Resource
+
+->Http verb		Operation  Idempotent	Has-Body
+
+POST 			Create		No			Yes
+GET				Read		Yes			No
+PUT				Update		Yes			Yes
+Delete			Delete		Yes			No
+
+GET request has no body.All data in GET is sent via headers.
+POST request always has a body, which may be empty.
+
+Accept : 
+header information which is sent in Request object.
+It specifies the MIME a client can handle.
+
+Content-Type :
+MIME type that server sends while sending reponse.
+This header also includes charset.
+charset specifies character encoding.
+eg: Ascii, ANSI, UTF-8
+
+Rest url example :
+
+https://www.amazon.in/index.html
+
+	https://www.amazon.in  => host
+
+	index.html  => url/path/resource
+
+	
+Difference b/w PUT and POST :
+PUT 
+(1) creating/overriding a resource/file with specified URI.
+(2) PUT to a URI , effects only that URI.
+(3) Idempotent
+(4) PUT always requires an Id , to be updated in URI
+
+POST 
+(1) It will make an action at server which makes
+	-> effect one or more than one resource
+	-> Gateway to some other protocol
+(2) A post to a URI could have any effect at all.
+(3) Non-Idempotent
+(4) If POST do not contain any id, then a new resource with new id is created.
+
+NOTE : Containers like tomcat/jetty do not have request.getParameter() for PUT.
+
+
+=======================Chapter 2=======================
+
