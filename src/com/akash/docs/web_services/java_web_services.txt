@@ -138,7 +138,9 @@ https://www.amazon.in/index.html
 
 	index.html  => url/path/resource
 
-	
+
+=======================Chapter 2=======================
+
 Difference b/w PUT and POST :
 PUT 
 (1) creating/overriding a resource/file with specified URI.
@@ -157,5 +159,156 @@ POST
 NOTE : Containers like tomcat/jetty do not have request.getParameter() for PUT.
 
 
-=======================Chapter 2=======================
+=>HttpServlet example
+
+//GET  -> id is in header
+//POST -> id is in body
+String param = request.getParameter("id");
+
+// If the HTTP Accept header is set to application/json OR text/x-json
+String accept = request.getHeader("accept");
+if(accept.contains("json")) {
+} 
+
+
+
+---------------------------------------------------------------------------
+
+
+=> JAX-RS (Java API for XML-RESTful Services)
+
+It is an API.
+Its implementation includes
+->Jersey
+->RESTEasy
+->Apache Wink
+->Apache CXF
+
+
+
+@ApplicationPath("/resourcesA")
+public class RestfulAdage extends Application {
+	@Override
+	public Set<Class<?>> getClasses() {
+		Set<Class<?>> set = new HashSet<Class<?>>();
+		set.add(Adages.class);
+		return set;
+	}
+}
+
+curl http://localhost:8080/adages/resourcesA/ 
+war file deployed in tomcat has name : adages.war
+
+
+@XmlRootElement(name = "adage")
+public class Adage {
+
+	@XmlElement(required = true)
+	private String words;
+	
+	private int wordCount;
+	
+	public Adage() {}
+	
+	@Override
+	public String toString() {
+		return words + " -- " + wordCount + " words";
+	}
+	public void setWords(String words) {
+		this.words = words;
+		this.wordCount = words.trim().split("\\s+").length;
+	}
+	public String getWords() {
+		return this.words;
+	}
+	public void setWordCount(int wordCount) {
+	}
+	public int getWordCount() {
+		return this.wordCount;
+	}
+}
+
+
+=> web.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<servlet>
+		<servlet-name>jersey</servlet-name>
+		<servlet-class>
+			com.sun.jersey.spi.container.servlet.ServletContainer
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</web-app>
+
+
+**ServletContainer class scans all ApplicationPath annotations and all Path annotations in war file.
+
+
+@Path("/")
+public class Adages { // Add aphorisms to taste... 
+
+	private String[ ] aphorisms = {"What can be shown cannot be said.", 
+						"If a lion could talk, we could not understand him.",
+						"Philosophy is a battle against the bewitchment of ",
+						"Ambition is the death of thought.",
+						"The limits of my language mean the limits of my world."
+						};
+
+	public Adages() { }
+
+	@GET
+	@Produces({ MediaType.APPLICATION_XML }) // could use "application/xml"
+	public JAXBElement<Adage> getXml() {
+		return toXml(createAdage());
+	}
+
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("/json")
+	public String getJson() {
+		return toJson(createAdage());
+	}
+
+	@GET
+	@Produces({ MediaType.TEXT_PLAIN })
+	@Path("/plain")
+	public String getPlain() {
+		return createAdage().toString() + "\n";
+	}
+
+	private Adage createAdage() {
+		Adage adage = new Adage();
+		adage.setWords(aphorisms[new Random().nextInt(aphorisms.length)]);
+		return adage;
+	}
+
+	// Java Adage --> XML document
+	@XmlElementDecl(namespace = "http://aphorism.adage", name = "adage")
+	private JAXBElement<Adage> toXml(Adage adage) {
+		return new JAXBElement<Adage>(new QName("adage"), Adage.class, adage);
+	}
+
+	// Java Adage --> JSON document
+	// Jersey provides automatic conversion to JSON using the Jackson
+	// libraries. In this example, the conversion is done manually
+	// with the Jackson libraries just to indicate how straightforward it is.
+	private String toJson(Adage adage) {
+		String json = "If you see this, there's a problem.";
+		try {
+			json = new ObjectMapper().writeValueAsString(adage);
+		} catch (Exception e) {
+		}
+		return json;
+	}
+}
+
+
+http://localhost:8080/adages/resourcesA/ 
+http://localhost:8080/adages/resourcesA/json
+http://localhost:8080/adages/resourcesA/plain
+
+
+---------------------------------------------------------------------------
 
