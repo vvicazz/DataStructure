@@ -676,3 +676,602 @@ com.fasterxml.jackson.databind.ObjectMapper
 
 ---------------------------------------------------------------------------
 
+=>JAX-WS 
+java Api for xml web services
+
+interface API is included in jdk 1.6 and above
+jax-ws can be used for both REST and SOAP
+but generally it is used for SOAP
+
+with JDK 1.6 or greater, JAX-WS services can be compiled and published using only core Java.
+
+=======================Chapter 4=======================
+
+Example 1 :  (Code First)
+
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import java.util.Random;
+
+@WebService
+public class RandService {
+	private static final int maxRands = 16;
+
+	@WebMethod
+	public int next1() {
+		return new Random().nextInt();
+	}
+
+	@WebMethod
+	public int[] nextN(final int n) {
+		final int k = (n > maxRands) ? maxRands : Math.abs(n);
+		int[] rands = new int[k];
+		Random r = new Random();
+		for (int i = 0; i < k; i++)
+			rands[i] = r.nextInt();
+		return rands;
+	}
+}
+
+
+
+=> Standalone class to publish RandService
+
+import javax.xml.ws.Endpoint;
+
+public class RandPublisher {
+	public static void main(String[] args) {
+		final String url = "http://localhost:8888/rs";
+		System.out.println("Publishing RandService at endpoint " + url);
+		Endpoint.publish(url, new RandService());
+	}
+}
+
+
+=> Two configuration files are needed: the usual file web.xml and the additional file sunjaxws.xml
+=> web.xml file for publishing RandService via tomcat
+=> WSServletContextListener parses the sun-jaxws.xml file
+=> WSServlet acts as the interceptor: 
+	the servlet receives incoming requests and dispatches these to the RandService.
+
+	
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<listener>
+		<listener-class>
+			com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+		</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>jaxws</servlet-name>
+		<servlet-class> com.sun.xml.ws.transport.http.servlet.WSServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jaxws</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+</web-app> 
+
+
+=> sun-jaxws.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+	<endpoint implementation="rand.RandService" name="RandService" url-pattern="/*" />
+</endpoints> 
+
+
+=> An endpoint definition in sun-jaxws.xml has several attributes:
+	   "name" - the endpoint name
+	   "implementation" - the name of the endpoint implementation class
+	   "wsdl" - the name of a resource corresponding to the WSDL document for the endpoint
+	   "service" - the QName of the WSDL service that owns this endpoint;
+	   "port" - the QName of the WSDL port for this endpoint;
+	   "url-pattern" - the URL pattern this endpoint is mapped to.
+	   "binding" - specify binding id for SOAP1.1 or SOAP1.2
+	   "enable-mtom" - Enables MTOM optimization
+		"wsdl", "service", "port" attributes are required for provider based endpoints 
+
+
+=> Check if soap web service is up. This will show xml schema of web service
+	http://localhost:8080/myWarFileName?xsd=1
+
+
+	
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:tns="http://rand/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+	targetNamespace="http://rand/">
+	
+	<xs:element name="next1" type="tns:next1"></xs:element>
+	<xs:element name="next1Response" type="tns:next1Response"></xs:element>
+	<xs:element name="nextN" type="tns:nextN"></xs:element>
+	<xs:element name="nextNResponse" type="tns:nextNResponse"></xs:element>
+	
+	<xs:complexType name="next1">
+		<xs:sequence></xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="next1Response">
+		<xs:sequence>
+			<xs:element name="return" type="xs:int"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="nextN">
+		<xs:sequence>
+			<xs:element name="arg0" type="xs:int"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="nextNResponse">
+		<xs:sequence>
+			<xs:element name="return" type="xs:int" minOccurs="0"
+				maxOccurs="unbounded">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+
+* Every SOAP web service has an associated endpoint url
+* A class having @WebService, a public instance method is a service operation even if the method is not annotated.
+* add query string xsd=1 to endpoint url , to check if web service is up  
+* Schema provides a data type for each SOAP message that travels, in either direction, between the service and the client
+* There are two SOAP messages per web service operation 
+Next1 and Next1Response are the XML counterparts to the JAX-B artifacts
+	
+	
+---------------------------------------------------------------
+
+Example 2 :  (Contract First)
+
+
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import java.util.Random;
+
+@WebService
+public interface RandService {
+	@WebMethod
+	public int next1();
+
+	@WebMethod
+	public int[] nextN(final int n);
+}
+
+
+
+
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import java.util.Random;
+
+@WebService(endpointInterface = "rand2.RandService")
+public class RandImpl implements RandService {
+	private static final int maxRands = 16;
+
+	@WebMethod
+	public int next1() {
+		return new Random().nextInt();
+	}
+
+	@WebMethod
+	public int[] nextN(final int n) {
+		final int k = (n > maxRands) ? maxRands : Math.abs(n);
+		int[] rands = new int[k];
+		Random r = new Random();
+		for (int i = 0; i < k; i++)
+			rands[i] = r.nextInt();
+		return rands;
+	}
+}
+
+
+=> sun-jaxws.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+	<endpoint implementation="rand.RandImpl" name="RandImpl" url-pattern="/random" />
+</endpoints> 
+
+
+when publisher is up, the below two urls will show wsdl document:
+-> curl http://localhost:8888/random?wsdl  
+
+wsimport utility is used to generate java files from wsdl at client side :
+-> wsimport -p client.rand -keep http://localhost:8888/random?wsdl 
+
+
+=>8 java files are created
+
+1. (C) Next1
+2. (C) Next1Response
+3. (C) NextN
+4. (C) NextNResponse
+5. (C) RandServiceService   -- <name of endpoint service> Service
+6. (I) RandService			-- <name of endpoint service>
+7. (C) package-info
+8. (C) ObjectFactory
+
+
+=>Client side code
+	RandServiceService service = new RandServiceService();
+	RandService port = service.getRandServicePort(); 
+	port.next1();
+	port.nextN(4);
+	
+=> wsgen 
+	It can be used to generate a WSDL
+	
+	wsgen -cp . -wsdl rand.RandService 
+	
+	generates a WSDL file named RandServiceService.wsdl
+	
+---------------------------------------------------------------
+
+Example 3 :  (throwing exception and handlerChain example)
+
+
+package com.akash.servlet.ws.soap;
+
+import javax.jws.HandlerChain;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
+@WebService()
+@HandlerChain(file="handler/handler-chain.xml")
+public class CalculatorService {
+
+	@WebMethod
+	public int add(int a, int b) {
+		return a + b;
+	}
+
+	@WebMethod
+	public int subtract(int a, int b) {
+		return a - b;
+	}
+
+	@WebMethod
+	public int multiply(int a, int b) {
+		return a * b;
+	}
+
+	@WebMethod
+	public int divide(int a, int b) throws InvalidDenominatorException {
+		if (b != 0) {
+			return a / b;
+		} else {
+			throw new InvalidDenominatorException("denominator cannot be 0",
+					"denominator cannot be 0");
+		}
+	}
+}
+
+
+
+
+
+
+package com.akash.servlet.ws.soap;
+
+import javax.xml.ws.WebFault;
+
+//	http://stackoverflow.com/questions/2064447/jax-ws-map-exceptions-to-faults
+
+@WebFault
+public class InvalidDenominatorException extends Exception {
+
+	private static final long serialVersionUID = 100003L;
+
+	private String details;
+
+	public InvalidDenominatorException(String reason, String details) {
+		super(reason);
+		this.details = details;
+	}
+
+	public String getFaultInfo() {
+		return this.details;
+	}
+}
+
+
+
+=> handler-chain.xml
+
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<javaee:handler-chains xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<javaee:handler-chain>
+		<javaee:handler>
+			<javaee:handler-class>com.akash.servlet.ws.soap.handler.CalculatorSoapHandler
+			</javaee:handler-class>
+		</javaee:handler>
+	</javaee:handler-chain>
+
+</javaee:handler-chains>
+
+
+
+
+
+
+
+package com.akash.servlet.ws.soap.handler;
+
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+public class CalculatorSoapHandler implements SOAPHandler<SOAPMessageContext> {
+
+	// http://java.dzone.com/articles/creating-soap-message-handlers
+	// http://www.coderanch.com/t/540427/Web-Services/java/print-JAXWS-request-response
+
+	public CalculatorSoapHandler() {
+	}
+
+	public void close(MessageContext mCtx) {
+	}
+
+	public Set<QName> getHeaders() {
+		return null;
+	}
+
+	public boolean handleFault(SOAPMessageContext mCtx) {
+		printMessage(mCtx);
+		return true;
+	}
+
+	public boolean handleMessage(SOAPMessageContext mCtx) {
+		printMessage(mCtx);
+		return true; // continue down the handler chain
+	}
+
+	private void printMessage(SOAPMessageContext mCtx) {
+		Boolean outbound = (Boolean) mCtx
+				.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+		// When Server sending Response
+		if (outbound) {
+			try {
+				System.out
+						.println("-----------Server Response Envolope starts-----------");
+				mCtx.getMessage().writeTo(System.out);
+				System.out
+						.println("-----------Server Response Envolope Ends-----------");
+			} catch (Exception e) {
+				throw new RuntimeException("SOAPException thrown.", e);
+			}
+		} else { // When Server getting Request
+			try {
+				System.out
+						.println("-----------Server Request Envolope starts-----------");
+				mCtx.getMessage().writeTo(System.out);
+				System.out
+						.println("-----------Server Request Envolope ends-----------");
+			} catch (Exception e) {
+				throw new RuntimeException("SOAPException thrown.", e);
+			}
+		}
+	}
+
+}
+
+
+
+=> sun-jaxws.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+	<endpoint implementation="com.akash.servlet.ws.soap.CalculatorService" 
+		name="CalculatorService" url-pattern="/calculator" />
+</endpoints>
+
+
+
+---------------------------------------------------------------
+
+
+WSDL created by CalculatorService 
+
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. 
+	RI's version is JAX-WS RI 2.2-hudson-752-. --><!-- Generated by JAX-WS RI at http://jax-ws.dev.java.net. 
+	RI's version is JAX-WS RI 2.2-hudson-752-. -->
+<definitions
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsp="http://www.w3.org/ns/ws-policy"
+	xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://soap.ws.servlet.akash.com/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://soap.ws.servlet.akash.com/"
+	name="CalculatorServiceService">
+	
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="http://soap.ws.servlet.akash.com/"
+				schemaLocation="http://localhost:80/calculator?xsd=1" />
+		</xsd:schema>
+	</types>
+	
+	<message name="add">
+		<part name="parameters" element="tns:add" />
+	</message>
+	<message name="addResponse">
+		<part name="parameters" element="tns:addResponse" />
+	</message>
+	<message name="divide">
+		<part name="parameters" element="tns:divide" />
+	</message>
+	<message name="divideResponse">
+		<part name="parameters" element="tns:divideResponse" />
+	</message>
+	<message name="InvalidDenominatorException">
+		<part name="fault" element="tns:InvalidDenominatorException" />
+	</message>
+	<message name="subtract">
+		<part name="parameters" element="tns:subtract" />
+	</message>
+	<message name="subtractResponse">
+		<part name="parameters" element="tns:subtractResponse" />
+	</message>
+	<message name="multiply">
+		<part name="parameters" element="tns:multiply" />
+	</message>
+	<message name="multiplyResponse">
+		<part name="parameters" element="tns:multiplyResponse" />
+	</message>
+	
+	<portType name="CalculatorService">
+		<operation name="add">
+			<input
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/addRequest"
+				message="tns:add" />
+			<output
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/addResponse"
+				message="tns:addResponse" />
+		</operation>
+		<operation name="divide">
+			<input
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/divideRequest"
+				message="tns:divide" />
+			<output
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/divideResponse"
+				message="tns:divideResponse" />
+			<fault message="tns:InvalidDenominatorException"
+				name="InvalidDenominatorException"
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/divide/Fault/InvalidDenominatorException" />
+		</operation>
+		<operation name="subtract">
+			<input
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/subtractRequest"
+				message="tns:subtract" />
+			<output
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/subtractResponse"
+				message="tns:subtractResponse" />
+		</operation>
+		<operation name="multiply">
+			<input
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/multiplyRequest"
+				message="tns:multiply" />
+			<output
+				wsam:Action="http://soap.ws.servlet.akash.com/CalculatorService/multiplyResponse"
+				message="tns:multiplyResponse" />
+		</operation>
+	</portType>
+	
+	<binding name="CalculatorServicePortBinding"
+		type="tns:CalculatorService">
+		<soap:binding
+			transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<operation name="add">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+		<operation name="divide">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="InvalidDenominatorException">
+				<soap:fault name="InvalidDenominatorException"
+					use="literal" />
+			</fault>
+		</operation>
+		<operation name="subtract">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+		<operation name="multiply">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+	</binding>
+	
+	<service name="CalculatorServiceService">
+		<port name="CalculatorServicePort"
+			binding="tns:CalculatorServicePortBinding">
+			<soap:address location="http://localhost:80/calculator" />
+		</port>
+	</service>
+	
+</definitions>
+
+
+
+
+---------------------------------------------------------------
+
+wsdl information:
+
+1) definitions  : specifies and declares any other xsd if required
+2) types 		: declares or links all complex data types used in web service
+3) message 		: Request and response message formats using complex data type of types section
+4) portType		: it defines operations of services, i.e. methods with input request and output response
+5) binding		: it defines soap architectural settings, like SOAP version or transport level protocol used.
+6) service 		: it is combination of portType and binding
+
+
+note : targetNamespace is used to refer any external xsd or schema in wsdl.
+
+-----------------------------------
+
+Communication in SOAP is done via transferring xml content.
+This xml content is known as SOAP envelope.
+
+SOAP message Envelope contains :
+1) optional header
+2) mandatory body 
+3) optional attachments
+
+SOAP have a feature similar to filters in J2EE. These filters are known as Handlers.
+Handlers in SOAP can be at both side , client OR Server.
+
+For Server side handlers : request can be inbound and outbound.
+For Client side handlers : response can be can be outbound and inbound.
+
+Handlers in SOAP are two types :
+1) SOAPHandler : can access full soap envelope
+2) LogicalHandler : can access only body
+
+--------------------------
+
+=>methods in Handler interface :
+
+boolean handleMessage(SOAPMessageContext ctx);
+
+void close(SOAPMessageContext ctx);
+
+boolean handleFault(SOAPMessageContext ctx);
+
+Set<QName> getHeaders();
+
+
+--------------------------
+
+Exception handling in SOAP is done via Faults.
