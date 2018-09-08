@@ -1,5 +1,25 @@
 mongodb course :
 
+
+-> Stores data as documents in a binary representation called BSON (Binary JSON)
+-> Related information is stored together for fast query access
+	No joins
+-> Schemaless
+	there is no need to declare the structure of documents to the system – 
+	documents are self-describing
+-> Documents give you the ability to represent hierarchical relationships
+    to store arrays and other more complex structures easily
+-> Quering, aggregation , indexing
+-> No transactions as all related data is at single collection
+-> Distributted environment : replication and sharding
+-> multi-document transactions , version 4.0
+
+Table		->	Collection
+Row			->	Document
+Column		->	Field
+GROUP_BY	->	Aggregation Pipeline
+
+
 http://stackoverflow.com/questions/3778428/best-way-to-store-date-time-in-mongodb
 
 data type defined by json spec :
@@ -20,6 +40,7 @@ show dbs
 show collections
 use databaseName
 db.collectionName.insert({"name":"akash", "age":20});
+db.collectionName.insertMany([ {...}, {...} ]);
 db.collectionName.insertOne({"name":"akash", "age":20});
 db.collectionName.insert({});
 db.collectionName.find()
@@ -36,7 +57,7 @@ cursor.next()
 
 1 Post can have many tags
 1 post can have many comments
-authors can have seoerate collection 
+authors can have separate collection 
 
 -->comments can be saved within post because comments cannot be used independently without post
 -->Size of a document limits to 16 MB.
@@ -45,15 +66,13 @@ indexing is supported in sub-document and array elements.
 
 ========================================================================================
 
-Week 2 :
-
 insertOne({})
 insertMany([ {},{} ] , { "ordered" : false });
 //by default ordered is true
 
 db.collectionName.drop();		//drop collection
 
-mongodb uses _id field in every collection as a primary index.
+mongodb uses _id field in every collection as a primary key.
 
 ===========================================================================================
 
@@ -76,15 +95,15 @@ searching in an array :
 	$size : checks if array has a size as specified
 	$elemMatch : when array contains document and we want to check against multiple fields in that document
 
-db.coll.find({ "params.country" : ["Auz","US"] })
+db.coll.find({ "params.country" : ["Auz","US"] })		//exact match
 
-db.coll.find({ "params.country" : "India" })		//this is similar to selector to scalar values
+db.coll.find({ "params.country" : "India" })		//all documents whose array contains this element
 
-db.coll.find({ "params.country.0" : "India" })
+db.coll.find({ "params.country.0" : "India" })		//if element exist in array at particular index
 
-db.BCBS_configuration.find({"data.value.permissions" : { $all : ["AddRecurringInfo","AdminAddRecurringInfo"] } }).count();
+db.coll.find({ "params.country" : { $all : ["India","US"] } }).count();
 
-db.BCBS_configuration.find({"data.value.permissions" : { $size : 6 } }).count();
+db.coll.find({ "params.country" : { $size : 6 } }).count();
 
 
 
@@ -105,7 +124,7 @@ db.coll.find({ "name" : "abd" } , { stars:1, _id:0, params:1 })
 =============================================================================================
 
 comparison operators: 
-db.coll.find({ "params.rating" : {$gt : 5 , $lt : 10} , });
+db.coll.find({ "params.rating" : {$gt : 5 , $lt : 10} });
 
 $gt
 $gte
@@ -144,29 +163,75 @@ db.BCBS_configuration.find().count();
 db.BCBS_configuration.distinct("data.type");
 [ "UI", "type1", "SYSTEM" ]
 
-db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"UI"}}] }).count();
-212
+================================================================
+=>Database and Collection
 
-db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"SYSTEM"}}] }).count();
-7
+use myNewDB
+db.myNewCollection1.insertOne( { x: 1 } )
 
-db.BCBS_configuration.find({ $and : [{"data.type" : {$eq:"type1"}}] }).count();
-1
+	new database and new collection is created on the fly.
+	
+db.createCollection("students");
+	is used create a collection explicitly.
 
-Q)find all entries which have no data.type
 
-db.BCBS_configuration.find({ $and : [{"data.type" : {$ne:"UI"}},{"data.type" : {$ne:"SYSTEM"}},{"data.type":{$ne:"type1"}}] }).count();
-62
+->Document validation can be done on collection level.
 
-db.BCBS_configuration.find({"data.type":null}).count();
-16
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "year", "major", "gpa" ],
+         properties: {
+            name: {
+               bsonType: "string",
+               description: "must be a string and is required"
+            },
+            gender: {
+               bsonType: "string",
+               description: "must be a string and is not required"
+            },
+            year: {
+               bsonType: "int",
+               minimum: 2017,
+               maximum: 3017,
+               exclusiveMaximum: false,
+               description: "must be an integer in [ 2017, 3017 ] and is required"
+            },
+            major: {
+               enum: [ "Math", "English", "Computer Science", "History", null ],
+               description: "can only be one of the enum values and is required"
+            },
+            gpa: {
+               bsonType: [ "double" ],
+               minimum: 0,
+               description: "must be a double and is required"
+            }
+         }
+      }
+   }
+})
 
-> db.BCBS_configuration.aggregate({$group:{_id:"$data.type"}});
-{ "_id" : "UI" }
-{ "_id" : "type1" }
-{ "_id" : [ ] }
-{ "_id" : "SYSTEM" }
-{ "_id" : null }
+
+-> View can be created to perform any kind of read only operation
+	they are linked to indexes of collection but they have some restricted query operations.
+	
+	
+-> Capped Collection are fixed size collection
+	they do not require indexing
+	so it has high insertion throughput
+	you cannot shard a capped collection
+	
+===============================================================
+ObjectId
+
+->a 4-byte value representing the seconds since the Unix epoch,
+->a 5-byte random value, and
+->a 3-byte counter, starting with a random value.
+
+
+BSON strings are UTF-8
+
 
 =============================================================================================
 
@@ -190,6 +255,26 @@ $and
 $nor
 $not
 
+-> db.inventory.find( { $or: [ { status: "A" }, { qty: { $lt: 30 } } ] } )
+corresponding sql
+-> SELECT * FROM inventory WHERE status = "A" OR qty < 30
+
+
+-> db.inventory.find( {
+     	status: "A",
+     	$or: [ { qty: { $lt: 30 } }, { item: /^p/ } ]
+	} );
+corresponding sql
+-> SELECT * FROM inventory WHERE status = "A" AND ( qty < 30 OR item LIKE "p%");
+
+
+Q)find all entries which have no data.type
+
+db.BCBS_configuration.find({ $and : [{"data.type" : {$ne:"UI"}},{"data.type" : {$ne:"SYSTEM"}},{"data.type":{$ne:"type1"}}] }).count();
+62
+
+db.BCBS_configuration.find({"data.type":null}).count();
+16
 
 =============================================================================================
 
@@ -202,13 +287,21 @@ $elemMatch
 
 Update documents :
 
+updateOne(filter, update, options) -- updates first document that matches the filter
+updateMany(filter, update, options) -- updates all documents that matches the filter
+replaceOne(filter, update, options)
+
+options for update 
+	->upsert		-- if no document found then it insert new document
+	->writeConcern
+	->collation
+	->arrayFilters
+
 db.coll.updateOne({"name":"abc"} , { $set : {"feature" : "xyz"} });
 
 db.BCBS_configuration.updateOne( {"data.type":"UI"}, {$set : {"data.value":{"permissions": ["AddPI"] }}} );
 
 db.BCBS_configuration.updateOne( {"data.type":"UI"}, {$set : {"data.value.attr":"smart"}} );
-
-https://docs.mongodb.com/manual/reference/operator/update/ 
 
 update operators for fields:
 
@@ -221,10 +314,48 @@ $max
 $rename
 $currentDate 
 
+==========================================================
+
 update operators for array:
+-> update first element
+-> update all elements
+-> $addToSet  -- add element to array if not exist
+-> $pop       -- removes first or last element from array
+-> $push	  -- adds values to the array
+				$each
+				$slice
+				$sort
+				$position
+				
+-> $pullAll   -- removes all matching values
+
+==========================================================
+delete documents 
+
+deleteOne()
+deleteMany()
 
 ==========================================================
 
+-> db.people.find( { status: "A" } ).sort( { user_id: 1 } )
+corresponding sql
+-> SELECT * FROM people WHERE status = "A" ORDER BY user_id ASC
+
+
+-> db.people.find().count()
+corresponding sql
+-> SELECT COUNT(*) FROM people
+
+
+-> db.people.find( { user_id: { $exists: true } } ).count()
+corresponding sql
+-> SELECT COUNT(user_id) FROM people
+
+find first 5 people
+-> db.people.find().limit(5)
+
+
+=========================================================
 mongorestore dump
 
 mongoimport -d students -c grades < grades.json -batchSize 1
