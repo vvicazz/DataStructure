@@ -66,10 +66,43 @@ mongod -dppath WT -storageEngine wiredtiger
 
 indexes :
 
+-> range-based query operations.
+-> avoid full collection scan
+-> return sorted results
+
 indexes are stored in BTREE data structure.
 
-data which is indexed are stored in different memory in sorted order and then it is easy to search it using binary search.
+data which is indexed are stored in different memory in sorted order and 
+then it is easy to search it using binary search.
 
+==============================================================
+
+=>Type of Indexes in Mongodb
+
+-> Single field
+	-> the sort order of single field index does not matter
+-> Compound index
+	-> sort order compound index matters
+	-> if a compound index consists of { userid: 1, score: -1 }, 
+		the index sorts first by userid and then, 
+		within each userid value, sorts by score.
+
+-> MultiKey index
+	-> indexes for array elements
+	-> separate index entry is created for every element of the array
+
+-> Geospatial index 
+	-> storing 2D points
+
+-> Text index
+	-> for full text search
+	-> removing stop words, storing stem words, various tokenizers
+	
+-> Hashed index
+	-> used for keys in sharding
+
+==============================================================
+	
 ==>indexes are created as
 (A,B,C)
 
@@ -156,13 +189,17 @@ db.coll.createIndex({"scores.score":1});
 
 covered queries :
 
-if documentExamined is zero, i.e. data is searched in index and returned from the index itself and not need to fetch the document.
+When the query criteria and the projection of a query include only the indexed fields, 
+MongoDB returns results directly from the index 
+without scanning any documents or bringing documents into memory
 
 (a:1,b:1) is the index 
 
 db.coll.find({a:1},{_id:0,a:1,b:1});    will be
 
-db.coll.find({a:1},{_id:0});           will not be
+db.coll.find({a:1},{_id:1});           will not be
+
+#since the index does not include the _id field.
 
 ========================
 
@@ -181,9 +218,11 @@ sort = (a:1) , (a:1,b:1) , (a:1,b:1,c:1)
 http://stackoverflow.com/questions/36142299/how-does-sorting-with-an-index-work-in-mongodb
 
 When result of a query returned, mongodb operates in memory to sort these objects.
-When result of a query returned from indexes, then sorting logic can use the same index to sort but it depends on the query.
+When result of a query returned from indexes,
+ then sorting logic can use the same index to sort but it depends on the query.
 
-If result of the query by indexes already sorts the required sorting logic then it is good , else it will go for in memory processing.
+If result of the query by indexes already sorts the required sorting logic then it is good,
+ else it will go for in memory processing.
 
 db.coll.createIndex({a:1.b:1,c:1})
 
@@ -277,14 +316,14 @@ multikey
 
 ==========
 
-***ensureIndex indexes field of type : 2d , 2dsphere , text
+***createIndex indexes field of type : 2d , 2dsphere , text
 
 
 {name:'' , location : [20,20]}
 {name:'' , location : [10,-10]}
 
 //creating index of type 2d
-db.coll.ensureIndex({'location':'2d' , type:1})
+db.coll.createIndex({'location':'2d' , type:1})
 
 db.coll.find({location : {$near : [50,50] } });
 
@@ -306,7 +345,7 @@ example :
 { "_id" : { "$oid" : "535471aaf28b4d8ee1e1c86f" }, "store_id" : 8, "loc" : { "type" : "Point", "coordinates" : [ -37.47891236119904, 4.488667018711567 ] } }
 
 //creating index of type 2dsphere
-db.coll.ensureIndex({'loc' : '2dsphere'});
+db.coll.createIndex({'loc' : '2dsphere'});
 
 db.stores.find({'loc' : {$near : {$geometry : { type:'Point' , coordinates : [-130,39] } , $maxDistance : 1000000 } } });
 
@@ -315,7 +354,7 @@ db.stores.find({'loc' : {$near : {$geometry : { type:'Point' , coordinates : [-1
 Full text search :
 
 //creating index of type text
-db.coll.ensureIndex({'words' : 'text'});
+db.coll.createIndex({'words' : 'text'});
 
 db.coll.find({ $text : { $search : 'akash rahul' } });
 
@@ -571,16 +610,50 @@ HW
 
 ==============================
 
-Now query the profile data, looking for all queries to the students collection in the database school2, sorted in order of decreasing latency. What is the latency of the longest running operation to the collection, in milliseconds?
+Now query the profile data, looking for all queries to the students collection in the database school2,
+ sorted in order of decreasing latency. 
+ What is the latency of the longest running operation to the collection, in milliseconds?
 
 
-In this problem you will analyze a profile log taken from a mongoDB instance. Query the profile data, looking for all queries to the students collection in the database school2, sorted in order of decreasing latency. What is the latency of the longest running operation to the collection, in milliseconds?
+In this problem you will analyze a profile log taken from a mongoDB instance. 
+Query the profile data, looking for all queries to the students collection in the database school2,
+ sorted in order of decreasing latency. 
+ What is the latency of the longest running operation to the collection, in milliseconds?
 
 
 $ mongo
 > db.profile.find({ op:"query", ns:/school2.students/})
             .sort({ millis: -1}).limit( 1)
-{ "_id" : ObjectId("531604231f113c79eae77957"), "ts" : ISODate("2012-11-20T20:09:49.862Z"), "op" : "query", "ns" : "school2.students", "query" : { "student_id" : 80 }, "ntoreturn" : 0, "ntoskip" : 0, "nscanned" : 10000000, "keyUpdates" : 0, "numYield" : 5, "lockStats" : { "timeLockedMicros" : { "r" : 19776550, "w" : 0 }, "timeAcquiringMicros" : { "r" : 4134067, "w" : 5 } }, "nreturned" : 10, "responseLength" : 2350, "millis" : 15820, "client" : "127.0.0.1", "user" : "" }
+
+{  
+   "_id":ObjectId("531604231f113c79eae77957"),
+   ISODate("2012-11-20T20:09:49.862Z"),
+   "op":"query",
+   "ns":"school2.students",
+   "query":{  
+      "student_id":80
+   },
+   "ntoreturn":0,
+   "ntoskip":0,
+   "nscanned":10000000,
+   "keyUpdates":0,
+   "numYield":5,
+   "lockStats":{  
+      "timeLockedMicros":{  
+         "r":19776550,
+         "w":0
+      },
+      "timeAcquiringMicros":{  
+         "r":4134067,
+         "w":5
+      }
+   },
+   "nreturned":10,
+   "responseLength":2350,
+   "millis":15820,
+   "client":"127.0.0.1",
+   "user":""
+}
 
 
 db.profile.find({ op:"query", ns:/school2.students/}).sort({ millis: -1}).limit( 1)
