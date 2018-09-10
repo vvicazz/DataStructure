@@ -662,6 +662,9 @@ Solution3=>
 3. Call DFS(GT), but in the main loop, consider vertices in order of decreasing f[u] (as computed in first DFS)
 4. Output the vertices in each tree of the depth-first forest formed in second DFS as a separate SCC.
 
+the finish time of a vertex that connects to other SCCs (other that its own SCC),
+ will always be greater than finish time of vertices in the other SCC
+
 http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/GraphAlgor/strongComponent.htm
 
 ------------------------------------------
@@ -671,15 +674,16 @@ Applications of BFS :
 2.Bipartite graph
 
 Applications of DFS in undirected graph :
-1. Two Edge Connected
-2. Planar graph
-3. Vertex connected
-4. Connected Components
+1. Connected Components
+2. Two Edge Connected	-- Bridge edge
+3. Vertex connected		-- Articulation point
+4. Planar graph
 
 Applications of DFS in Directed graph :
-1. Strongly Connected graph
-2. Acyclic
-3. Topological sort
+1. Acyclic
+2. Topological sort
+3. Strongly Connected graph
+4. Strongly Connected Component
 
 All above applications have linear time complexity.
 
