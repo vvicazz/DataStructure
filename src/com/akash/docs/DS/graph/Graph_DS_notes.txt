@@ -687,6 +687,10 @@ Applications of DFS in Directed graph :
 
 All above applications have linear time complexity.
 
+Euler path and Euler Cycle
+	->connected components
+	->bridge edge
+
 ===============================================
 (1) diameter of a graph
 	
