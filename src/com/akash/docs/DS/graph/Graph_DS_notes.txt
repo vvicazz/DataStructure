@@ -564,15 +564,20 @@ This ordering is also called as topological sort.
 Statement :
 Given an acyclic graph G, ordering of vertices in their departure time is called Topological sort.   
  
-Topological sort : sorting vertices on the basis of departure timestamp 
+Topological sort : sorting vertices on the basis of departure timestamp (larger to smaller)
 	(this can be done while performing DFS just to avoid complexity of sorting)
 	
 DAG : Directed Acyclic Graph
-(Q) Given a directed graph G, check if G is Acyclic?
-	-> no back edge means no cycle
-(Q) Given an undirected graph G, check if G is Acyclic?
-	-> no back edge means no cycle
-	-> use find-union disjoint set			
+(Q) Given a Directed graph G, check if G is Acyclic?
+	-> No back edge means no cycle
+	-> Coloring method in DFS (White, Gray, Black)
+(Q) Given an Undirected graph G, check if G is Acyclic?
+	-> No back edge means no cycle
+	-> Use find-union disjoint set	
+	
+	
+(Q) Detect Cycle in a directed graph using colors (Coloring method in DFS)
+(Q) Print all the cycles in an undirected graph		
 
 =>In undirected Graph : 
 Connected Graph = There is a path bw every pair of vertices.
@@ -980,7 +985,34 @@ i.e. decrease priority of vertices in heap
 Heap will contain only those vertices that are S'
 
 
+Each vertex will have below properties :
+-> key
+-> parent
 
+int INF = Integer.maxInt;
+
+prim() {
+	for each vertex v in graph {
+		v.key = INF;
+		v.parent = null;
+	}
+	//any vertex
+	root.key = 0;
+	add all vertices to heap (min priority queue) by their key priority
+	
+	while(heap.isNotEmpty()) {
+		Vertex tempNode = heap.extractMin();
+		for each adjacent vertex of tempNode as u {
+			if( heap.contains(u) && w(tempNode,u) < u.key ) {
+				u.key = w(tempNode,u);
+				u.parent = tempNode;
+				heap.heapify(u);
+			}
+		}
+	}
+}
+
+Complexity = E*log(V)
 
 =================================================
 
@@ -1073,7 +1105,7 @@ Tree, forward and cross edges exist.
 
 topological sort SSSP : O(V + E),  considering a graph having negative edge but no negative-weight cycle.
 {
-	do dfs and perform topological sort
+	do dfs and perform topological sort (larger to smaller departure time)
 	intialize_all_nodes();
 	for vertices u in sorted order
 		for all adjacent edges of u (u,v)		// mark processed edges
@@ -1086,13 +1118,13 @@ topological sort can be done in O(V + E), during DFS we can store vertices of th
 ->greedy approach
 {
 	intialize_all_nodes();
-	create_min_heap(for all V by d)
+	create_min_heap(for all V by distance)
 	S = empty set
 	while(heap is not empty) {
 		u = extract_min_heap();
 		for(all adjacent edges of u (u,v)) {		// mark processed edges
 			relax(u,v,w)
-			update_heap();
+			heap.heapify(v);
 		}
 		S = S Union u
 	}
