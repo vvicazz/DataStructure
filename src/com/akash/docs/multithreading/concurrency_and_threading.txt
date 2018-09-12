@@ -1474,3 +1474,166 @@ ExecutorCompletionService implements CompletionService
 
 ========================Chapter 7========================
 
+Killing a thread is a  Cooperative Approach
+If we do not follow that approach, 
+it can leave shared data structure in an inconsistent state.
+
+Why we require cancellation
+-user requested
+-time limited activity
+-errors
+-shutdown
+
+One cooperative mechanism is setting a “cancellation requested” flag 
+that the task checks periodically; if it finds the flag set, the task terminates early.
+cancelled flag must be volatile
+
+
+@ThreadSafe
+public class PrimeGenerator implements Runnable {
+	@GuardedBy("this")
+	private final List<BigInteger> primes = new ArrayList<BigInteger>();
+	private volatile boolean cancelled;
+
+	public void run() {
+		BigInteger p = BigInteger.ONE;
+		while (!cancelled) {
+			p = p.nextProbablePrime();
+			synchronized (this) {
+				primes.add(p);
+			}
+		}
+	}
+
+	public void cancel() {
+		cancelled = true;
+	}
+
+	public synchronized List<BigInteger> get() {
+		return new ArrayList<BigInteger>(primes);
+	}
+}
+
+
+(Q) How to handle cases of cancellation when code uses interrupted API like BlockingQueue
+
+the task might never check the cancellation flag and therefore might never terminate
+
+class BrokenPrimeProducer extends Thread {
+	private final BlockingQueue<BigInteger> queue;
+	private volatile boolean cancelled = false;
+
+	BrokenPrimeProducer(BlockingQueue<BigInteger> queue) {
+		this.queue = queue;
+	}
+
+	public void run() {
+		try {
+			BigInteger p = BigInteger.ONE;
+			while (!cancelled)
+				queue.put(p = p.nextProbablePrime());
+		} catch (InterruptedException consumed) {
+		}
+	}
+
+	public void cancel() {
+		cancelled = true;
+	}
+}
+
+void consumePrimes() throws InterruptedException { 
+	BlockingQueue<BigInteger> primes = ...; 
+	BrokenPrimeProducer producer = new BrokenPrimeProducer(primes); 
+	producer.start(); 
+	try { 
+		while (needMorePrimes()) 
+			consume(primes.take()); 
+	} finally { 
+		producer.cancel(); 
+	} 
+}
+
+Problem :
+ The producer thread generates primes and places them on a blocking queue. 
+ If the producer gets ahead of the consumer, the queue will ﬁll up and put will block. 
+ What happens if the consumer tries to cancel the producer task while it is blocked in put? 
+ It can call cancel which will set the cancelled ﬂag—but the producer will never check the ﬂag
+ because it will never emerge from the blocking put 
+ (because the consumer has stopped retrieving primes from the queue). 
+ 
+ 
+Each thread has a boolean interrupted status; interrupting a thread sets its interrupted status to true
+Thread contains methods for interrupting a thread and querying the interrupted status of a thread
+  
+  
+public class Thread { 
+	public void interrupt() { ... } 
+	public boolean isInterrupted() { ... } 
+	public static boolean interrupted() { ... } 
+	... 
+}
+
+->interrupt() method interrupts the target thread
+
+->isInterrupted() returns the interrupted status of the target thread
+
+->static interrupted() method clears the interrupted status of the current thread 
+	and returns its previous value.
+	this is the only way to clear the interrupted status.
+	
+
+Thread.sleep and Object.wait try to detect when a thread has been interrupted and return early.
+They respond to interruption by clearing the interrupted status and 
+throwing InterruptedException,indicating that the blocking operation completed early due to interruption
+
+
+If a thread is interrupted when it is not blocked, its interrupted status is set, and 
+it is up to the activity being cancelled to poll the interrupted status to detect interruption.
+In this way interruption is “sticky”—if it doesn’t trigger an InterruptedException, 
+evidence of interruption persists until someone deliberately clears the interrupted status
+
+
+A good way to think about interruption is that it does not actually interrupt a running thread;
+ it just requests that the thread interrupt itself at the next convenient opportunity.
+ (These opportunities are called cancellation points.) 
+ Some methods, such as wait, sleep, and join, take such requests seriously,
+ throwing an exception when they receive an interrupt request or 
+ encounter an already set interrupt status upon entry. 
+ Well behaved methods may totally ignore such requests so long as they leave 
+ the interruption request in place so that calling code can do something with it. 
+ Poorly behaved methods swallow the interrupt request, 
+ thus denying code further up the call stack the opportunity to act on it. 
+ The static interrupted method should be used with caution, 
+ because it clears the current thread’s interrupted status. 
+ If you call interrupted and it returns true, 
+ unless you are planning to swallow the interruption, 
+ you should do something with it—either throw InterruptedException or 
+ restore the interrupted status by calling interrupt again
+
+
+
+class PrimeProducer extends Thread {
+	private final BlockingQueue<BigInteger> queue;
+
+	PrimeProducer(BlockingQueue<BigInteger> queue) {
+		this.queue = queue;
+	}
+
+	public void run() {
+		try {
+			BigInteger p = BigInteger.ONE;
+			while (!Thread.currentThread().isInterrupted())
+				queue.put(p = p.nextProbablePrime());
+		} catch (InterruptedException consumed) {
+			/* Allow thread to exit */ }
+	}
+
+	public void cancel() {
+		interrupt();
+	}
+}
+
+
+Calling interrupt does not necessarily stop the target thread from doing what it is doing;
+it merely delivers the message that interruption has been requested.
+
