@@ -1219,3 +1219,242 @@ public class Factorizer implements Servlet {
 ==========================================================================================================
 
 
+========================Chapter 6========================
+
+=> Sequential web server.
+
+class SingleThreadWebServer {
+	public static void main(String[] args) throws IOException {
+		ServerSocket socket = new ServerSocket(80);
+		while (true) {
+			Socket connection = socket.accept();
+			handleRequest(connection);
+		}
+	}
+}
+
+
+it can handle only one request at a time
+rarely provides either good throughput or good responsiveness
+
+
+=> Web server that starts a new thread for each request
+
+class ThreadPerTaskWebServer {
+	public static void main(String[] args) throws IOException {
+		ServerSocket socket = new ServerSocket(80);
+		while (true) {
+			final Socket connection = socket.accept();
+			Runnable task = new Runnable() {
+				public void run() {
+					handleRequest(connection);
+				}
+			};
+			new Thread(task).start();
+		}
+	}
+}
+
+Features :
+ resume waiting for the next incoming connection more quickly
+ Tasks can be processed in parallel
+ 
+ As long as the request arrival rate does not exceed the 
+ server’s capacity to handle requests, 
+ this approach offers better responsiveness and throughput.
+ 
+Disadvantage :
+-> Thread creation and teardown are not free. thread creation takes time
+-> If you have enough threads to keep all the CPUs busy, creating more threads won’t help and may even hurt. 
+->  There is a limit on how many threads can be created.
+	 requested stack size in the Thread constructor, and 
+	 limits on threads placed by the underlying operating system
+	 
+public interface Executor {
+	void execute(Runnable command);
+} 
+
+->  Executor processes tasks asynchronously
+-> It provides a standard means of decoupling task submission from task execution,
+-> The Executor implementations also provide lifecycle support and 
+ hooks for adding statistics gathering, application management, and monitoring
+	hooks : 
+		-> number of alive threads 
+		-> waiting task queue size
+		-> ThreadFactory
+		-> RejectedExecutionHandler
+
+
+class TaskExecutionWebServer {
+	private static final int NTHREADS = 100;
+	private static final Executor exec = Executors.newFixedThreadPool(NTHREADS);
+
+	public static void main(String[] args) throws IOException {
+		ServerSocket socket = new ServerSocket(80);
+		while (true) {
+			final Socket connection = socket.accept();
+			Runnable task = new Runnable() {
+				public void run() {
+					handleRequest(connection);
+				}
+			};
+			exec.execute(task);
+		}
+	}
+}
+
+Executor is based on the producer-consumer pattern, 
+where activities that submit tasks are the producers (producing units of work to be done)
+ and the threads that execute tasks are the consumers (consuming those units of work). 
+
+
+Whenever you see code of the form: 
+	new Thread(runnable).start()
+ and you think you might at some point want a more ﬂexible execution policy,
+ seriously consider replacing it with the use of an Executor.
+
+=> Types of thread Pool
+newFixedThreadPool
+newCachedThreadPool
+newSingleThreadExecutor
+newScheduledThreadPool
+
+(Q) why cached thread pool uses SynchronousQueue
+-> newScheduledThreadPool uses DelayedWorkQueue
+
+
+Submitting a task with execute adds the task to the work queue, 
+and the worker threads repeatedly dequeue tasks from the work queue and execute them. 
+
+
+---------------------------------------
+
+=> Executor lifecycle 
+
+the JVM can’t exit until all the (nondaemon) threads have terminated, 
+so failing to shut down an Executor could prevent the JVM from exiting. 
+
+two types of shutdown
+-> gracefull shutdown
+-> abrupt shutdown
+
+If an executor application shuts down, it has to send information of all tasks status:
+-> task can completed , no information required
+-> task may be cancelled , info required
+-> task may not be started, info required
+
+To address above requirements, ExecutorService interface extends Executor, 
+adding a number of methods for lifecycle management 
+
+
+public interface ExecutorService extends Executor {
+	void shutdown(); 
+	List<Runnable> shutdownNow(); 
+	boolean isShutdown(); 
+	boolean isTerminated(); 
+	boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException; 
+	// ... additional convenience methods for task submission 
+} 
+
+
+=>ExecutorService has 3 life cycle stages :
+->Running
+	-> initial stage of Executor
+->Shutting down
+	-> shutting down executor gracefully
+	-> no new tasks are accepted
+	-> previously submitted tasks are allowed to complete—including those that have not yet begun execution
+->Terminated
+	-> attempts to cancel outstanding tasks 
+	-> does not start any tasks that are queued but not begun
+	
+
+All rejected tasks are handled by RejectedExecutionHandler
+
+
+class LifecycleWebServer {
+	private static final int NTHREADS = 100;
+	private static final Executor exec = Executors.newFixedThreadPool(NTHREADS);
+
+	public void start() throws IOException {
+		ServerSocket socket = new ServerSocket(80);
+		while (!exec.isShutdown()) {
+			try {
+				final Socket conn = socket.accept();
+				exec.execute(new Runnable() {
+					public void run() {
+						handleRequest(conn);
+					}
+				});
+			} catch (RejectedExecutionException e) {
+				if (!exec.isShutdown())
+					log("task submission rejected", e);
+			}
+		}
+	}
+
+	public void stop() {
+		exec.shutdown();
+	}
+
+	void handleRequest(Socket connection) {
+		Request req = readRequest(connection);
+		if (isShutdownRequest(req))
+			stop();
+		else
+			dispatchRequest(req);
+	}
+}
+
+
+For Delayed and periodic tasks use  ScheduledThreadPoolExecutor.
+
+
+**run() cannot return a value or throw checked exceptions
+call() will return a value and anticipates that it might throw an exception
+
+Future represents the lifecycle of a task and provides methods to test whether the task has 
+completed or 
+been cancelled, 
+retrieve its result, and 
+cancel the task
+
+task lifecycle can only move forwards, not backwards
+Once a task is completed, it stays in that state forever
+
+It returns immediately or throws an Exception if the task has already completed, 
+but if not it blocks until the task completes
+If the task completes by throwing an exception, get rethrows it wrapped in an ExecutionException
+
+
+public interface Callable<V> {
+	V call() throws Exception;
+}
+
+public interface Future<V> {
+	boolean cancel(boolean mayInterruptIfRunning);
+
+	boolean isCancelled();
+
+	boolean isDone();
+
+	V get() throws InterruptedException, ExecutionException, CancellationException;
+
+	V get(long timeout, TimeUnit unit)
+			throws InterruptedException, ExecutionException, CancellationException, TimeoutException;
+}
+
+
+**
+The exception handling code surrounding Future.get() deals with two possible problems: 
+that the task encountered an Exception, or 
+the thread calling get was interrupted before the results were available
+
+If you have a list of tasks to execute asynchronously,
+you can use submitAll() method and then poll for result of each future
+Alternatively, you can use CompletionService
+
+ExecutorCompletionService implements CompletionService
+
+
+========================Chapter 7========================
