@@ -21,7 +21,7 @@ Multi-threading interview question
 15) how to stop a thread, how to stop a thread with blocking Api
 16) Strong References, WeakReference, SoftReference
 17) escaping this object during construction -- start a thread in constructor, event listener in constructor
-
+ 
 18) what is ThreadPool ? How to create our own ThreadPool
 19) diff bw Lock api and syncronized keyword -> 
 		try methods, interruptible, fair-unfair, 
