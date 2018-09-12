@@ -2,14 +2,14 @@ Multi-threading interview question
 
 1) Thread, Runnable, run, start, ThreadGroup
 2) what are the ways to create a thread and which is better: Thread,Runnable,Executor framework
-3) why wait, notify and notifyAll are in object class? why they called inside syncronized ?
+3) why wait, notify and notifyAll are in object class? why they called inside synchronized ?
 4) diff bw sleep and wait
 5) join()
 6) ThreadLocal : set(), get(), initialValue()
 7) ThreadGroup
 8) diff bw syncronized method and block
 9) daemon thread
-10)-- Java Timer classes
+10)-- Java Timer classes vs ScheduledThreadPoolExecutor
 11) How to count no of request to a servlet -- AtomicLong
 12) Why atomic class are better than Lock api - 
 	CAS -> compare and swap , it opportunisticly updates the variable
@@ -18,7 +18,7 @@ Multi-threading interview question
 	AtomicLong, AtomicInteger, AtomicBoolean, AtomicReference
 13) volatile keyword
 14) Why suspend(), resume() and stop() methods are deprecated
-15) how to stop a thread
+15) how to stop a thread, how to stop a thread with blocking Api
 16) Strong References, WeakReference, SoftReference
 17) escaping this object during construction -- start a thread in constructor, event listener in constructor
 
