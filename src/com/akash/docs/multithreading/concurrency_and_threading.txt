@@ -957,6 +957,7 @@ public void interrupt() {
 //The interrupted status of the thread is cleared by this method.
 //if there is an interrupt, then first call will return true and status is cleared
 //second call will return false.
+//third call will also return false
 
 public static boolean interrupted() {
 	return currentThread().isInterrupted(true);
@@ -988,7 +989,7 @@ private native void interrupt0();
 
 When a method can throw InterruptedException, it is telling you that it is a blocking method,
  and further that if it is interrupted, it will make an effort to stop blocking early.
- Thread provides the interrupt method for interrupting a thread
+ Thread provides the interrupt() method for interrupting a thread
  and for querying whether a thread has been interrupted.
  Each thread has a boolean property that represents its interrupted status;
  interrupting a thread sets this status.
@@ -1003,7 +1004,7 @@ When a method can throw InterruptedException, it is telling you that it is a blo
  1) Propagate the InterruptedException
 	just propagate the InterruptedException to your caller. 
 	->not catching InterruptedException
-	->catching it and throwing it again after performing some brief activity-speciﬁc cleanup
+	->catching it and throwing it again after performing some brief activity-specific cleanup
 2) Restore the interrupt
 	you must catch InterruptedException and restore the interrupted status by calling interrupt
 	on the current thread, so that code higher up the call stack can see that an interrupt was issued
@@ -1060,7 +1061,7 @@ states : 	waiting to run
 --->Barriers 
 
 
-=>Building an efﬁcient, scalable result cache
+=>Building an efficient, scalable result cache
 
 ***Memoizer1
 
@@ -1204,11 +1205,17 @@ public class Factorizer implements Servlet {
 • It’s the mutable state, stupid.1 All concurrency issues boil down to coordinating access to mutable state.
  The less mutable state, the easier it is to ensure thread safety.
 
- • Make ﬁelds ﬁnal unless they need to be mutable.
+ • Make fields final unless they need to be mutable.
 
- • Immutable objects are automatically thread-safe. Immutable objects simplify concurrent programming tremendously. They are simpler and safer, and can be shared freely without locking or defensive copying.
+ • Immutable objects are automatically thread-safe. 
+ 	Immutable objects simplify concurrent programming tremendously. 
+ 	They are simpler and safer, and can be shared freely without locking or defensive copying.
 
- • Encapsulation makes it practical to manage the complexity. You could write a thread-safe program with all data stored in global variables, but why would you want to? Encapsulating data within objects makes it easier to preserve their invariants; encapsulating synchronization within objects makes it easier to comply with their synchronization policy.
+ • Encapsulation makes it practical to manage the complexity. 
+ 	You could write a thread-safe program with all data stored in global variables, 
+ 	but why would you want to? 
+ 	Encapsulating data within objects makes it easier to preserve their invariants; 
+ 	encapsulating synchronization within objects makes it easier to comply with their synchronization policy.
 
  • Guard each mutable variable with a lock.
 
@@ -1273,7 +1280,7 @@ Features :
  this approach offers better responsiveness and throughput.
  
 Disadvantage :
--> Thread creation and teardown are not free. thread creation takes time
+-> Thread creation and tear down are not free. thread creation takes time
 -> If you have enough threads to keep all the CPUs busy, creating more threads won’t help and may even hurt. 
 ->  There is a limit on how many threads can be created.
 	 requested stack size in the Thread constructor, and 
@@ -1564,9 +1571,9 @@ void consumePrimes() throws InterruptedException {
 
 Problem :
  The producer thread generates primes and places them on a blocking queue. 
- If the producer gets ahead of the consumer, the queue will ﬁll up and put will block. 
+ If the producer gets ahead of the consumer, the queue will fill up and put will block. 
  What happens if the consumer tries to cancel the producer task while it is blocked in put? 
- It can call cancel which will set the cancelled ﬂag—but the producer will never check the ﬂag
+ It can call cancel which will set the cancelled flag—but the producer will never check the flag
  because it will never emerge from the blocking put 
  (because the consumer has stopped retrieving primes from the queue). 
  
@@ -1582,14 +1589,18 @@ public class Thread {
 	... 
 }
 
-->interrupt() method interrupts the target thread
+1)->interrupt() method interrupts the target thread
 
-->isInterrupted() returns the interrupted status of the target thread
+2)->isInterrupted() returns the interrupted status of the target thread
 
-->static interrupted() method clears the interrupted status of the current thread 
+3)->static interrupted() method clears the interrupted status of the current thread 
 	and returns its previous value.
 	this is the only way to clear the interrupted status.
 	
+ method (1) sets the interrupt status
+ method (2) checks the interrupt status
+ method (3) clears the interrupt status
+  
 
 Thread.sleep and Object.wait try to detect when a thread has been interrupted and return early.
 They respond to interruption by clearing the interrupted status and 
