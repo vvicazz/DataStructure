@@ -1457,4 +1457,20 @@ Alternatively, you can use CompletionService
 ExecutorCompletionService implements CompletionService
 
 
+(Q) How using thread pool Executor is better than creating object of thread class
+	only those number of threads are created that CPU can handle
+	cpu reuses thread from pool for execution of new task
+	shutdown hook is available
+	RejectionExecutionHandler is available
+	configuring size of thread pool is a separate concern from execution of tasks
+(Q) Threadpool reuses threads already created ?
+	yes, using worker queue
+	already created thread which has no task to execute, picks another task from worker queue
+	->runWorker()
+		->getTask()
+(Q) Why ThreadPoolExecutor$Worker has two fields : 
+	Thread thread;			// thread.start()
+	Runnable firstTask;		// firstTask.run()
+
 ========================Chapter 7========================
+
