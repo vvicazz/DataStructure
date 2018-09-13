@@ -85,3 +85,36 @@ Difference b/w run() and call()
 ================================================================
 
 http://crunchify.com/hashmap-vs-concurrenthashmap-vs-synchronizedmap-how-a-hashmap-can-be-synchronized-in-java/
+
+
+ReentrantLock
+	lock()
+	lockInterruptibly()
+	tryLock()
+	timed tryLock()
+
+	newCondition()
+
+	Condition
+		await
+		signal
+		signalAll
+	
+
+Semaphore
+	acquire
+	release
+	
+	acquireInterruptibly()
+	tryAcquire
+	timed tryAcquire
+	
+
+CountDownLatch
+	await()
+	countDown()
+	
+
+CyclicBarrier
+	await()
+	Runnable barrierAction
