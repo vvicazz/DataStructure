@@ -3,6 +3,7 @@ AbstractQueuedSynchronizer
 ReentrantLock
 Semaphore
 CountdownLatch
+CyclicBarrier
 ReentrantReadWriteLock
 FutureTask
 SynchronousQueue
