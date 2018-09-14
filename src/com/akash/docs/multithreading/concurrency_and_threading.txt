@@ -1657,3 +1657,254 @@ class PrimeProducer extends Thread {
 Calling interrupt does not necessarily stop the target thread from doing what it is doing;
 it merely delivers the message that interruption has been requested.
 
+
+
+=============================================================================
+
+==>Practice Programs :
+
+class Myclass extends Thread {
+
+      private int x;
+      private Lock lock;
+
+      public Myclass(int x, Lock lock) {
+            this.x = x;
+            this.lock = lock;
+      }
+
+      public void run() {
+            lock.lock();
+            try {
+                  if (x == 1) {
+                        try {
+                              Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                              e.printStackTrace();
+                        }
+                        
+                  } else {
+                        System.out.println(""+x + Thread.currentThread().isInterrupted());
+                  }
+            } finally {
+                  System.out.println("inside finally : "+x);
+                  lock.unlock();
+            }
+            System.out.println("outside finally : "+x);
+      }
+}
+
+public class Test {
+      public static void main(String[] args) throws InterruptedException {
+
+            Lock lock = new ReentrantLock();
+            Thread t1 = new Myclass(1, lock);
+            Thread t2 = new Myclass(2, lock);
+            t1.start();
+            try {
+				Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                  e.printStackTrace();
+            }
+            t2.start();
+            t2.interrupt();
+      }
+}
+
+//output
+
+
+
+
+=================================================================
+
+class Myclass extends Thread {
+
+      private int x;
+      private Lock lock;
+
+      public Myclass(int x, Lock lock) {
+            this.x = x;
+            this.lock = lock;
+      }
+
+      public void run() {
+            try {
+                  lock.lockInterruptibly();
+            } catch (InterruptedException e1) {
+                  e1.printStackTrace();
+            }
+            try {
+                  if (x == 1) {
+                        try {
+                              Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                              e.printStackTrace();
+                        }  
+                  } else {
+                        System.out.println(""+x + Thread.currentThread().isInterrupted());
+                  }
+            } finally {
+                  System.out.println("inside finally : "+x);
+                  lock.unlock();						// IllegalMonitorStateException
+            }
+            System.out.println("outside : "+x);
+      }
+}
+
+public class Test {
+      public static void main(String[] args) throws InterruptedException {
+
+            Lock lock = new ReentrantLock();
+            Thread t1 = new Myclass(1, lock);
+            Thread t2 = new Myclass(2, lock);
+            t1.start();
+            try {
+                  Thread.sleep(100);
+            } catch (InterruptedException e) {
+                  e.printStackTrace();
+            }
+            t2.start();
+            t2.interrupt();
+      }
+}
+
+
+
+
+=================================================================
+
+class Myclass extends Thread {
+
+      private int x;
+      private Lock lock;
+
+      public Myclass(int x, Lock lock) {
+            this.x = x;
+            this.lock = lock;
+      }
+
+      public void run() {
+            try {
+				lock.lockInterruptibly();
+				try {
+					  if (x == 1) {
+							try {
+								  Thread.sleep(10000);
+							} catch (InterruptedException e) {
+								  e.printStackTrace();
+							}
+					  } else {
+							System.out.println(""+x + Thread.currentThread().isInterrupted());
+					  }
+				} finally {
+					  System.out.println("inside finally : "+x);
+					  lock.unlock();
+				}
+				System.out.println("outside : "+x);
+			} catch (InterruptedException e1) {
+                  System.out.println("Thread Interrupted before lock acquring, critical section not executed");
+            }
+      }
+}
+
+public class Test {
+      public static void main(String[] args) throws InterruptedException {
+
+            Lock lock = new ReentrantLock();
+            Thread t1 = new Myclass(1, lock);
+            Thread t2 = new Myclass(2, lock);
+            t1.start();
+            try {
+                  Thread.sleep(100);
+            } catch (InterruptedException e) {
+                  e.printStackTrace();
+            }
+            t2.start();
+            t2.interrupt();
+      }
+}
+
+Output :
+
+
+
+=================================================================
+
+class Myclass extends Thread {
+
+      private int x;
+      private Lock lock;
+
+      public Myclass(int x, Lock lock) {
+            this.x = x;
+            this.lock = lock;
+      }
+
+      public void run() {
+            lock.lock();
+			System.out.println(""+ x + Thread.currentThread().isInterrupted());
+      }
+}
+
+public class Test {
+      public static void main(String[] args) throws InterruptedException {
+
+            Lock lock = new ReentrantLock();
+            Thread t1 = new Myclass(1, lock);
+            Thread t2 = new Myclass(2, lock);
+            t1.start();
+            try {
+				Thread.sleep(100);
+            } catch (InterruptedException e) {
+                  e.printStackTrace();
+            }
+            t2.start();
+      }
+}
+
+
+/**
+t1 thread completes its execution but will never release lock
+t2 thread will never get any chance to execute
+JVM will be running for ever , as there is a non-deamon thread which is waiting for lock
+**/
+
+
+
+=================================================================
+
+class Myclass extends Thread {
+
+      private int x;
+      private Lock lock;
+
+      public Myclass(int x, Lock lock) {
+            this.x = x;
+            this.lock = lock;
+      }
+
+      public void run() {
+            lock.lock();
+			System.out.println(""+ x + Thread.currentThread().isInterrupted());
+      }
+}
+
+public class Test {
+      public static void main(String[] args) throws InterruptedException {
+
+            Lock lock = new ReentrantLock();
+            Thread t1 = new Myclass(1, lock);
+            Thread t2 = new Myclass(2, lock);
+            t1.start();
+      }
+}
+
+/**
+t1 thread completes its execution but will never release lock
+JVM process will be over
+**/
+
+
+=================================================================
+
