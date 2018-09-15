@@ -1,0 +1,72 @@
+**get Oauth code , get Access token, get user details
+
+https://projects.spring.io/spring-social/
+Spring social is a Spring layer over Oauth
+
+====================================================================
+
+Oauth steps to understand (simple oauth without Spring social) :
+
+
+->First user has to login in facebook account
+	user will hit a GET request with url :
+
+	"http://www.facebook.com/dialog/oauth?" + "client_id="
+		+ FBConnection.FB_APP_ID + "&redirect_uri="
+		+ URLEncoder.encode(FBConnection.REDIRECT_URI, "UTF-8")
+		+ "&scope=email,user_likes,user_friends";
+		
+		
+->hitting above url , user will be redirected to facebook login page
+
+->after successfull login, user will also asked to give permissions to server app for accessing data
+
+	->user will be redirected to Server redirect_uri with a code in HttpRequest
+	
+	-> This code will be used to fetch access token for user
+		
+		"https://graph.facebook.com/v2.2/oauth/access_token?"
+					+ "client_id=" + FBConnection.FB_APP_ID + "&redirect_uri="
+					+ URLEncoder.encode(FBConnection.REDIRECT_URI, "UTF-8")
+					+ "&client_secret=" + FB_APP_SECRET + "&code=" + code;
+		
+		=> Response : 	{"access_token":"EAAHhCEwqZBBIBACRvptrR8gATUVWum7rPIB2KmskZALZBCSQ2ZADeuOpsY7fr0BF3LZCASGkBGXyOBvdWaOBH6F8n7ZBqkU28UTM36Qoq0fQAU1kES4KaTiZBDF3e7PzX58ZBSNMrPoJNWZAbXZAYBZCioTHOZBcVZAHOpZCsVZCDNuQoOxGQZDZD","token_type":"bearer","expires_in":5179250}
+		
+	-> An access token is recieved with an expiry time
+	
+	-> Now Server can fetch details of user by this access token
+	
+		"https://graph.facebook.com/v2.10/me?" +
+			"fields=name,first_name,email,gender" +
+			"&access_token=" + accessToken
+			
+		=> Response : 
+		{"name":"Laxman Sharma","first_name":"Laxman","email":"akash777.sharma\u0040gmail.com","gender":"male","id":"1406659196313931"}
+		
+	-> Server fetching profile picture of user :
+	
+		"https://graph.facebook.com/v2.2/{user.id}/picture?format=json&method=get&redirect=false"
+		+ "&access_token=" + accessToken
+
+		=>Response :	{"data":{"height":50,"is_silhouette":false,"url":"https:\/\/platform-lookaside.fbsbx.com\/platform\/profilepic\/?asid=1406659196313931&height=50&width=50&ext=1539620059&hash=AeTuXApfW7YSHC50","width":50}}
+
+	-> Post on User profile (POST request)
+		"https://graph.facebook.com/v2.2/me/feed
+			?message=testing+facebook+api&?access_token=" + accessToken
+  
+			host:graph.facebook.com method:POST path:/v2.2/me/feed scheme:https
+  
+			output {"id": "172202062836724_873505378039442"}
+ 
+			posted message : testing facebook api
+  
+  
+	->list of friend
+		"https://graph.facebook.com/v2.2/{user_id}/friends?access_token=" + accessToken
+  
+		NOTE : This gives total number of friends for user but gives details of only
+		those users who are using this app.
+  
+		http://stackoverflow.com/questions/23417356/facebook-graph-api-v2-0-me-friends-returns-empty-or-only-friends-who-also-u
+		
+		
