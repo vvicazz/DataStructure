@@ -1908,3 +1908,173 @@ JVM process will be over
 
 =================================================================
 
+public class MyThreadPoolEx {
+
+	public static void main(String args[]) throws InterruptedException {
+		ExecutorService es = Executors.newFixedThreadPool(2);
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		List<Runnable> runnables = es.shutdownNow();
+		Thread.sleep(1000);
+		System.out.println("awaiting task in the queue : " + runnables.size());
+		for (Runnable runnable : runnables) {
+			RunnableFuture<String> future = ((RunnableFuture<String>) runnable);
+			System.out.println(runnable.getClass().getName() + " cancelled : " + future.isCancelled());
+		}
+	}
+}
+
+class MyWorkerEx implements Callable<String> {
+
+	public String call() {
+		System.out.println("started...");
+		while (!Thread.currentThread().isInterrupted()) {
+			System.out.println("running..." + Thread.currentThread().getName());
+		}
+		System.out.println("interrupt status : " + Thread.currentThread().isInterrupted());
+		return "hello";
+	}
+}
+
+
+=> Output : 
+
+started...
+started...
+interrupt status : true
+interrupt status : true
+awaiting task in the queue : 2
+java.util.concurrent.FutureTask cancelled : false
+java.util.concurrent.FutureTask cancelled : false
+
+========================================================================
+
+shutdownNow()  
+	-> tries to Stop running thread with interrupt
+	-> does not execute waiting threads in queue, 
+		waiting threads are not cancelled, they have state = NEW
+	
+shutdown() 
+	-> does not interrupt any thread
+	-> executes all running threads and awaiting threads in queue
+	
+========================================================================
+
+(Q) if new task is submitted after shutdownNow() method ?
+
+-> RejectedExecutionException will occur 
+
+========================================================================
+
+public class MyThreadPoolEx {
+
+	public static void main(String args[]) throws InterruptedException {
+		ExecutorService es = Executors.newFixedThreadPool(2);
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.shutdown();
+	}
+}
+
+class MyWorkerEx implements Callable<String> {
+
+	public String call() {
+		System.out.println("started...");
+		if (!Thread.currentThread().isInterrupted()) {
+			System.out.println("running..." + Thread.currentThread().getName());
+		}
+		System.out.println("interrupt status : " + Thread.currentThread().isInterrupted());
+		return "hello";
+	}
+}
+
+
+=> Output : 
+
+started...
+started...
+running...pool-1-thread-1
+running...pool-1-thread-2
+interrupt status : false
+interrupt status : false
+started...
+running...pool-1-thread-2
+interrupt status : false
+started...
+running...pool-1-thread-1
+interrupt status : false
+
+
+========================================================================
+
+(Q) When waiting task in queue is kept for more than threshold time
+-> RejectedExecutionException occurs
+
+
+public class MyThreadPoolEx {
+
+	public static void main(String args[]) throws InterruptedException {
+		BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(1);
+		ExecutorService es = new ThreadPoolExecutor(1, 1, 0, TimeUnit.NANOSECONDS,queue);
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.submit(new MyWorkerEx());
+		es.shutdown();
+	}
+}
+
+class MyWorkerEx implements Runnable {
+
+	public void run() {
+		System.out.println("started...");
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Ended..");
+	}
+}
+
+
+
+started...
+Exception in thread "main" java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.FutureTask@5c647e05 rejected from java.util.concurrent.ThreadPoolExecutor@33909752[Running, pool size = 1, active threads = 1, queued tasks = 1, completed tasks = 0]
+	at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.reject(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.execute(Unknown Source)
+	at java.util.concurrent.AbstractExecutorService.submit(Unknown Source)
+	at com.akash.threadpool.MyThreadPoolEx.main(MyThreadPoolEx.java:16)
+Ended..
+started...
+Ended..
+
+========================================================
+
+
+awaitTermination() is used to wait after shutdown() method is called
+
+
+=============================================================
+
+(Q) Diff bw submit() and invokeAll()
+
+Option 1 :
+	ExecutorService executorService = Executors.newFixedThreadPool(5);
+	List<Future<String>> futures = new ArrayList<>();
+	for(Callable callableItem: myCallableList){
+		futures.add(executorService.submit(callableItem));
+	}
+
+
+Option 2 :
+	ExecutorService executorService = Executors.newFixedThreadPool(5);
+	List<Future<String>> futures = executorService.invokeAll(myCallableList));
+	
+In Option 2, you have to wait for completion of all submitted tasks to ExecutorService unlike in Option 1
+
+=============================================================
