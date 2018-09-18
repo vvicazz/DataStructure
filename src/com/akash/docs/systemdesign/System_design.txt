@@ -63,13 +63,14 @@ request will hit the server that is nearer to its clock wise location in the rin
 ===============================================================
 
 => Messaging Queue
+(see pics)
 
 Asynchronous scalable solutions
 	->dont wait user to send response
 	->start an asynchronous process and put your task in a Queue
 some other system will pick task from queue 
 
-What is system handling queue fails	
+What if system handling queue fails	
 	-> we can persist that state in DB
 	
 Let say we have N servers that equally recieve task from queue as Consumers
@@ -105,3 +106,98 @@ and having notifier and load balancer is called Message/Task Queue.
 		
 
 ===============================================================
+
+Anti patterns
+=> Using Database as Message Queues
+(see pics)
+
+To implement Database as message queue, one server will insert data in DB
+and other servers will poll data from that DB at a regular interval
+
+Producer  ---Insert-->	Database	<---Poll---  Consumers
+
+Database cannot push notification to other servers.
+This is a way to implement message queue.(Asynchronous communication b/w different servers)
+This is considered as an Anti pattern
+
+Problems
+->Polling Database at short time interval will increase load on it.
+->Polling Database at long time interval will decrease response time.
+
+*** A database can be optimized either for Read or for Write , but not both.
+
+->Also what if a lot of messages are sent between servers.
+  this will make a lot old data that has no use.
+  We have delete it via a cron job or purge process
+  
+->We also have to do updates to rows which are not in current state,
+  that will result in more load on the DB
+  
+-> Sacalabity problem :
+	If we need to add new nodes/servers to the system to Scale,
+	the DB will have more load to handle
+	
+Message queue solves these problems :
+	-> they dont require any pull, They push the messages
+		this solves polling time problem
+	-> Efficient case for Read and Write operations
+	-> Easy to scale and add new nodes, as nodes only need to register with queue
+	
+Producer  ---Push messages-->   Queue   ---Push--->  Consumer
+
+This anti pattern will work when system is small.
+i.e. 
+if number of writes are small
+and high number of reads can be optimized
+
+===============================================================
+
+=>Monolith vs Microservices
+
+Advantages of Monolithik
+-> There is no remote procedural call, network time is saved
+-> Easy to find and solve issues/bugs as all code and data are in cohesive nature
+-> Data is always in a consistent state.
+	All ACID properties are followed here.
+
+
+Disadvantages of Monolithik
+-> Difficult to understand for a new developer in team, as he has to understand whole application
+-> There is a lot coupling and no cohesion in application
+-> For every small change or any small bug fix in application, whole server needs to be restarted
+	it makes all services down even if they are not related to the issue or fix
+-> Single point of failover, if one server is down whole application is not working
+
+	
+Advantages of Microservices
+-> More cohesion in code and modules are decoupled 
+-> Easy to work for new developer in team, as he has to understand a small part of whole bussiness
+-> if one node is down , other nodes are still working.
+	i.e. Partial running application is still visible to user
+	Easy to handle fail overs
+-> Easy to scale, add or remove server nodes at any time
+	you do not need any service anymore, you take it down without effecting any other service
+	
+	
+Disadvantages of Microservices
+-> There are lot configuration things like, logging, property configurations
+	that need to be done for every service 
+-> If any issue/bug comes ,
+	it will be a difficult task to find the actual root cause in a chain of service calls
+-> you need to consider network call time
+-> You also need to consider ACID properties of data if any node fails
+	Any failure of server nodes should rollback all the actions
+	and keep data in a Atomic, Consistent, Integrated and Durable state
+
+	
+
+**If one service always recieve request from another single server and not from any other node
+  then these two services can be merged into single node 
+  this will save network latency in remote procedural call
+
+
+===============================================================
+
+=>Publish Subscribe vs. Request Response
+event-driven architecture (EDA)
+
