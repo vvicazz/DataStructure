@@ -199,5 +199,90 @@ Disadvantages of Microservices
 ===============================================================
 
 =>Publish Subscribe vs. Request Response
-event-driven architecture (EDA)
 
+Client  ---Request--->  S0 server(DB)    ---Request--->    S1 server(DB)	---Request--->		S3 server  
+							|									|
+							|request							|Request
+							|									|
+						S2 server 							S4 server
+						
+client send request to S0
+S0 sends request to S1 and S2 and wait for thier responses
+S1 again sends a request to S3 and S4
+
+S0 and S1 can have a database to store request and response data
+
+
+Problems with this Design
+-> This is a synchronous system, where S0 has to wait for response of S1 and S2
+    S2 in tern has to wait for S3 and S4
+	long waiting time for client
+-> if S3 or S4 fails or gets down for some time, S1 and S0 will be blocked
+-> S1 will update some state of request in its own DB
+  and if blocked servers comes after some time, then servers will have inconsistence data
+  They have to rollback state properly
+  
+
+Solution :
+We can use publisher subscriber model
+eg: Kafka, RabbitMQ
+
+Advantages of publisher subscriber model
+-> Decoupling , fire and forget
+	no need to take back response
+-> Easy to scale, easy to add or remove servers
+-> message queue will handle fail overs
+
+
+Disadvantages of publisher subscriber model
+-> Cannot send instant response
+-> Difficult to maintain ACID properties of Data, 
+	like banking domain data, where consistency matters the most
+
+
+===============================================================
+
+=> Event Driven architecture (EDA)
+
+Git,smalltalk is using EDA
+React
+Nodejs
+Gaming servers
+Sagas uses it in microservices system
+	(events are fired and rollbacked with servers storing cached data)
+
+
+In Event driven design, every service sending or recieving data
+must have its own database to save event
+These events can a state of an object any time t
+So services need to store data of themselves and other services
+
+Event bus is there to store the events and transfer then to appropriate services
+
+Advantages :
+-> high availability, but it causes less consistency
+-> storing log of events
+-> Easy rollback to any event or object state at time t
+-> Easy to test/debug issues with events
+-> Transactional gaurenties with micro services
+-> since we have state in the event, we have an audit log feature available
+
+Disadvantages :
+-> Not applicable for Gateways, like sending an email
+-> control over actual client request/response
+-> We are posting every change of an object to event bus
+   but that can be a security issue
+   there may be some data that should not be exposed to other services
+-> Difficult to understand
+-> Difficult to migrate to some other design 
+
+
+How to manage event history
+-> replay from start
+-> take diffs
+-> Undo
+	-> but some operations cannot be undone, like sending a mail
+
+Compaction of events is also done to keep a final state, like end of the day/week
+
+===============================================================
