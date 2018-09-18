@@ -1,0 +1,107 @@
+System Design :
+
+->gateway service
+->messaging queue
+->load balancer
+->considering fail overs
+
+servers should never fail
+should have multiple copies of data for failovers
+Applying multiple layers or caches at different level should result in keeping data consistent
+distributing load fairly
+heavy loads of request should be handled properly
+
+===============================================================
+
+=>Horizontal vs Vertical Scaling
+
+1) Horizontal - Load balancing required
+ vertical -- NA
+ 
+2) Horizontal - Resilient to single point of failure
+   Vertical  -  Single point of failure
+   
+3) Horizontal -  n/w calls from one service to another service (RPC)
+   Vertical   - Inter process communication , faster
+   
+4) Horizontal - chances of data inconsistency, 
+				data travels from one servive to another in a single request
+				non atomic
+   Vertical  - data consistent , atomic
+   
+5) Horizontal - Scales well with increase in number of request
+   Vertical  -  Hardware limit
+
+
+===============================================================
+
+=>Load balancing and Consistent Hashing
+
+If we huge number of request and N number of servers to handle those request
+then we need a load balancer and also want it handle the request fairly equally to all server nodes
+one way to do this is to use a hashing function 
+
+problem will come when a new server will be added in system and 
+hashing will redirect request to some different server nodes
+what will happen if these nodes have their internal caches for request
+** It also ensures that single request is not served to multiple nodes, avoid duplication
+
+while performing consistent hashing in load balancing, we need to consider below factors :
+1) server added
+2) server removed/crashed
+
+load should be balanced fairly and there should be as minimum change of request as possible
+
+for this we take a ring of numbers 0--(M-1)
+we take hash of servers
+we do hash of request ids
+and divide servers on the ring on equal distance
+
+request will hit the server that is nearer to its clock wise location in the ring
+
+
+===============================================================
+
+=> Messaging Queue
+
+Asynchronous scalable solutions
+	->dont wait user to send response
+	->start an asynchronous process and put your task in a Queue
+some other system will pick task from queue 
+
+What is system handling queue fails	
+	-> we can persist that state in DB
+	
+Let say we have N servers that equally recieve task from queue as Consumers
+So we need a persistence layer that will store task ids and their respective server ids
+
+We also require a Notifier server which will check the state of server after every 20/30 sec
+A load balancer will also be required here to fairly distribute load 
+and to avoid duplicate request by consistent hashing
+
+if one server gets down, notifier will transfer unprocessed task to active servers
+
+This whole process of maintaing task in queue, processing them by server
+and having notifier and load balancer is called Message/Task Queue.
+
+
+===============================================================
+
+=>Single point of failure
+ whole system fails when one server or machine gets down
+
+	-> adding nodes as server
+		-> for multiple nodes we should have load balancer
+			->load balancer should be more than one as for single load balancer may be a point of failure
+				these load balancer will also act as gateways
+				multiple IP addresses are mapped with multiple gateways of single domain
+				
+	-> Adding replicas for fail over
+		they can master/slave or master/master
+		
+	-> Database layer has multiple instances, so to handle proper routing of DB calls
+		there may be some kind of coordinator at DB level
+		these coordinators can also be more than one in count as in case of load balancer
+		
+
+===============================================================
