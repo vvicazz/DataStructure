@@ -286,3 +286,106 @@ How to manage event history
 Compaction of events is also done to keep a final state, like end of the day/week
 
 ===============================================================
+
+design twitter along with use cases
+design tinder
+
+Tinder :
+
+->User profile
+->users images
+
+images can be stored in file system, rather than on DB
+DB -- blob
+file system -- cheaper , faster, CDN support, static files can be easily published in container
+				files can also be stored in DFS
+
+User_id, image_id, image_url
+
+** Image can be stored on profile service itself, or they can be stored in separate service
+	Image service, it can have its own personalized database.
+	In future if any other service requires image, this way would decrease load from profile service also.
+	And all features would be in a decoupled state.
+
+Now user need to have login functionality
+Authentication of user for every request
+
+There could be a Person service that does registration of user and stores it username and password.
+This service sends access token to the client for next request, as Http is stateless.
+There could also be some 2 step authentication, for example :
+	sending confirmation mail to user
+
+** There may be multiple request by user to access application GET/POST
+	Every time those request need to be authenticated
+	by person service or any other service.
+	To avoid this duplication, we can make a Gateway just for authentication 
+	This Gateway talks to Person service and checks if user is authenticated or not.
+	
+client ----->   Gateway   --------->  person service
+				|	|						|
+				|	|						|
+				|	<------------<-----------
+				|
+			Any other service
+			
+-> Now user can update his profile by uploading pics and updating status
+
+-> Chat
+
+for chat we cannot use HTTP protocol
+we have to use XMTP/SMTP
+	simple message transfer protocol
+	XML Smtp
+	
+here we require, a web socket connection which connects user to server
+or TCP connection
+We need to store these connections in a database
+There could be a different service for maintaining these connections against User ids
+different from authentication gateway.
+
+-> Match and swipe left/right info
+
+For fast accessing these, infomation can be stored in client mobile itself
+But it also need to have secured back up at server
+if user uninstalls mobile app and again installs it, data will be downloaded from server.
+
+A matcher service can be created to store match combinations for all users.
+user1_id , user2_id
+
+-> when user start chat with another user, it first checks at authentication gateway
+	then it checks if user1 is matched with user2 at Matcher service
+	then it sends data via Session service
+
+-> Where to store chat :
+	In profile service itself or there could be some Chat Service,
+	with user1 and user2 Ids
+	chat content and their time
+	
+-> Recomendations
+	below factors can decide :
+	age, gender, location
+	
+	we can use indexes to get fast recomendations
+	but avoid making all columns as index
+	query will pick only one index at a time, apply binary search on that column 
+	and then use binary search on another column with filtered data.
+	So use index appropriatly
+	
+*** Recomendation Database can use a Distributed database like Cassandra Or Amazon Dynamo
+*** You can also use Sharding or horizontal Partitioning for fast access
+	To avoid single point of failure, you can use master slave architecture (replication)
+
+-> How sharding will help here ?
+	sharding of data can be done on the basis of location of user
+	that will help us to search near by clients easily
+	
+All these things can be stored in a separate service as Recomendation
+Service can store 
+user_id, current_location
+
+user can poll its current_location and may be updated after every fix interval of time.
+
+===============================================================
+
+https://www.youtube.com/watch?v=umWABit-wbk
+https://www.quora.com/What-are-some-of-the-best-answers-to-the-question-How-would-you-design-Twitter-in-a-system-design-interview
