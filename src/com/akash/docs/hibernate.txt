@@ -388,7 +388,7 @@ Table Per Subclass
 ->there will be only one owner table in relational database
 
 	bidirectional mapping
-		mappedBy  attribute in annotation
+		mappedBy  attribute in annotation, used by non owner table
 		@JoinColumn 		--owner table will use this annotation to define foreign key 
 		
 	unidirectional mapping
