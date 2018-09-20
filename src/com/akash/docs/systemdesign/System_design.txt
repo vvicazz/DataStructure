@@ -1,3 +1,15 @@
+https://www.youtube.com/playlist?list=PLMCXHnjXnTnvo6alSjVkgxV-VH6EPyvoX
+
+https://www.nginx.com/blog/introduction-to-microservices/
+
+https://microservices.io/
+
+https://www.careercup.com/page?pid=software-design-interview-questions
+
+https://www.educative.io/collection/page/5668639101419520/5649050225344512/5741031244955648
+
+===============================================================
+
 System Design :
 
 ->gateway service
@@ -386,6 +398,9 @@ user_id, current_location
 user can poll its current_location and may be updated after every fix interval of time.
 
 ===============================================================
+
+CAP theorem :
+https://www.youtube.com/watch?v=hUd_9FENShA
 
 https://www.youtube.com/watch?v=umWABit-wbk
 https://www.quora.com/What-are-some-of-the-best-answers-to-the-question-How-would-you-design-Twitter-in-a-system-design-interview
