@@ -10,6 +10,14 @@ https://www.educative.io/collection/page/5668639101419520/5649050225344512/57410
 
 ===============================================================
 
+database 				-- nosql(cassandra, dynamodb), rdbms (mysql)
+memory cache 			-- redis, memcache
+message queue 			-- kafka, rabbitMq
+Gateway ,LB				-- Elastic load balancer
+heart beat/ notifier 	-- zookeper
+
+===============================================================
+
 System Design :
 
 ->gateway service
