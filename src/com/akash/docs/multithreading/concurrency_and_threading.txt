@@ -1381,7 +1381,7 @@ public interface ExecutorService extends Executor {
 	-> no new tasks are accepted
 	-> previously submitted tasks are allowed to complete—including those that have not yet begun execution
 ->Terminated
-	-> attempts to cancel outstanding tasks 
+	-> Requests the task to stop by sending an interrupt
 	-> does not start any tasks that are queued but not begun
 	
 
