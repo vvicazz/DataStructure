@@ -14,7 +14,7 @@ database 				-- nosql(cassandra, dynamodb), rdbms (mysql)
 memory cache 			-- redis, memcache
 message queue 			-- kafka, rabbitMq
 Gateway ,LB				-- Elastic load balancer
-heart beat/ notifier 	-- zookeper
+heart beat/ notifier 	-- zookeper, spring Actuator
 
 ===============================================================
 
