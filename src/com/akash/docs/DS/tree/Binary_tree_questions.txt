@@ -93,85 +93,420 @@ threaded binary tree
 
 -------------------------------------------------
 
-
-public void printVerticalNodes() {
-	Map<Integer, List<Node<V>>> map = new HashMap<>();
-	getVericalNodes(rootNode, map, 0);
-	Iterator it = map.entrySet().iterator();
-	while(it.hasNext()) {
-		Map.Entry<Integer, List<Node<V>>> entry = it.next();
-		System.out.print(entry.getKey()+" ");
-		for(Node<V> node : entry.getValue()) {
-			System.out.print(node.getValue()+" ");
-		}
-		System.out.println();
+void preorder(Node root) {
+	if(root != null) {
+		process(root);
+		preorder(root.left);
+		preorder(root.right);
 	}
 }
 
-private void getVericalNodes(Node<V> rootNode, Map<Integer, List<Node<V>>> map, int horizontalDistance) {
-	if(rootNode==null) {
-		return;
+void inorder(Node root) {
+	if(root != null) {
+		inorder(root.left);
+		process(root);
+		inorder(root.right);
 	}
-	map.put(horizontalDistance, rootNode);
-	getVericalNodes(rootNode.getLeft(), map, horizontalDistance-1);
-	getVericalNodes(rootNode.getRight(), map, horizontalDistance+1);
 }
 
-private static class QNode<V> {
-	Node<V> node;
-	int hd;
+void postorder(Node root) {
+	if(root != null) {
+		postorder(root.left);
+		postorder(root.right);
+		process(root);
+	}
 }
 
-public void printTopView(Node<V> rootNode) {
-	Set<Integer> set = new HashSet<>();
-	Queue<QNode<V>> queue = new LinkedList<>();
-	queue.offer(rootNode);
-	int hd;
-	Node<V> temp;
-	while(!queue.isEmpty()) {
-		QNode<V> qNode = queue.poll();
-		hd = qNode.hd;
-		temp = qNode.node;
-		if(!set.contains(hd)) {
-			print(qNode.node.getValue()+" ");
-			set.add(hd);
-		}
+void preOrder(Node root) {
+	Stack<Node> stack = new Stack<>();
+	stack.push(root);
+	while(stack.size() > 0) {
+		Node temp = stack.pop();
+		process(temp);
 		if(temp.left != null) {
-			qNode.offer(new QNode(temp.left, hd-1));
+			stack.push(temp.left);
 		}
 		if(temp.right != null) {
-			qNode.offer(new QNode(temp.right, hd+1));
+			stack.push(temp.right);
 		}
 	}
 }
 
 
-public void printBottomView(Node<V> rootNode) {
-	Set<Integer> set = new HashSet<>();
-	Queue<QNode<V>> queue = new LinkedList<>();
-	Stack<QNode<V>> stack = new Stack<>();
-	QNode newQNode = new QNode(rootNode, 0);
-	queue.offer(newQNode);
-	int hd;
-	Node<V> temp;
-	while(!queue.isEmpty()) {
-		QNode<V> qNode = queue.poll();
-		hd = qNode.hd;
-		temp = qNode.node;
+void inOrder(Node root) {
+	Stack<Node> stack = new Stack<>();
+	stack.push(root);
+	while(root.left != null) {
+		stack.push(root.left);
+		root = root.left;
+	}
+	while(stack.size() > 0) {
+		Node temp = stack.pop();
+		process(temp);
+		if(temp.right != null) {
+			temp = temp.right;
+			stack.push(temp);
+			while(temp.left != null) {
+				temp = temp.left;
+				stack.push(temp);
+			}
+		}
+	}
+}
+
+
+void postOrder(Node root) {
+	Stack<Node> stack = new Stack<>();
+	stack.push(root);
+	while(root.left != null) {
+		stack.push(root.left);
+		root = root.left;
+	}
+	while(stack.size() > 0) {
+		Node temp = stack.peek();
+		if(temp.isRightNodeProcessed()) {
+			process(temp);
+			stack.pop();
+		} else {
+			temp.setRightNodeProcessed(true);
+			if(temp.right != null) {
+				temp = temp.right;
+				stack.push(temp);
+				while(temp.left != null) {
+					temp = temp.left;
+					stack.push(temp);
+				}
+			}
+		}
+	}
+}
+
+
+void inOrder(Node root) {
+	Node temp = root;
+	Node pre = null;
+	while(temp != null) {
 		if(temp.left != null) {
-			newQNode = new QNode(temp.left, hd-1);
-			queue.offer(newQNode);
+			pre = temp.left;
+			while(pre.right != null && pre.right != temp) {
+				pre = pre.right;
+			}
+			if(pre.right == null) {
+				pre.right = temp;
+				temp = temp.left;
+			} else {
+				pre.right = null;
+				process(temp);
+				temp = temp.right;
+			}
+		} else {
+			process(temp);
+			temp = temp.right;
+		}
+	}
+}
+
+------------------------
+
+// recursive way to calculate height of binary tree
+
+int getHeight(Node root) {
+	if(root == null) {
+		return 0;
+	}
+	int left = getHeight(root.left);
+	int right = getHeight(root.right);
+	return max(left, right) + 1;
+}
+
+------------------------
+
+// recursive way to calculate height of binary tree
+
+private int height = 0;
+
+public int getHeight(Node root) {
+	getHeight(root, 1);
+	return height;
+}
+
+private void getHeight(Node root, int level) {
+	if(root != null) {
+		if(height < level) {
+			height = level;
+		}
+		getHeight(root.left, level+1);
+		getHeight(root.right, level+1);
+	}
+}
+
+------------------------
+
+// level order traversal, without calculating level of node
+// iterative way of level order traversal
+
+void levelOrderTraversal(Node root) {
+	Queue<Node> queue = new LinkedList<>();
+	queue.add(root);
+	while(queue.size() != 0) {
+		Node temp = queue.poll();
+		process(temp);
+		if(temp.left != null) {
+			queue.add(temp.left);
 		}
 		if(temp.right != null) {
-			newQNode = new QNode(temp.left, hd-1);
-			queue.offer(newQNode);
-		}
-	}
-	while(!stack.isEmpty()) {
-		QNode<V> qNode = stack.pop();
-		if(!set.contains(hd)) {
-			print(qNode.node.getValue()+" ");
-			set.add(hd);
+			queue.add(temp.right);
 		}
 	}
 }
+
+------------------------
+
+// level order traversal with calculating each level and height
+// iterative way to calculate height
+
+int levelOrderTraversal(Node root) {
+	Queue<Node> queue = new LinkedList<>();
+	queue.add(root);
+	int height = 0;
+	while(queue.size() != 0) {
+		int size = queue.size();
+		height++;
+		while(size > 0) {
+			size--;
+			Node temp = queue.poll();
+			process(temp)
+			if(temp.left != null) {
+				queue.add(temp.left);
+			}
+			if(temp.right != null) {
+				queue.add(temp.right);
+			}
+		}
+	}
+	return height;
+}
+
+
+------------------------
+
+// recursive way of level order traversal
+
+void levelOrderTraversal() {
+	int height = getHeight(root);
+	for(int i=0; i<height; i++) {
+		recursiveLevelOrder(root, i);
+	}
+}
+
+private void recursiveLevelOrder(Node root, int level) {
+	if(root != null) {
+		if(level == 0) {
+			process(root);
+		} else {
+			recursiveLevelOrder(root.left, level-1);
+			recursiveLevelOrder(root.right, level-1);
+		}
+	}
+}
+
+------------------------
+
+//check if binary tree is a BST
+
+private previousNode = null;
+boolean isBinaryTreeBst(Node root) {
+	if(root != null) {
+		if( !isBinaryTreeBst(root.left) ) {
+			return false;
+		}
+		if(previousNode != null && previousNode.value > root.value) {
+			return false;
+		}
+		previousNode = root;
+		return isBinaryTreeBst(root.right)
+	}
+	return true;
+}
+
+
+------------------------
+
+// print left view of binary tree
+// recursive way
+// N L R
+
+private int levelProcessed = 0;
+
+public void printLeftView(Node root) {
+	printLeftView(root, 1);
+}
+
+private void printLeftView(Node root, int level) {
+	if(root != null) {
+		if(levelProcessed < level) {
+			levelProcessed++;
+			process(root);
+		}
+		printLeftView(root.left, level + 1);
+		printLeftView(root.right, level + 1);
+	}
+}
+
+------------------------
+
+// print left view of binary tree
+// iterative way
+// N L R
+
+void printLeftView(Node root) {
+	Queue<Node> queue = new LinkedList<>();
+	queue.add(root);
+	int level = 0;
+	int levelProcessed = 0;
+	while(queue.size() > 0) {
+		level++;
+		int size = queue.size();
+		while(size > 0) {
+			size--;
+			Node temp = queue.poll();
+			if(levelProcessed < level) {
+				levelProcessed++;
+				process(temp);
+			}
+			if(temp.left != null) {
+				queue.add(temp.left);
+			}
+			if(temp.right != null) {
+				queue.add(temp.right);
+			}
+		}
+	}
+}
+
+------------------------
+
+// print right view of binary tree
+// recursive way
+// N R L
+
+private int levelProcessed = 0;
+
+public void printRightView(Node root) {
+	printRightView(root, 1);
+}
+
+private void printRightView(Node root, int level) {
+	if(root != null) {
+		if(levelProcessed < level) {
+			levelProcessed++;
+			process(root);
+		}
+		printRightView(root.right, level + 1);
+		printRightView(root.left, level + 1);
+	}
+}
+
+------------------------
+
+// print right view of binary tree
+// iterative way
+// N R L
+
+void printRightView(Node root) {
+	Queue<Node> queue = new LinkedList<>();
+	queue.add(root);
+	int level = 0;
+	int levelProcessed = 0;
+	while(queue.size() > 0) {
+		level++;
+		int size = queue.size();
+		while(size > 0) {
+			size--;
+			Node temp = queue.poll();
+			if(levelProcessed < level) {
+				levelProcessed++;
+				process(temp);
+			}
+			if(temp.right != null) {
+				queue.add(temp.right);
+			}
+			if(temp.left != null) {
+				queue.add(temp.left);
+			}
+		}
+	}
+}
+
+------------------------
+
+// print top view of binary tree
+// can also be written in iterative way,
+// each node has to store its level
+
+private Map<Integer,Node> map = new TreeMap<>();
+
+void printTopView(Node root) {
+	printTopView(root, 0);
+	map.values().iterator().forEachRemaining(node -> SOP(node.value));
+}
+
+private void printTopView(Node root, int level) {
+	if(root != null) {
+		if(map.get(level) != null) {
+			map.put(level, root);
+		}
+		printTopView(root.left, level - 1);
+		printTopView(root.right, level + 1);
+	}
+}
+
+------------------------
+
+// print bottom view of binary tree
+// can also be written in iterative way,
+// each node has to store its level
+
+private Map<Integer,Node> map = new TreeMap<>();
+
+void printBottomView(Node root) {
+	printBottomView(root, 0);
+	map.values().iterator().forEachRemaining(node -> SOP(node.value));
+}
+
+private void printBottomView(Node root, int level) {
+	if(root != null) {
+		map.put(level, root);
+		printBottomView(root.left, level - 1);
+		printBottomView(root.right, level + 1);
+	}
+}
+
+------------------------
+
+// print vertical order sum in binary tree
+// can also be written in iterative way,
+// each node has to store its level
+
+private Map<Integer,Integer> map = new TreeMap<>();
+
+void printVerticalOrderSum(Node root) {
+	printVerticalOrderSum(root, 0);
+	map.values().iterator().forEachRemaining(value -> SOP(value));
+}
+
+private void printVerticalOrderSum(Node root, int level) {
+	if(root != null) {
+		Integer value = map.get(level);
+		if(value == null) {
+			map.put(level, root.value);
+		} else {
+			map.put(level, value + root.value);
+		}
+		printVerticalOrderSum(root.left, level - 1);
+		printVerticalOrderSum(root.right, level + 1);
+	}
+}
+
+------------------------
+
