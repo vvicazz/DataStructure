@@ -92,7 +92,6 @@ threaded binary tree
 --Heap
 
 -------------------------------------------------
-
 void preorder(Node root) {
 	if(root != null) {
 		process(root);
@@ -507,6 +506,307 @@ private void printVerticalOrderSum(Node root, int level) {
 		printVerticalOrderSum(root.right, level + 1);
 	}
 }
+
+------------------------
+
+// print boundary nodes in binary tree
+
+void printBoundary(Node root) {
+	if(root != null) {
+		process(root);
+		printLeft(root.left);
+		printLeaves(root.left);
+		printLeaves(root.right);
+		printRight(root.right);
+	}
+}
+
+void printLeft(Node root) {
+	if(root != null) {
+		if(root.left != null) {
+			process(root);
+			printLeft(root.left);
+		} else if(root.right != null) {
+			process(root);
+			printLeft(root.right);
+		}
+	}
+}
+
+void printRight(Node root) {
+	if(root.right != null) {
+		printRight(root.right);
+		process(root);
+	} else if(root.left != null) {
+		printRight(root.left);
+		process(root);
+	}
+}
+
+void printLeaves(Node root) {
+	if(root != null) {
+		if(root.left == null && root.right == null) {
+			process(root);
+			return;
+		}
+		printLeaves(root.left);
+		printLeaves(root.right);
+	}
+}
+
+------------------------
+
+// check if two binary trees are identical
+
+boolean isIdentical(Node node1, Node node2) {
+	if(node1 != null || node2 != null) {
+		if(node1 == null) {
+			return false;
+		}
+		if(node2 == null) {
+			return false;
+		}
+		if(node1.data != node2.data) {
+			return false;
+		}
+		if( !isIdentical(node1.left, node2.left)) {
+			return false;
+		}
+		return isIdentical(node1.right, node2.right);
+	}
+	return true;
+}
+
+------------------------
+
+// check if two binary trees are isomorphic
+
+boolean isomorphic(Node node1, Node node2) {
+	if(node1 != null || node2 != null) {
+		if(node1 == null) {
+			return false;
+		}
+		if(node2 == null) {
+			return false;
+		}
+		if(node1.data != node2.data) {
+			return false;
+		}
+		if( (isomorphic(node1.left, node2.left) && isomorphic(node1.right, node2.right))
+			|| 
+			(isomorphic(node1.left, node2.right) && isomorphic(node1.right, node2.left)) ){
+			return true;
+		}
+		return false;
+	}
+	return true;
+}
+
+------------------------
+
+// check if two trees are mirror
+
+boolean isMirror(Node node1, Node node2) {
+	if(node1 != null || node2 != null) {
+		if(node1 == null) {
+			return false;
+		}
+		if(node2 == null) {
+			return false;
+		}
+		if(node1.data != node2.data) {
+			return false;
+		}
+		if( !isMirror(node1.left, node2.right)) {
+			return false;
+		}
+		return isMirror(node1.right, node2.left);
+	}
+	return true;
+}
+
+------------------------
+
+// convert a binary tree into its mirror
+
+Node mirror(Node root) {
+	if(root != null) {
+		Node left, right;
+		right = mirror(root.left);
+		left = mirror(root.right);
+		root.left = left;
+		root.right = right;
+		return root;
+	}
+	return null;
+}
+
+------------------------
+
+// sorted array to BST
+
+Node root = sortedArrayToBst(arr, 0, arr.length-1);
+
+Node sortedArrayToBst(int arr[], int start, int end) {
+	if(start <= end) {
+		int mid = start + (end-start)/2 ;
+		Node node = new Node();
+		node.data = arr[mid];
+		node.left = sortedArrayToBst(arr, start, mid-1);
+		node.right = sortedArrayToBst(arr, mid+1, end);
+		return node;
+	}
+	return null;
+}
+
+------------------------
+
+// sorted singly linked list to BST
+
+TreeNode sortedLinkedListToBst(LlNode node) {
+	if(node != null) {
+		LlNode middleNode = getMiddle(node);
+		LlNode nextToMiddle = middleNode.next;
+		middleNode.next = null;
+		TreeNode treeNode = new TreeNode();
+		treeNode.data = middleNode.data;
+		treeNode.left = sortedLinkedListToBst(node);
+		treeNode.right = sortedLinkedListToBst(nextToMiddle);
+		return treeNode;
+	}
+	return null;
+}
+
+LlNode getMiddle(LlNode node) {
+	LlNode fastPointer = node;
+	LlNode slowPointer = node;
+	LlNode prevToSlow = null;
+	while(fastPointer.next != null && fastPointer.next.next != null) {
+		fastPointer = fastPointer.next.next;
+		prevToSlow = slowPointer;
+		slowPointer = slowPointer.next;
+	}
+	if(prevToSlow != null) {
+		prevToSlow.next = null;
+	}
+	return slowPointer;
+}
+
+------------------------
+
+// Lowest Common Ancestor(LCA)
+// recursive findPath()
+
+time 	-- O(N)
+memory 	-- O(N)
+
+Node lowestCommonAncestor(Node root, Node node1, Node node2) {
+	List<Node> list1 = new ArrayList<>();
+	List<Node> list2 = new ArrayList<>();
+	findPath(root, node1, list1);
+	findPath(root, node2, list2);
+	Collections.reverse(list1);
+	Collections.reverse(list2);
+	if(list1.size() == 0 || list2.size() == 0) {
+		return null;
+	}
+	int minSize = list1.size() > list2.size() ? list2.size() : list1.size();
+	return list1.get(minSize);
+}
+
+boolean findPath(Node key, Node root, List<Node> list) {
+	if(root != null) {
+		if(key.data == root.data) {
+			list.add(root);
+			return true;
+		}
+		if(findPath(key, root.left, list)) {
+			list.add(root);
+			return true;
+		}
+		if(findPath(key, root.right, list)) {
+			list.add(root);
+			return true;
+		}
+	}
+	return false;
+}
+
+------------------------
+
+// Lowest Common Ancestor(LCA)
+time 	-- O(N)
+memory 	-- O(1)
+
+class Pojo {
+	boolean isNode1;
+	boolean isNode2;
+}
+
+private Node lca = null;
+
+Node findPath(Node root, Node node1, Node node2) {
+	findPath(root, node1, node2);
+	if(lca != null) {
+		print(lca);
+	}
+}
+
+Pojo findPath(Node root, Node node1, Node node2) {
+	Pojo pojo = new Pojo();
+	if(root != null) {
+		if(root.data == node1.data) {
+			pojo.isNode1 = true;
+		} else if(root.data == node2.data) {
+			pojo.isNode2 = true;
+		}
+		Pojo leftChildPojo = findPath(root.left, node1, node2);
+		if(lca != null) {
+			return pojo;
+		}
+		if( (pojo.isNode1 && leftChildPojo.isNode2) ||
+			(pojo.isNode2 && leftChildPojo.isNode1) ) {
+			
+			lca = root;
+			return pojo;
+		}
+		Pojo rightChildPojo = findPath(root.right, node1, node2);
+		if(lca != null) {
+			return pojo;
+		}
+		if( (pojo.isNode1 && rightChildPojo.isNode2) ||
+			(pojo.isNode2 && rightChildPojo.isNode1) ) {
+			
+			lca = root;
+			return pojo;
+		}
+	}
+	return pojo;
+}
+
+
+------------------------
+
+// Lowest Common Ancestor(LCA)
+// recursive saving parent of each node in hashmap
+
+time 	-- O(N)
+memory 	-- O(N)
+
+
+
+
+
+------------------------
+
+// Lowest Common Ancestor(LCA)
+// Euler method
+
+time 	-- O(N)
+memory 	-- O(N)
+
+
+
 
 ------------------------
 
