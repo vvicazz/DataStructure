@@ -22,27 +22,35 @@ check if two trees are mirror
 	->recursive
 		->node.data, left==right, right==left
 	->iterative
-		->level order traversal with isLeft varaible
+		->level order traversal with isLeft variable
 		->compare LNR and RNL
 convert a binary tree into its mirror
---sorted linked list to BST
+
+sorted linked list to BST
 	->O(nlog(n)) mid of linked list will be root, use recursive for left and right
 	->O(n) 
 sorted array to balanced BST
 	->mid of array will be root, use recursive for left and right
-BST to min heap
-	->inorder traversal of BST is min heap
+binary tree to doubly linked list
 normal BST to balanced BST
 	->inorder of BST, sorted array to balanced BST
+
+BST to min heap
+	->inorder traversal of BST is min heap
 find median in BST
 	->check no of nodes in BST,do inorder traversal and stop at n/2
 BST from preorder
 	->first element will be root, find first number in array greater than root,right subtree starts from there.Recursive
 BST from postorder
+
 Construct Tree from given Inorder and Preorder traversals
-Construct a tree from Inorder and Level order traversals
+	-> naive approach will take O(N^2) time
+	-> use hashmap for storing index of each key, time = O(N)
 Construct Tree from given Inorder and Postorder traversals
-binary tree to doubly linked list
+	-> naive approach will take O(N^2) time
+	-> use hashmap for storing index of each key, time = O(N)
+Construct Tree from Inorder and Level order traversals
+
 
 Lowest Common Ancestor(LCA)
 	->findPath(Node,Node,List<Node>)
@@ -60,13 +68,15 @@ given level order traversal of binary tree, check if min heap
 
 --Construct all possible BSTs for keys 1 to N
 --Find all possible binary trees with given Inorder Traversal
---merge k sorted arrays
+merge k sorted arrays
 --check if two nodes are swapped in BST
 --Diameter of a binary tree
 --floor and ceiling of a BST
 
 --path with max sum in binary tree
---Check if all leaves are at same level
+Check if all leaves are at same level
+	-> do level order traversal, check if node is leaf, save its level 
+	-> recursive pre, in, post order traversal and perform same check
 print perfect binary tree in below form:
 	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
 	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
@@ -75,7 +85,7 @@ print perfect binary tree in below form:
 --Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
 
-Check for Children Sum Property in a Binary Tree 
+--Check for Children Sum Property in a Binary Tree 
 	
 --------------------------------------------------
 
