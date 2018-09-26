@@ -64,6 +64,7 @@ Find subarray with given sum (Nonnegative Numbers)
 Largest Rectangular Area in a Histogram 
 print all permutations of a given string
 
+print all subsequences of a string 
 
 ----------------------------------------------------------------------
 
@@ -312,3 +313,32 @@ int longestBitonicSubarray(int arr[]) {
 
 
 
+// print all subsequences of a string 
+
+input : ABC
+output : A B C AB AC BC ABC
+
+void printAllSubsequences(String arr) {
+	List<List<Character>> list = getAllSubsequences(arr.toCharArray(), 0, arr.length-1);
+	for(List<Character> characters : list) {
+		System.out.println(characters);
+	}
+}
+
+private List<List<Character>> getAllSubsequences(char arr[], int start, int end) {
+	List<List<Character>> returnList = new LinkedList<>();
+	List<Character> list = new LinkedList<>();
+	list.add(arr[start]);
+	returnList.add(list);
+	if(end > start) {
+		List<List<Character>> recursiveList = getAllSubsequences(arr, start+1, end);
+		returnList.addAll(recursiveList);
+		
+		List<List<Character>> copiedRecursiveList = new new LinkedList<>(recursiveList);
+		for(List temp : copiedRecursiveList) {
+			temp.addFirst(arr[start]);
+		}
+		returnList.addAll(copiedRecursiveList);
+	}
+	return returnList;
+}
