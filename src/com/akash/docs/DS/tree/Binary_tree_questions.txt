@@ -32,6 +32,7 @@ sorted linked list to BST
 sorted array to balanced BST
 	->mid of array will be root, use recursive for left and right
 binary tree to doubly linked list
+	->similar to check if binary tree is a BST
 normal BST to balanced BST
 	->inorder of BST, sorted array to balanced BST
 
@@ -63,15 +64,14 @@ Lowest Common Ancestor(LCA)
 	-> Build Euler path of tree with level of nodes
 		find minimum level bw the two nodes
 
-check if binary tree is heap   -> level order traversal, check parent child relation (0 to n/2)
+check if binary tree is heap   
+	-> level order traversal, check parent child relation (0 to n/2)
 given level order traversal of binary tree, check if min heap
 
---Construct all possible BSTs for keys 1 to N
---Find all possible binary trees with given Inorder Traversal
+Construct all possible BSTs for keys 1 to N
+Find all possible binary trees with given Inorder Traversal
 merge k sorted arrays
---check if two nodes are swapped in BST
---Diameter of a binary tree
---floor and ceiling of a BST
+floor and ceiling of a BST
 
 --path with max sum in binary tree
 Check if all leaves are at same level
@@ -81,6 +81,9 @@ print perfect binary tree in below form:
 	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
 	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
 	-> 2 queue and 1 stack
+	
+--check if two nodes are swapped in BST
+--Diameter of a binary tree
 --Remove all nodes which don’t lie in any path with sum>= k
 --Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
@@ -101,7 +104,8 @@ threaded binary tree
 
 --Heap
 
--------------------------------------------------
+==============================================================
+
 void preorder(Node root) {
 	if(root != null) {
 		process(root);
@@ -323,7 +327,8 @@ private void recursiveLevelOrder(Node root, int level) {
 
 //check if binary tree is a BST
 
-private previousNode = null;
+private Node previousNode = null;
+
 boolean isBinaryTreeBst(Node root) {
 	if(root != null) {
 		if( !isBinaryTreeBst(root.left) ) {
@@ -333,7 +338,7 @@ boolean isBinaryTreeBst(Node root) {
 			return false;
 		}
 		previousNode = root;
-		return isBinaryTreeBst(root.right)
+		return isBinaryTreeBst(root.right);
 	}
 	return true;
 }
@@ -817,5 +822,65 @@ memory 	-- O(N)
 
 
 
+
+------------------------
+
+//binary tree to doubly linked list
+
+private Node previousNode = null;
+private Node head = null;
+
+void binaryTreeToDoublyLl(Node root) { 
+	internalBinaryTreeToDoublyLl(root);
+	return head;
+}
+
+private void internalBinaryTreeToDoublyLl(Node root) {
+	if(root != null) {
+		binaryTreeToDoublyLl(root.left);
+		
+		if(previousNode != null) {
+			root.left = previousNode;
+			previousNode.right = root;
+		} else {
+			head = root;
+		}
+		previousNode = root;
+		binaryTreeToDoublyLl(root.right);
+	}
+}
+
+------------------------
+
+// Create all BST from sorted array
+
+void printAllBst(int arr[]) {
+	List<List<Integer>> list = getAllBst(arr, 0, arr.length-1);
+	for(List<Integer> preOrders : list) {
+		System.out.println(preOrders);
+	}
+}
+
+List<List<Integer>> getAllBst(Integer arr[], int start, int end) {
+	List<List<Integer>> returnedList = new ArrayList<>();
+	if(start < end) {
+		List<Integer> list = new LinkedList<>();
+		returnedList.add(list);
+	}
+	for(int i=start; i<=end; i++) {
+		List<List<Integer>> leftList = getAllBst(arr, start, i-1);
+		List<List<Integer>> rightList = getAllBst(arr, i+1, end);
+		for(int j=0; j<leftList.size(); j++) {
+			for(int k=0; k<rightList.size(); k++) {
+				List<Integer> list = new LinkedList<>();
+				list.add(arr[i]);
+				list.addAll(leftList.get(j));
+				list.addAll(rightList.get(k));
+				returnedList.add(list);
+			}
+		}
+	}
+	return returnedList;
+}
 
 ------------------------

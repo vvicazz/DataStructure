@@ -96,6 +96,7 @@ private findPivot(int arr[], int start, int end) {
 }
 
 
+-------------------
 
 //Rearrange an array such that arr[i] = i
 int place(int arr[]) {
@@ -115,6 +116,7 @@ int place(int arr[]) {
 	}
 }
 
+-------------------
 
 //Move all negative numbers to beginning and positive to end
 void moveNegativeToStart(int arr[]) {
@@ -129,6 +131,7 @@ void moveNegativeToStart(int arr[]) {
 	}
 }
 
+-------------------
 
 //Rearrange an array such that ‘arr[j]’ becomes ‘i’ if ‘arr[i]’ is ‘j’
 void replace(int arr[]) {
@@ -150,7 +153,7 @@ void replaceInternal(int arr[], int i) {
 	}
 }
 
-
+-------------------
 
 //print longest increasing substring 
 int longestIncreasingSubstring(int arr[]) {
@@ -182,6 +185,7 @@ int longestIncreasingSubstring(int arr[]) {
 	return max;
 }
 
+-------------------
 
 // longest increasing subsequence
 
@@ -213,7 +217,7 @@ int longestIncreasingSubsequence(int arr[]) {
 	return max;
 }
 
-
+-------------------
 
 //Longest Bitonic Subsequence
 //this is based on longest increasing subsequence
@@ -249,7 +253,7 @@ int longestBitonicSubsequence(int arr[]) {
 	return max;
 }
 
-
+-------------------
 
 //Longest Bitonic Subarray
 //	time = O(n)
@@ -282,7 +286,7 @@ int longestBitonicSubarray(int arr[]) {
 	return max;
 }
 
-
+-------------------
 
 //Longest Bitonic Subarray
 //	time = O(n)
@@ -311,12 +315,24 @@ int longestBitonicSubarray(int arr[]) {
 	return max;
 }
 
-
+-------------------
 
 // print all subsequences of a string 
 
 input : ABC
 output : A B C AB AC BC ABC
+
+ABC		->	BC	->	C
+
+A			B		C
+AB			BC
+ABC			C
+AC
+B
+BC
+C
+
+
 
 void printAllSubsequences(String arr) {
 	List<List<Character>> list = getAllSubsequences(arr.toCharArray(), 0, arr.length-1);
@@ -342,3 +358,5 @@ private List<List<Character>> getAllSubsequences(char arr[], int start, int end)
 	}
 	return returnList;
 }
+
+-------------------
