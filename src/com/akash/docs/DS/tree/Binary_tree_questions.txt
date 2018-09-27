@@ -73,7 +73,7 @@ Find all possible binary trees with given Inorder Traversal
 merge k sorted arrays
 floor and ceiling of a BST
 
---path with max sum in binary tree
+path with max sum in binary tree
 Check if all leaves are at same level
 	-> do level order traversal, check if node is leaf, save its level 
 	-> recursive pre, in, post order traversal and perform same check
@@ -82,15 +82,55 @@ print perfect binary tree in below form:
 	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
 	-> 2 queue and 1 stack
 	
---check if two nodes are swapped in BST
---Diameter of a binary tree
+Two nodes of a BST are swapped, correct the BST
+	-> case 1 : two nodes are not adjacent
+	-> case 2 : two nodes are adjacent
+Diameter of a binary tree
 --Remove all nodes which don’t lie in any path with sum>= k
 --Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
 
---Check for Children Sum Property in a Binary Tree 
+Check for Children Sum Property in a Binary Tree 
 	
 --------------------------------------------------
+
+Foldable Binary Trees  -- left and right subtrees of the tree are structure wise mirror image 
+Symmetric Tree (Mirror Image of itself)
+Level order traversal with direction change after every two levels 
+Reverse tree path
+Reverse alternate levels of a perfect binary tree
+Calculate depth of a full Binary tree from Preorder
+Modify a binary tree to get preorder traversal using right pointers only
+Construct Full Binary Tree from given preorder and postorder traversals
+Construct Full Binary Tree using its Preorder traversal and Preorder traversal of its mirror tree
+Construct a special tree from given preorder traversal
+Construct tree from ancestor matrix
+ancestor matrix from binary tree
+Construct a special tree from given preorder traversal
+Construct Binary Tree from given Parent Array representation
+Creating a tree with Left-Child Right-Sibling Representation
+Convert a Binary Tree into Doubly Linked List in spiral fashion
+Convert Ternary Expression to a Binary Tree
+Convert Ternary Expression to a Binary Tree
+
+--------------------------------------------------
+Checking & Printing :
+
+Check if removing an edge can divide a Binary Tree in two halves
+check if tree is full binary tree
+check if tree is perfect binary tree
+Check if a given Binary Tree is height balanced like a Red-Black Tree
+Check if a binary tree is subtree of another binary tree 
+Check if a Binary Tree contains duplicate subtrees of size 2 or more
+Check if there is a root to leaf path with given sequence
+Print middle level of perfect binary tree without finding height
+
+--------------------------------------------------
+
+Summation :
+
+--------------------------------------------------------------
+
 
 --binary tree
 --BST
@@ -881,6 +921,77 @@ List<List<Integer>> getAllBst(Integer arr[], int start, int end) {
 		}
 	}
 	return returnedList;
+}
+
+------------------------
+
+// Diameter of a Binary Tree
+	->every node will save its left max height and right max height
+
+private int maxDiameter = 0;
+
+int diameter(Node root) {
+	if(root != null) {
+		int left=0;
+		int right=0;
+		if(root.left != null) {
+			left = diameter(root.left);
+		}
+		if(root.right != null) {
+			right = diameter(root.right);
+		}
+		maxDiameter = max(maxDiameter , left+right+1);
+		return max(left, right) + 1;
+	}
+	return 0;
+}
+
+------------------------
+
+// path with max sum in binary tree
+	-> every node will return max path sum of its own subtree to its parent
+		-> we can also exclude both left and right, as nodes can be negative
+	-> it will also check if current node forms max sum with both left and right subtree
+
+private int maxPathSum = 0;
+	
+int getMaxPathSum(Node root) {
+	if(root != null) {
+		int leftTreeSum = getMaxPathSum(root.left);
+		int rightTreeSum = getMaxPathSum(root.right);
+		maxPathSum = max(maxPathSum,leftTreeSum + rightTreeSum + root.data);
+		return max(root.data , max(leftTreeSum,rightTreeSum) + root.data);
+	}
+	return 0;
+}
+
+------------------------
+
+// Two nodes of a BST are swapped, correct the BST
+	-> case 1 : two nodes are not adjacent
+	-> case 2 : two nodes are adjacent
+
+Node prev = null; 
+Node firstSmall = null;
+Node secondSmall = null;
+
+void correctSwappedBst(Node root) {
+	inOrder(root);
+	swapData(firstSmall, secondSmall);
+}
+
+private void inOrder(Node root) {
+	if(root != null) {
+		inOrder(root.left);
+		if(prev != null && prev.data > root.data) {
+			if(firstSmall != null) {
+				firstSmall = prev;
+			}
+			secondSmall = root;
+		}
+		prev = root;
+		inOrder(root.right);
+	}
 }
 
 ------------------------
