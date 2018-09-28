@@ -1,0 +1,176 @@
+Write a function to delete a Linked List
+Find Length of a Linked List (Iterative and Recursive)
+Detect loop in a linked list
+Find length of loop in linked list
+Reverse a linked list
+	-> iterative | recursive
+Function to check if a singly linked list is palindrome
+	->reverse after middle point, check, then again reverse after middle point
+Remove duplicates from an unsorted linked list
+Reverse a Linked List in groups of given size
+	-> break linked list after k nodes
+
+Recursive function to print reverse of a Linked List
+merge sort on linked list
+quick sort on linked list
+Merge two sorted linked lists such that merged list is in reverse order
+Alternate Odd and Even Nodes in a Singly Linked List
+Add two numbers represented by linked lists
+Find a triplet from three linked lists with sum equal to a given number
+Flattening a Linked List
+Clone a linked list with next and random pointer
+
+
+======================================================
+
+void deleteLinkedList(Node head) {
+	if(head != null) {
+		Node next = head.next;
+		head.next = null;
+		deleteLinkedList(next);
+	}
+}
+
+----------------------------
+
+// iterative
+
+int getLength(Node head) {
+	if(head != null) {
+		Node temp = head;
+		int length = 1;
+		while(temp.next != null) {
+			length++;
+			temp = temp.length;
+		}
+		return length;
+	}
+	return 0;
+}
+
+----------------------------
+
+// recursive
+
+int getLength(Node head) {
+	if(head != null) {
+		return getLength(head.next) + 1;
+	}
+	return 0;
+}
+
+----------------------------
+
+// Detect loop in a linked list
+
+boolean detectLoop(Node head) {
+	Node slow = head;
+	Node fast = head;
+	while(fast != null && fast.next != null && fast.next.next != null) {
+		fast = fast.next.next;
+		slow = slow.next;
+		if(fast == slow) {
+			return true;
+		}
+	}
+	return false;
+}
+
+----------------------------
+
+// Find length of loop in linked list
+// and break the loop
+
+int getLoopLength(Node head) {
+	Node slow = head;
+	Node fast = head;
+	Node loopNode = null;
+	while(fast != null && fast.next != null && fast.next.next != null) {
+		fast = fast.next.next;
+		slow = slow.next;
+		if(fast == slow) {
+			loopNode = slow;
+			break;
+		}
+	}
+	slow = head;
+	if(loopNode != null) {
+		while(slow != loopNode) {
+			slow = slow.next;
+			loopNode = loopNode.next;
+		}
+		Node temp = loopNode;
+		int length = 1;
+		while(temp.next != loopNode) {
+			temp = temp.next;
+			length++;
+		}
+		//temp.next = null;		// Break the loop
+		return length;
+	}
+	return 0;
+}
+
+----------------------------
+
+// Reverse a linked list
+// iterative
+
+t1 t2 t3 t4
+      t1 t2 t3 t4
+	        t1 t2 t3 t4
+
+Node reverse(Node head) {
+	if(head == null) {
+		return null;
+	}
+	Node t1 = null;
+	Node t2 = head;
+	Node t3 = t2.next;
+	if(t3 == null) {
+		return head;
+	}
+	Node t4 = = t3.next;
+	while(t2 != null && t3 != null) {
+		t2.next = t1;
+		t3.next = t2;
+		t1 = t3;
+		t2 = t4;
+		if(t2 != null) {
+			t3 = t2.next;
+		} else {
+			t3 = null;
+		}
+		if(t3 != null) {
+			t4 = t3.next;
+		} else {
+			t4 = null;
+		}
+	}
+	if(t2 != null) {
+		t2.next = t1;
+		return t2;
+	}
+	return t1;
+}
+
+
+----------------------------
+
+// Function to check if a singly linked list is palindrome
+
+-> copy linked list to an array, check array , time = O(N), memory = O(N)
+-> use get() method for linked list , time = O(N^2) memory = O(1)
+-> push all elements on stack, and compare with linked list,  time = O(N), memory = O(N)
+-> using recursion
+-> reverse linked list after middle, check and again reverse after middle,  time = O(N), memory = O(1)
+
+----------------------------
+
+// Remove duplicates from an unsorted linked list
+-> two loops , O(N^2)
+-> hashset 
+-> sort, and then remove
+
+----------------------------
+
