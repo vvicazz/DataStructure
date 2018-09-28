@@ -74,6 +74,9 @@ merge k sorted arrays
 floor and ceiling of a BST
 
 path with max sum in binary tree
+	-> every node will return max path sum of its own subtree to its parent
+		-> we can also exclude both left and right, as nodes can be negative
+	-> it will also check if current node forms max sum with both left and right subtree
 Check if all leaves are at same level
 	-> do level order traversal, check if node is leaf, save its level 
 	-> recursive pre, in, post order traversal and perform same check
@@ -86,7 +89,11 @@ Two nodes of a BST are swapped, correct the BST
 	-> case 1 : two nodes are not adjacent
 	-> case 2 : two nodes are adjacent
 Diameter of a binary tree
---Remove all nodes which don’t lie in any path with sum>= k
+	->every node will check its left max height and right max height
+Remove all nodes which don’t lie in any path with sum>= k
+	-> every node will pass its sum of nodes from root , to its left and right child
+	-> at any node if sum >= k, return "do not delete"
+	-> only at leaf node, if sum < k, return "delete me", recursively check this at every node
 --Convert left-right representation of a binary tree to down-right
 Minimum no. of iterations to pass information to all nodes in the tree
 
@@ -98,12 +105,18 @@ Foldable Binary Trees  -- left and right subtrees of the tree are structure wise
 Symmetric Tree (Mirror Image of itself)
 Level order traversal with direction change after every two levels 
 Reverse tree path
+	-> store path in an array, swap data from front to end
 Reverse alternate levels of a perfect binary tree
-Calculate depth of a full Binary tree from Preorder
-Modify a binary tree to get preorder traversal using right pointers only
-Construct Full Binary Tree from given preorder and postorder traversals
+	-> store such path in an array, change tree based on that array
+
+--Calculate depth of a full Binary tree from Preorder
+--Modify a binary tree to get preorder traversal using right pointers only
+
+--Construct Full Binary Tree from given preorder and postorder traversals
 Construct Full Binary Tree using its Preorder traversal and Preorder traversal of its mirror tree
-Construct a special tree from given preorder traversal
+	-> pre -- NLR ,pre mirror -- NRL
+--Construct a special tree from given preorder traversal
+
 Construct tree from ancestor matrix
 ancestor matrix from binary tree
 Construct a special tree from given preorder traversal
