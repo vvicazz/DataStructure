@@ -1,0 +1,16 @@
+Interval problems
+
+->Interval tree
+
+https://www.geeksforgeeks.org/interval-tree/
+
+Given list of intervals , array of arrival and array of departure
+
+-> check if there is any conflict in intervals
+	Check if any two intervals overlap among a given set of intervals
+-> train arrival and departure times are given, find minimum number of platforms required
+	Minimum Number of Platforms Required for a Railway/Bus Station
+	Find the point where maximum intervals overlap
+-> Merge Overlapping Intervals
+-> Given n appointments, find all conflicting appointments
+-> Activity Selection problem
