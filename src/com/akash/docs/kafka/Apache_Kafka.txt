@@ -1,0 +1,145 @@
+Apache Kafka
+
+https://www.youtube.com/watch?v=el-SqcZLZlI
+https://www.youtube.com/watch?v=9RMOc0SwRro
+
+production issues with kafka
+** https://www.youtube.com/watch?v=1vLMuWsfMcA
+
+https://www.youtube.com/watch?v=wMLAlJimPzk
+https://www.youtube.com/watch?v=tJ1uIHQtoNc
+
+kafka architecture blog
+http://cloudurable.com/blog/kafka-architecture/index.html
+
+zookeper features
+https://data-flair.training/blogs/zookeeper-in-kafka/
+
+=================
+
+(Q) Diff bw kafka and rabbitmq
+
+==============================================
+Apache kafka  : distributed streaming platform
+
+Advantages : 
+->enterprise messaging system
+->stream processing
+->connectors to import and export bulk data from database
+
+
+enterprise messaging system
+producers and consumers
+P1		C1	
+P2		C2
+P3		C3
+
+P1 -- C1, C3
+P2 -- C2, C3
+P3 -- C3
+many more systems and many more combinations will be added as system grows
+This problem was faced at linkedin and they came up with a solution of kafka
+
+Producers --> Message Broker  --> Consumer
+
+message Broker ==> kafka cluster with many brokers , zookeper
+
+==============================================
+
+Terminologies :
+
+Producer
+Consumer
+Broker
+Cluster
+Topic
+Partitions
+Offset
+Consumer group
+
+=>Producer 	: Application that sends data/message record to kafka
+=>Consumer 	: application that request broker to recieve data sent from producer
+=>Broker 		: kafka Server that keeps data in the form of array of bytes
+				message do not contain consumers address, 
+				producer just send relevant message to the broker without any consumer information
+				Consumer request broker to get data from a particular consumer
+
+=>Topic 		: unique name for a kafka stream, it signifies type of data inside it
+
+=>Cluster 	: running multiple instances of same application
+=>Partition 	: Topic can be broken and stored on diff systems known as partitions
+				It is like sharding of Topic, which is done by producers.
+				topics in a partition are ordered but there is no global ordering of topic in different partitions.
+				For global ordering of topics in different partitions, developer can add shard keys
+
+=>Offset 		: messages in a broker as stored as an array in an order arrival time
+				old messages to new messages (0 to N)
+				this an array number which is immutable
+
+Offsets are local to partition
+There is no global offset
+For locating a message we should have 3 things :
+	Topic Name + Partition Number + Offset
+
+=>Consumer Group : Acting as a single logical unit
+				when multiple consumers share same kind of messages
+When millions of data is pushed in broker, and single consumer has to handle this data
+This single consumer can be divided into multiple consumers handling same kind of requests
+In this example, broker can also be divided into many partitions 
+and each consumer in consumer group is alligned with some set of partitions.
+
+partitions P1, P2, P3, P4
+Consumers C1, C2
+
+C1 <---takes message from---P1, P2
+C2 <---takes message from---P3, P4
+
+Partitioning and Consumer group helps us to scale our system.
+
+Note :
+transferring data from partitions to consumer group has use cases as:
+-> publisher subscriber
+-> Message Queue
+
+Every partition has a retention policy of holding a topic upto a limit of :
+-> time , eg : 7 days
+-> size of partition
+
+==============================================
+
+(Q) Why zookeper is required to use kafka ?
+
+Zookeper is used for reliable distributed coordination
+
+Naming
+synchronization accross clusters
+Messaging
+Leader election
+Notification
+
+-> configuration information
+-> naming
+-> providing distributed synchronization
+-> providing group services
+-> centralized service 
+
+zookeper server takes machine information and stores it in a System state log.
+Master slave architechture is supported in zookeper,
+where multiple servers send their log files data master server
+Each client machine communicates with one of the zookeper servers to fetch machine data.
+
+Kafka, Storm, HBase, SolrCloud uses zookeper
+mongodb and elasticsearch created their own in house product for this.
+
+==============================================
+
+3 paradigms of programming :
+-> request response
+-> Batch
+-> Stream processing => mix of above two
+
+Async applications
+large scale data
+multiple processes are communicating with multiple other processes
+Scalability and partitioning
+fault tolerance
