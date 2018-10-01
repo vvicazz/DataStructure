@@ -27,8 +27,9 @@ Solution
 	worst case time = O(N^2)
 	
 (3) sort arr and dep array
-	if i->i-1 is a conflict
-	then check i->i-2 upto i->0
+	if (i->i-1) is a conflict
+	then check (i->i-2) upto i->0
+		-> find ceiling of a number in a sorted array
 	A,B,D,E
 	worst case time = O(N.logN)
 	

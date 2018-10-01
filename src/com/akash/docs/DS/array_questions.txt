@@ -61,9 +61,15 @@ Find subarray with given sum (Nonnegative Numbers)
 
 
 --Print all subarrays with 0 sum
-Largest Rectangular Area in a Histogram 
+Largest Rectangular Area in a Histogram
+	-> use segment tree , time = O(N.logN)
+	-> nearest min in left and nearest min in right
+		Find the nearest smaller numbers on left side in an array
+histogram with water
+	-> max index of left and right
+--create and store segment tree
+--max diff in an array of integers, such that A[j] > A[i] and j>i
 print all permutations of a given string
-
 print all subsequences of a string 
 
 ----------------------------------------------------------------------
