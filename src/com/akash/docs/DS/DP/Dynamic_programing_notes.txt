@@ -110,38 +110,46 @@ int fibonacci(int n) {
 	return fib[n];
 }
 
+--------------------------
 
 //2,3,5
 //numbers whose only prime factors are 2, 3 or 5
-int uglyNumber(int n) {
-	int uglyNum[] = new int[n];
-	uglyNum[0] = 1;
-	if(n == 1) {
-		return 1;
-	}
-	int pos1, pos2, pos3 = 0;
-	int i1 = uglyNum[pos1] * 2;
-	int i2 = uglyNum[pos2] * 3;
-	int i3 = uglyNum[pos3] * 5;
-	for(int i=1; i<n; i++) {
-		if(i1 < i2 && i1 < i3) {
-			uglyNum[i] = i1;
-			pos1++;
-			i1 = uglyNum[pos1] * 2;
-		} else if(i2 < i1 && i2 < i3) {
-			uglyNum[i] = i2;
-			pos2++;
-			i2 = uglyNum[pos2] * 3;
+void printUglyNumber(int n) {
+	int memo[] = new int[];
+	memo[0] = 1;
+	int pos2 = 0;
+	int pos3 = 0;
+	int pos5 = 0;
+	int num2 = 2 * memo[pos2];
+	int num3 = 3 * memo[pos3];
+	int num5 = 5 * memo[pos5];
+	int index = 1;
+	
+	while(index < n) {
+		if(num2 < num3 && num2 < num5) {
+			memo[index++] = num2;
+			num2 = 2 * memo[++pos2];
+			while(num2 == num3 || num2 == num5) {
+				num2 = 2 * memo[++pos2];
+			}
+		} else if(num3 < num2 && num3 < num5) {
+			memo[index++] = num3;
+			num3 = 3 * memo[++pos3];
+			while(num3 == num2 || num3 == num5) {
+				num3 = 3 * memo[++pos3];
+			}
 		} else {
-			uglyNum[i] = i3;
-			pos3++;
-			i3 = uglyNum[pos3] * 5;
+			memo[index++] = num5;
+			num5 = 5 * memo[++pos5];
+			while(num5 == num2 || num5 == num3) {
+				num5 = 5 * memo[++pos5];
+			}
 		}
 	}
-	return uglyNum[n-1];
+	return memo[n-1];
 }
 
-
+--------------------------
 
 //no of BSTs of a sorted array
 //total number of ways to make n opening and closing braces
@@ -159,9 +167,12 @@ int catalanNumber(int n) {
 }
 f(n) = f(0)*f(n-1) + f(1)*f(n-2) + f(2)*f(n-3) ... + f(n-1)*f(0)
 
+--------------------------
 
 //2xN dashboard, 2x1 tiles
 //count the number of ways to tile the given board
+T(n) = T(n-1) + T(n-2)
+
 int tillingProblem(int n) {
 	if(n == 1 || n == 2) {
 		return n;
@@ -175,7 +186,9 @@ int tillingProblem(int n) {
 	return tiling[n-1];
 }
 
+--------------------------
 
+T(n) = T(n-1) + (n-1)*T(n-2)
 
 int friendPairProblem(int n) {
 	if(n==1 || n==2) {
@@ -191,17 +204,20 @@ int friendPairProblem(int n) {
 }
 
 
+--------------------------
 
+// coin change problem : Min number of coins to make given sum
+// if value of sum is very large, then memory usage can be optimized
+// by using fixed size window array as a Queue for size of max denomination
+// eg : if denominations are : 1,2,5,10 , then array size can be 10
 
-//coin change problem
-//min number of coins to make a sum
 int minCoinChangeProblem(int sum, int coins[]) {
 	int MAX_INT = Integer.MAX_VALUE;
 	int minCoin[] = new int[sum+1];
-	minCoin[0] = 0;
-	for(int i=1; i<=sum; i++) {
+	for(int i=0; i<=sum; i++) {
 		minCoin[i] = MAX_INT;
 	}
+	minCoin[0] = 0;
 	for(int i=1; i<=sum; i++) {
 		for(int j=0; j<coins.length; j++) {
 			if(i > coins[j] && MAX_INT != minCoin[i - coins[j]] ) {
@@ -215,31 +231,33 @@ int minCoinChangeProblem(int sum, int coins[]) {
 	return minCoin[n];
 }
 
+--------------------------
 
+// coin change problem : Total number of ways to make sum
+// 2D array can be reduced to Nx2 array
+// and Nx2 array can also be reduced to max_denomination x 2 array as in minCoinsCount problem
 
-
-//coin change problem
-//total number of ways to make a sum
-int totalWaysCoinChangeProblem(int sum, int coins[]) {
-	int totalWays[][] = new int[sum+1][coins.length+1];
-	for(int i=0; i<=sum; i++) {
-		totalWays[0][i] = 0;
+int waysToMakeSum(int sum, int denominations[]) {
+	int waysCount[][] = new int[denominations.length+1][sum+1];
+	for(int i=0; i<denominations.length; i++) {
+		waysCount[i][0] = 1;
 	}
-	for(int i=0; i<=coins.length; i++) {
-		totalWays[i][0] = 1;
+	for(int i=0; i<sum; i++) {
+		waysCount[0][i] = 0;
 	}
-	for(int i=0; i<coins.length; i++) {
-		for(int j=1; j<=sum; j++) {
-			if(j >= coins[i]) {
-				totalWays[i][j] = totalWays[i][j-coins[i]] + totalWays[i][j-1];
+	for(int i=1; i<=sum; i++) {
+		for(int j=1; j<=denominations.length; j++) {
+			if(i >= denominations[j]) {
+				waysCount[j][i] = waysCount[j-1][i] + waysCount[j][i-denominations[j]];
 			} else {
-				totalWays[i][j] = totalWays[i][j-1];
+				waysCount[j][i] = waysCount[j-1][i];
 			}
 		}
 	}
-	return totalWays[sum][coins.length];
+	return waysCount[denominations.length][sum];
 }
 
+--------------------------
 
 
 //check if Set of non-negative numbers,contains a subset with given sum
@@ -276,6 +294,7 @@ boolean setContainsSubsetWithSum(int set[], int sum) {
 	return false;
 }
 
+--------------------------
 
 int goldMineProblem(int golds[][]) {
 	int n = golds.length;
@@ -315,7 +334,7 @@ private int getValue(int i, int j, int golds[][]) {
 	return golds[i][j];
 }
 
-
+--------------------------
 
 Check if set Contains Sum Divisible By m
 Approach 1:
@@ -327,29 +346,29 @@ Approach 1:
 Approach 2:
 //create new array with modulus of each number and then do subset sum problem
 
+--------------------------
 
 Rod Cutting problem
 cuts = 1, 2, 3, 4, 5, 6, 7, 8
 values = 3, 5, 8, 9, 10, 17, 17, 20
 Rod Length = 24
 
-int rodCutting(int cut[], int price[], int rodLength) {
-	int maxPrice[] = new int[rodLength+1];
-	maxPrice[0] = 0;
-	for(int i=1; i<=rodLength; i++) {
-		for(int j=0; j<cut.length; j++) {
-			if(i >= cut[j]) {
-				maxPrice[i] = max(maxPrice[i], maxPrice[i-cut[j]] + price[j]);
-			} else {
-				break;
+int rodCutting(int price[], int cuts[], int n) {
+
+	// all values in array are initially zero
+	int[] cutsPrice = new int[n+1];
+
+	for(int number = 1; number <= n; number++) {
+		for(int cutIndex = 0; cutIndex < cuts.length; cutIndex++) {
+			if(number >= cuts[cutIndex]) {
+				cutsPrice[number] = Math.max( cutsPrice[number], cutsPrice[number-cuts[cutIndex]] + price[cutIndex] );
 			}
 		}
 	}
-	return maxPrice[rodLength];
+	return cutsPrice[n];
 }
 
-
-
+--------------------------
 
 Zero One KnapSack problem
 WTs 	= 10, 20, 30
@@ -380,8 +399,7 @@ int zeroOneKnapSack(int weight[], int price[], int bagSize) {
 	return memo[weight.length][bagSize];
 }
 
-
-
+--------------------------
 
 int longestCommonSubstring(char s1[], char s2[]) {
 	int memo[][] = new memo[s1.length+1][s2.length+1];
@@ -407,8 +425,7 @@ int longestCommonSubstring(char s1[], char s2[]) {
 	return maxLength;
 }
 
-
-
+--------------------------
 
 int longestCommonSubsequence(char s1[], char s2[]) {
 	int memo[][] = new memo[s1.length+1][s2.length+1];
@@ -430,6 +447,7 @@ int longestCommonSubsequence(char s1[], char s2[]) {
 	return memo[s1.length][s2.length];
 }
 
+--------------------------
 
 //print longest increasing substring 
 int longestIncreasingSubstring(int arr[]) {
@@ -461,6 +479,7 @@ int longestIncreasingSubstring(int arr[]) {
 	return max;
 }
 
+--------------------------
 
 // longest increasing subsequence
 
@@ -492,3 +511,4 @@ int longestIncreasingSubsequence(int arr[]) {
 	return max;
 }
 
+--------------------------
