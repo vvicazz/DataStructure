@@ -97,6 +97,8 @@ Min Cost Path
 
 ==================================================
 
+f(n) = f(n-1) + f(n-2)
+
 int fibonacci(int n) {
 	if(n==0 || n==1) {
 		return n;
@@ -154,6 +156,9 @@ void printUglyNumber(int n) {
 //no of BSTs of a sorted array
 //total number of ways to make n opening and closing braces
 //total number of full binary trees by n nodes
+
+f(n) = f(0)*f(n-1) + f(1)*f(n-2) + f(2)*f(n-3) ... + f(n-1)*f(0)
+
 int catalanNumber(int n) {
 	int catalan[] = new int[n+1];
 	catalan[0] = 1;
@@ -165,12 +170,12 @@ int catalanNumber(int n) {
 	}
 	return catalan[n];
 }
-f(n) = f(0)*f(n-1) + f(1)*f(n-2) + f(2)*f(n-3) ... + f(n-1)*f(0)
 
 --------------------------
 
 //2xN dashboard, 2x1 tiles
 //count the number of ways to tile the given board
+
 T(n) = T(n-1) + T(n-2)
 
 int tillingProblem(int n) {
@@ -211,6 +216,9 @@ int friendPairProblem(int n) {
 // by using fixed size window array as a Queue for size of max denomination
 // eg : if denominations are : 1,2,5,10 , then array size can be 10
 
+// for every coin i
+// T(sum, n) = MAX( T(sum-i, n) )
+
 int minCoinChangeProblem(int sum, int coins[]) {
 	int MAX_INT = Integer.MAX_VALUE;
 	int minCoin[] = new int[sum+1];
@@ -236,6 +244,9 @@ int minCoinChangeProblem(int sum, int coins[]) {
 // coin change problem : Total number of ways to make sum
 // 2D array can be reduced to Nx2 array
 // and Nx2 array can also be reduced to max_denomination x 2 array as in minCoinsCount problem
+
+// for every coin i
+// T(sum, n) = T(sum-i, n) + T(sum, n-i)
 
 int waysToMakeSum(int sum, int denominations[]) {
 	int waysCount[][] = new int[denominations.length+1][sum+1];
@@ -263,6 +274,9 @@ int waysToMakeSum(int sum, int denominations[]) {
 //check if Set of non-negative numbers,contains a subset with given sum
 
 isSubsetSum(arr, sum, n) = isSubsetSum(arr, sum - arr[n-1], n-1) || isSubsetSum(arr, sum, n-1)
+
+for every number in set as i
+T(sum,n) = T(sum-i, n-i) + T(sum, n-i)
 
 if n=0, sum>0 , false
 if sum=0 , true
@@ -353,6 +367,9 @@ cuts = 1, 2, 3, 4, 5, 6, 7, 8
 values = 3, 5, 8, 9, 10, 17, 17, 20
 Rod Length = 24
 
+// for every cut length as i
+// T(n,cuts) = MAX( T(n-i, cuts) )
+
 int rodCutting(int price[], int cuts[], int n) {
 
 	// all values in array are initially zero
@@ -378,6 +395,9 @@ Weight of bag = 50
 //bag of size 50 = 220
 //bag of size 10 = 60
 //bag of size 11 = 60
+
+for every weight as i
+T(n,weight) = MAX( T(n-i, weight-i) )
 
 int zeroOneKnapSack(int weight[], int price[], int bagSize) {
 	int memo[][] = new int[price.length+1][bagSize+1];
