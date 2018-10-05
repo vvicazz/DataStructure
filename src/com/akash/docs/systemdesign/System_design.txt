@@ -448,6 +448,6 @@ Rate Limiter
 
 when to use no sql database
 	-> https://www.slideshare.net/fabiofumarola1/data-modeling-for-nosql-12
-	
+
 When to use mongodb
 cassandra use cases
