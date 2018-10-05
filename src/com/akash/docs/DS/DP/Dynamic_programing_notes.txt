@@ -49,7 +49,6 @@ it does not have overlapping subproblems property.
 ugly mumbers
 fibonacci
 Catalan number
---print balanced parantheses
 Tiling problem : 2xN dashboad, 2x1 tiles
 Friends Pairing Problem
 coin change problem : 
@@ -58,13 +57,13 @@ coin change problem :
 check if Set of non-negative numbers,contains a subset with given sum
 Set of non-negative numbers,Print all subsets with given sum
 check if Set of non-negative numbers,contains a subset with sum divisible by m
---Count all sub-arrays having sum divisible by k
 gold mine problem
 Rod cutting problem
 zero one knapsack
-Longest common substring
-	->suffix tree can also be used(Compressed Trie)
 Longest common subsequence
+Longest common substring
+	-> same as LCSubsequence
+	-> suffix tree can also be used(Compressed Trie)
 Longest Palindromic Subsequence, 	print Subsequence
 Longest palindromic substring, 		print substring
 	->suffix tree can also be used(Compressed Trie)
@@ -74,7 +73,7 @@ Longest Bitonic Subsequence  -> DP
 Longest Bitonic SubArray	-> O(n) time, O(1) space
 Maximum Sum Increasing Subsequence (positive numbers)
 	->similar to longest increasing subsequence
---Largest Sum Contiguous Subarray	(negative and positive both)
+Maximum Sum Subarray	(negative and positive both)
 
 --longest repeated substring
 	->DP
@@ -84,15 +83,16 @@ Maximum Sum Increasing Subsequence (positive numbers)
 Check if a given string is a rotation of a palindrome
 Min Cost Path
 
---Maximum sum increasing subsequence
 --Egg dropping problem
 --edit distance
---max area in histogram
+	insert , remove , replace
+	-> display all the words in a dictionary that are near proximity to a given word incorrectly spelled word
 --Optimal Binary Search Tree
-
---Text justification problem
+	keys[] = {10, 12}, freq[] = {34, 50}
 --parenthesis problem
---blackjack problem
+	symbol[]    = {T, F, T}
+	operator[]  = {^, &}
+	Count the number of ways we can parenthesize the expression for TRUE answer
 
 
 ==================================================
@@ -420,6 +420,10 @@ int zeroOneKnapSack(int weight[], int price[], int bagSize) {
 }
 
 --------------------------
+if last characters are equal
+	T(1->n, 1->m) = 1 + T(1->n-1, 1->m-1) 
+else 
+	T(1->n, 1->m) = 0
 
 int longestCommonSubstring(char s1[], char s2[]) {
 	int memo[][] = new memo[s1.length+1][s2.length+1];
@@ -446,6 +450,8 @@ int longestCommonSubstring(char s1[], char s2[]) {
 }
 
 --------------------------
+T(1->n, 1->m) = 1 + T(1->n-1, 1->m-1) if last characters are equal
+T(1->n, 1->m) = MAX[ T(1->n, 1->m-1) , T(1->n-1, 1->m) ] if last characters are not equal
 
 int longestCommonSubsequence(char s1[], char s2[]) {
 	int memo[][] = new memo[s1.length+1][s2.length+1];
@@ -530,5 +536,82 @@ int longestIncreasingSubsequence(int arr[]) {
 	}
 	return max;
 }
+
+--------------------------
+Longest Palindromic Subsequence
+
+if arr[0] == arr[n-1]
+	T(0->n-1) = 2 + T(1->n-2)
+else
+	T(0->n-1) = MAX( T(0->n-2), T(1->n-1) )
+
+
+int longestPalindromicSubsequence(char arr[]) {
+	int memo[][] = new int[arr.length][arr.length];
+	for(int i=0; i<arr.length; i++) {
+		for(int j=0; j<=i; j++) {
+			memo[i][j] = 1;
+		}
+	}
+	for(int i=0; i<arr.length; i++) {
+		for(int j=i+1; j<arr.length; j++) {
+			if(arr[i] == arr[j]) {
+				memo[i][j] = 2 + memo[i-1][j-1];
+			} else {
+				memo[i][j] = Math.max( memo[i][j-1], memo[i-1][j] );
+			}
+		}
+	}
+	return memo[0][arr.length-1];
+}
+
+
+--------------------------
+
+Longest Palindromic Substring
+
+if arr[0] == arr[n-1]
+	T(0->n-1) = 2 + T(1->n-2)
+else
+	T(0->n-1) = 0
+
+
+int longestPalindromicSubsequence(char arr[]) {
+	int memo[][] = new int[arr.length][arr.length];
+	for(int i=0; i<arr.length; i++) {
+		for(int j=0; j<=i; j++) {
+			memo[i][j] = 1;
+		}
+	}
+	int max = 1;
+	for(int i=0; i<arr.length; i++) {
+		for(int j=i+1; j<arr.length; j++) {
+			if(arr[i] == arr[j]) {
+				memo[i][j] = 2 + memo[i-1][j-1];
+				if(max < memo[i][j]) {
+					max = memo[i][j];
+				}
+			} else {
+				memo[i][j] = 0;
+			}
+		}
+	}
+	return max;
+}
+
+--------------------------
+
+Edit Distance
+
+T(n,m)
+arr1(1->n), arr2(1->m)
+
+insert, remove, replace
+
+if arr1[n] == arr2[m]
+	return T(n-1, m-1)
+return MIN[ T(n, m-1) , T(n-1, m) , T(n-1, m-1) ]
+				|			|			|
+			 insert		remove		replace
 
 --------------------------
