@@ -12,13 +12,27 @@ https://www.educative.io/collection/page/5668639101419520/5649050225344512/57410
 Introduction to NoSQL - Martin Fowler
 https://www.youtube.com/watch?v=qI_g07C_Q5I
 
+Uber design
+https://www.quora.com/What-is-Ubers-server-architecture
+
+Redis Use cases
+http://oldblog.antirez.com/post/take-advantage-of-redis-adding-it-to-your-stack.html
+
+How uber rebuilt their software
+https://www.youtube.com/watch?v=vujVmugFsKc
+
 ===============================================================
 
-database 				-- nosql(cassandra, dynamodb), rdbms (mysql)
-memory cache 			-- redis, memcache
-message queue 			-- kafka, rabbitMq
-Gateway ,LB				-- Elastic load balancer
-heart beat/ notifier 	-- zookeper, spring Actuator
+Load Balancer			-- Nginx
+Gateway					-- service in any language
+Heart beat/ Notifier 	-- spring Actuator
+
+Database 				-- nosql(cassandra, dynamodb), rdbms (mysql)
+Memory cache 			-- Redis (memory cache, cache with persistence, pub-sub)
+Message queue 			-- kafka (message queue, pub-sub, partitioning, consumer group)
+
+Geo spatial queries		-- Google S2 Geometry, Redis GEOPOS, Mongodb geo-spatial
+Search in reverse index	-- elasticSearch, lucene
 
 ===============================================================
 
@@ -416,3 +430,24 @@ https://www.youtube.com/watch?v=hUd_9FENShA
 
 https://www.youtube.com/watch?v=umWABit-wbk
 https://www.quora.com/What-are-some-of-the-best-answers-to-the-question-How-would-you-design-Twitter-in-a-system-design-interview
+
+
+===============================================================
+
+Design problems:
+
+Twitter
+Tinder
+Uber
+Foodpanda
+Times point
+Rate Limiter
+
+
+===============================================================
+
+when to use no sql database
+	-> https://www.slideshare.net/fabiofumarola1/data-modeling-for-nosql-12
+	
+When to use mongodb
+cassandra use cases
