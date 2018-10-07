@@ -450,4 +450,9 @@ when to use no sql database
 	-> https://www.slideshare.net/fabiofumarola1/data-modeling-for-nosql-12
 
 When to use mongodb
-cassandra use cases
+
+=>Cassandra use cases :
+
+https://blog.pythian.com/cassandra-use-cases/
+https://blog.pythian.com/cassandra-time-series-database/
+https://www.datastax.com/2014/06/what-are-people-using-cassandra-for
