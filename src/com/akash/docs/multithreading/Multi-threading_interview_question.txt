@@ -42,7 +42,7 @@ Multi-threading interview question
 	i.e. various implementations of ExecutorService interface in java
 	How state of pool is managed and how state of threads inside pool is managed ?
 	Advantages of executor framework ?
-27) create your own ThreadPoolExecutor ?
+27) create fixed size ThreadPoolExecutor
 28)-- ReadWriteLock
 29) diff bw volatile and atomic 
 	-> volatile provides visibility guaranty, but not atomicity
@@ -50,6 +50,20 @@ Multi-threading interview question
 30)-- fork-join framework in java
 31)-- ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, ConcurrentSkipListMap
 32) CompletableFuture
+33) diff b/w shutDown() and shutDownNow() in ExecutorService
+34) diff b/w lock() and lockInterruptibly() in ReentrantLock
+35) When  RejectedExecutionException will occur
+	-> When waiting task in queue is kept for more than threshold time
+	-> if new task is submitted after shutdownNow() method
+36) Diff bw submit() and invokeAll()
+37) awaitTermination() method in ExecutorService
+38) create ArrayBlockingQueue
+	-> using wait notify
+	-> using ReentrantLock
+39) print even odd numbers sequentialy using two threads
+	-> using wait notify
+	-> using ReentrantLock
+40) create BlockingQueue using Semaphore
 
 ----------------------------------------------
 
@@ -95,3 +109,4 @@ LinkedBlockingQueue
 DelayQueue --- elements are inserted in queue with a specified delay and released from queue order by their delay.
 
 Exchanger  --- exchange data between two threads
+

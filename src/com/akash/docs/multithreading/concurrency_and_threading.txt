@@ -1661,206 +1661,193 @@ it merely delivers the message that interruption has been requested.
 
 =============================================================================
 
+
 ==>Practice Programs :
 
+public class Test {
+	public static void main(String[] args) throws InterruptedException {
+
+		Lock lock = new ReentrantLock();
+		Thread t1 = new Myclass(1, lock);
+		Thread t2 = new Myclass(2, lock);
+		t1.start();
+		t2.start();
+		t2.interrupt();
+	}
+}
+
 class Myclass extends Thread {
 
-      private int x;
-      private Lock lock;
+	private int x;
+	private Lock lock;
 
-      public Myclass(int x, Lock lock) {
-            this.x = x;
-            this.lock = lock;
-      }
+	public Myclass(int x, Lock lock) {
+		this.x = x;
+		this.lock = lock;
+	}
 
-      public void run() {
-            lock.lock();
-            try {
-                  if (x == 1) {
-                        try {
-                              Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                              e.printStackTrace();
-                        }
-                        
-                  } else {
-                        System.out.println(""+x + Thread.currentThread().isInterrupted());
-                  }
-            } finally {
-                  System.out.println("inside finally : "+x);
-                  lock.unlock();
-            }
-            System.out.println("outside finally : "+x);
-      }
+	public void run() {
+		lock.lock();
+		try {
+			System.out.println("thread " + x + " " + Thread.currentThread().isInterrupted());
+		} finally {
+			System.out.println("finally started: " + x);
+			lock.unlock();
+		}
+		System.out.println("Thread finished: " + x);
+	}
 }
 
-public class Test {
-      public static void main(String[] args) throws InterruptedException {
 
-            Lock lock = new ReentrantLock();
-            Thread t1 = new Myclass(1, lock);
-            Thread t2 = new Myclass(2, lock);
-            t1.start();
-            try {
-				Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                  e.printStackTrace();
-            }
-            t2.start();
-            t2.interrupt();
-      }
-}
 
 //output
+thread 1 false
+finally started: 1
+Thread finished: 1
+thread 2 true
+finally started: 2
+Thread finished: 2
 
 
+(Q) Diff b/w lock() and lockInterruptibly() ?
+
+NOTE : When a thread is running while taking a lock, i.e. b/w lock() and unlock()
+		and an interrupt is fired on that thread, 
+		then only interrupt status is set for that thread
+		
+		calling interrupt() while waiting on lock() method 
+		will not remove lock and will end up normal execution
+
+		calling interrupt() while waiting on lockInterruptibly() method
+		will throw InterruptedException and lock will be released
+		No lock will be held for further execution
+		
+Note : calling unlock() without lock() causes  IllegalMonitorStateException
+
+=================================================================
+
+public class Test {
+	public static void main(String[] args) throws InterruptedException {
+
+		Lock lock = new ReentrantLock();
+		Thread t1 = new Myclass(1, lock);
+		Thread t2 = new Myclass(2, lock);
+		t1.start();
+		t2.start();
+		t2.interrupt();
+	}
+}
+
+class Myclass extends Thread {
+
+	private int x;
+	private Lock lock;
+
+	public Myclass(int x, Lock lock) {
+		this.x = x;
+		this.lock = lock;
+	}
+
+	public void run() {
+		try {
+			lock.lockInterruptibly();
+		} catch (InterruptedException e) {
+			System.out.println(e);
+		}
+		try {
+			System.out.println("Thread " + x + " " + Thread.currentThread().isInterrupted());
+		} finally {
+			System.out.println("finally started Thread : " + x);
+			lock.unlock();
+		}
+		System.out.println("Thread : " + x + " finished");
+	}
+}
+
+
+Note : calling unlock() without lock() causes  IllegalMonitorStateException
+
+// output
+Thread 1 false
+finally started Thread : 1
+Thread : 1 finished
+java.lang.InterruptedException
+Thread 2 false
+finally started Thread : 2
+Exception in thread "Thread-1" java.lang.IllegalMonitorStateException
+
+=================================================================
+
+public class Test {
+	public static void main(String[] args) throws InterruptedException {
+
+		Lock lock = new ReentrantLock();
+		Thread t1 = new Myclass(1, lock);
+		Thread t2 = new Myclass(2, lock);
+		t1.start();
+		t2.start();
+		t2.interrupt();
+	}
+}
+
+class Myclass extends Thread {
+
+	private int x;
+	private Lock lock;
+
+	public Myclass(int x, Lock lock) {
+		this.x = x;
+		this.lock = lock;
+	}
+
+	public void run() {
+		try {
+			lock.lockInterruptibly();
+			try {
+				System.out.println("Thread " + x + " " + Thread.currentThread().isInterrupted());
+			} finally {
+				System.out.println("finally started: " + x);
+				lock.unlock();
+			}
+			System.out.println("thread : " + x + " finished");
+		} catch (InterruptedException e1) {
+			System.out.println("Thread :"+x+" Interrupted before lock acquring, critical section not executed");
+		}
+	}
+}
+
+
+// Output :
+Thread 1 false
+finally started: 1
+thread : 1 finished
+Thread :2 Interrupted before lock acquring, critical section not executed
 
 
 =================================================================
 
-class Myclass extends Thread {
-
-      private int x;
-      private Lock lock;
-
-      public Myclass(int x, Lock lock) {
-            this.x = x;
-            this.lock = lock;
-      }
-
-      public void run() {
-            try {
-                  lock.lockInterruptibly();
-            } catch (InterruptedException e1) {
-                  e1.printStackTrace();
-            }
-            try {
-                  if (x == 1) {
-                        try {
-                              Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                              e.printStackTrace();
-                        }  
-                  } else {
-                        System.out.println(""+x + Thread.currentThread().isInterrupted());
-                  }
-            } finally {
-                  System.out.println("inside finally : "+x);
-                  lock.unlock();						// IllegalMonitorStateException
-            }
-            System.out.println("outside : "+x);
-      }
-}
-
 public class Test {
-      public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException {
 
-            Lock lock = new ReentrantLock();
-            Thread t1 = new Myclass(1, lock);
-            Thread t2 = new Myclass(2, lock);
-            t1.start();
-            try {
-                  Thread.sleep(100);
-            } catch (InterruptedException e) {
-                  e.printStackTrace();
-            }
-            t2.start();
-            t2.interrupt();
-      }
+		Lock lock = new ReentrantLock();
+		Thread t1 = new Myclass(lock);
+		Thread t2 = new Myclass(lock);
+		t1.start();
+		t2.start();
+	}
 }
-
-
-
-
-=================================================================
 
 class Myclass extends Thread {
 
-      private int x;
-      private Lock lock;
+	private Lock lock;
 
-      public Myclass(int x, Lock lock) {
-            this.x = x;
-            this.lock = lock;
-      }
+	public Myclass(Lock lock) {
+		this.lock = lock;
+	}
 
-      public void run() {
-            try {
-				lock.lockInterruptibly();
-				try {
-					  if (x == 1) {
-							try {
-								  Thread.sleep(10000);
-							} catch (InterruptedException e) {
-								  e.printStackTrace();
-							}
-					  } else {
-							System.out.println(""+x + Thread.currentThread().isInterrupted());
-					  }
-				} finally {
-					  System.out.println("inside finally : "+x);
-					  lock.unlock();
-				}
-				System.out.println("outside : "+x);
-			} catch (InterruptedException e1) {
-                  System.out.println("Thread Interrupted before lock acquring, critical section not executed");
-            }
-      }
-}
-
-public class Test {
-      public static void main(String[] args) throws InterruptedException {
-
-            Lock lock = new ReentrantLock();
-            Thread t1 = new Myclass(1, lock);
-            Thread t2 = new Myclass(2, lock);
-            t1.start();
-            try {
-                  Thread.sleep(100);
-            } catch (InterruptedException e) {
-                  e.printStackTrace();
-            }
-            t2.start();
-            t2.interrupt();
-      }
-}
-
-Output :
-
-
-
-=================================================================
-
-class Myclass extends Thread {
-
-      private int x;
-      private Lock lock;
-
-      public Myclass(int x, Lock lock) {
-            this.x = x;
-            this.lock = lock;
-      }
-
-      public void run() {
-            lock.lock();
-			System.out.println(""+ x + Thread.currentThread().isInterrupted());
-      }
-}
-
-public class Test {
-      public static void main(String[] args) throws InterruptedException {
-
-            Lock lock = new ReentrantLock();
-            Thread t1 = new Myclass(1, lock);
-            Thread t2 = new Myclass(2, lock);
-            t1.start();
-            try {
-				Thread.sleep(100);
-            } catch (InterruptedException e) {
-                  e.printStackTrace();
-            }
-            t2.start();
-      }
+	public void run() {
+		lock.lock();
+	}
 }
 
 
@@ -1874,30 +1861,26 @@ JVM will be running for ever , as there is a non-deamon thread which is waiting 
 
 =================================================================
 
-class Myclass extends Thread {
+public class Test {
+	public static void main(String[] args) throws InterruptedException {
 
-      private int x;
-      private Lock lock;
-
-      public Myclass(int x, Lock lock) {
-            this.x = x;
-            this.lock = lock;
-      }
-
-      public void run() {
-            lock.lock();
-			System.out.println(""+ x + Thread.currentThread().isInterrupted());
-      }
+		Lock lock = new ReentrantLock();
+		Thread t1 = new Myclass(lock);
+		t1.start();
+	}
 }
 
-public class Test {
-      public static void main(String[] args) throws InterruptedException {
+class Myclass extends Thread {
 
-            Lock lock = new ReentrantLock();
-            Thread t1 = new Myclass(1, lock);
-            Thread t2 = new Myclass(2, lock);
-            t1.start();
-      }
+	private Lock lock;
+
+	public Myclass(Lock lock) {
+		this.lock = lock;
+	}
+
+	public void run() {
+		lock.lock();
+	}
 }
 
 /**
@@ -1908,7 +1891,18 @@ JVM process will be over
 
 =================================================================
 
-public class MyThreadPoolEx {
+shutdownNow()  
+	-> tries to Stop running thread with interrupt
+	-> does not execute waiting threads in queue, 
+		waiting threads are not cancelled, they have state = NEW
+	
+shutdown() 
+	-> does not interrupt any thread
+	-> executes all running threads and awaiting threads in queue
+	
+========================================================================
+
+public class MyShutDownNow {
 
 	public static void main(String args[]) throws InterruptedException {
 		ExecutorService es = Executors.newFixedThreadPool(2);
@@ -1951,24 +1945,13 @@ java.util.concurrent.FutureTask cancelled : false
 
 ========================================================================
 
-shutdownNow()  
-	-> tries to Stop running thread with interrupt
-	-> does not execute waiting threads in queue, 
-		waiting threads are not cancelled, they have state = NEW
-	
-shutdown() 
-	-> does not interrupt any thread
-	-> executes all running threads and awaiting threads in queue
-	
-========================================================================
-
 (Q) if new task is submitted after shutdownNow() method ?
 
 -> RejectedExecutionException will occur 
 
 ========================================================================
 
-public class MyThreadPoolEx {
+public class MyShutDown {
 
 	public static void main(String args[]) throws InterruptedException {
 		ExecutorService es = Executors.newFixedThreadPool(2);
@@ -2076,5 +2059,3 @@ Option 2 :
 	List<Future<String>> futures = executorService.invokeAll(myCallableList));
 	
 In Option 2, you have to wait for completion of all submitted tasks to ExecutorService unlike in Option 1
-
-=============================================================
