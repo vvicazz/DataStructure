@@ -1,0 +1,360 @@
+https://www.careercup.com/question?id=14004678
+https://www.geeksforgeeks.org/producer-consumer-solution-using-semaphores-java/
+
+
+(Q) create fixed size ThreadPoolExecutor
+(Q) print even odd numbers sequentially using two threads
+	-> using wait notify
+	-> using ReentrantLock
+(Q) print numbers using 3 producers, p1-1, p2-2, p3-3, p1-4, p2-5, p3-6...
+(Q) create ArrayBlockingQueue
+	-> using wait notify
+	-> using ReentrantLock
+(Q) create BlockingQueue using Semaphore
+
+(Q) A service sends messages to 4 listeners.
+	A Message can have a priority as 1,2,3,4...
+	A listener can fetch a message with any priority
+	listeners must communicate with each other to print a message with least priority possible.
+	
+======================
+
+class FixedSizeThreadPool {
+
+	private int threadPoolSize;
+	private Worker threads[];
+	private BlockingQueue<Runnable> tasks = new ArrayBlockingQueue<>();
+	
+	FixedSizeThreadPool(int n) {
+		threadPoolSize = n;
+		threads = new Worker[threadPoolSize];
+		for(int i=0; i<threadPoolSize; i++) {
+			threadPoolSize[i] = new Worker();
+			threadPoolSize[i].start();
+		}
+	}
+	
+	void submit(Runnable runnable) {
+		tasks.put(runnable);
+	}
+	
+	void shutDownNow() {
+		for(int i=0; i<threadPoolSize; i++) {
+			threadPoolSize[i].interrupt();
+		}
+	}
+	
+	private class Worker implements Runnable {
+		
+		public void run() {
+			try {
+				Runnable task = null;
+				while( (task = tasks.take()) != null) {
+					task.run();
+				}
+			} catch(InterruptedException e) {
+				//thread is interrupted
+			}
+		}
+	}
+	
+}
+
+
+======================
+
+// print even odd numbers sequentialy using two threads
+
+class EvenProducer implements Runnable {
+
+	private PrintEvenOdd lock;
+
+	EvenProducer(PrintEvenOdd lock) {
+		this.lock = lock;
+	}
+
+	public void run() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		synchronized (lock) {
+			while (lock.getValue() < lock.getLimit()) {
+				while (lock.isOdd()) {
+					try {
+						lock.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				System.out.println("Even : " + lock.getValue());
+				lock.incrementValue();
+				lock.setOdd(true);
+				lock.notify();
+			}
+		}
+	}
+}
+
+class OddProducer implements Runnable {
+	private PrintEvenOdd lock;
+
+	OddProducer(PrintEvenOdd lock) {
+		this.lock = lock;
+	}
+
+	public void run() {
+		synchronized (lock) {
+			while (lock.getValue() < lock.getLimit()) {
+				while (!lock.isOdd()) {
+					try {
+						lock.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				System.out.println("Odd : " + lock.getValue());
+				lock.incrementValue();
+				lock.setOdd(false);
+				lock.notify();
+			}
+		}
+	}
+}
+
+public class PrintEvenOdd {
+
+	private volatile boolean isOdd = true;
+	private volatile int value = 1;
+	private final int limit;
+
+	PrintEvenOdd(int limit) {
+		this.limit = limit;
+	}
+
+	public boolean isOdd() {
+		return isOdd;
+	}
+
+	public void setOdd(boolean isOdd) {
+		this.isOdd = isOdd;
+	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public void incrementValue() {
+		value++;
+	}
+
+	public static void main(String args[]) {
+		PrintEvenOdd ob = new PrintEvenOdd(10);
+		EvenProducer ep = new EvenProducer(ob);
+		OddProducer op = new OddProducer(ob);
+		new Thread(ep).start();
+		new Thread(op).start();
+	}
+}
+
+======================
+
+// print numbers using 3 producers, p1-1, p2-2, p3-3, p1-4, p2-5, p3-6 ...
+
+public class Print123 {
+
+	enum Case123 {
+		ONE, TWO, THREE;
+	}
+
+	private volatile int value = 1;
+	private volatile Case123 case123 = Case123.ONE;
+	private final int limit;
+
+	Print123(int limit) {
+		this.limit = limit;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public void incrementValue() {
+		value++;
+	}
+
+	public Case123 getCase() {
+		return case123;
+	}
+
+	public void incrementCase() {
+		if (case123 == Case123.ONE) {
+			case123 = Case123.TWO;
+		} else if (case123 == Case123.TWO) {
+			case123 = Case123.THREE;
+		} else if (case123 == Case123.THREE) {
+			case123 = Case123.ONE;
+		}
+	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public static void main(String args[]) {
+		Print123 ob = new Print123(10);
+		Print1 p1 = new Print1(ob);
+		Print2 p2 = new Print2(ob);
+		Print3 p3 = new Print3(ob);
+		new Thread(p1).start();
+		new Thread(p2).start();
+		new Thread(p3).start();
+	}
+}
+
+class Print1 implements Runnable {
+
+	private Print123 ob;
+
+	Print1(Print123 ob) {
+		this.ob = ob;
+	}
+
+	public void run() {
+		synchronized (ob) {
+			while (ob.getValue() <= ob.getLimit()) {
+				while (ob.getCase() != Case123.ONE && ob.getValue() <= ob.getLimit()) {
+					try {
+						ob.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				if (ob.getValue() <= ob.getLimit()) {
+					System.out.println("p1 : " + ob.getValue());
+					ob.incrementValue();
+					ob.incrementCase();
+					ob.notifyAll();
+				} else {
+					ob.notifyAll();
+				}
+			}
+		}
+	}
+}
+
+class Print2 implements Runnable {
+
+	private Print123 ob;
+
+	Print2(Print123 ob) {
+		this.ob = ob;
+	}
+
+	public void run() {
+		synchronized (ob) {
+			while (ob.getValue() <= ob.getLimit()) {
+				while (ob.getCase() != Case123.TWO && ob.getValue() <= ob.getLimit()) {
+					try {
+						ob.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				if (ob.getValue() <= ob.getLimit()) {
+					System.out.println("p2 : " + ob.getValue());
+					ob.incrementValue();
+					ob.incrementCase();
+					ob.notifyAll();
+				} else {
+					ob.notifyAll();
+				}
+			}
+		}
+	}
+}
+
+class Print3 implements Runnable {
+
+	private Print123 ob;
+
+	Print3(Print123 ob) {
+		this.ob = ob;
+	}
+
+	public void run() {
+		synchronized (ob) {
+			while (ob.getValue() <= ob.getLimit()) {
+				while (ob.getCase() != Case123.THREE && ob.getValue() <= ob.getLimit()) {
+					try {
+						ob.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				if (ob.getValue() <= ob.getLimit()) {
+					System.out.println("p3 : " + ob.getValue());
+					ob.incrementValue();
+					ob.incrementCase();
+					ob.notifyAll();
+				} else {
+					ob.notifyAll();
+				}
+			}
+		}
+	}
+}
+
+======================
+
+
+// create ArrayBlockingQueue
+
+class MyBlockingQueue {
+	private final int arr[];
+	private final int size;
+	private volatile int count = 0;
+	private Object lock = new Object();
+	
+	private int head=0;
+	private int tail=0;
+	
+	MyBlockingQueue(int size) {
+		this.size = size;
+		this.arr = new int[size];
+	}
+	
+	void put(int val) throws InterruptedException {
+		synchronized(lock) {
+			while(size == count) {
+				lock.wait();
+			}
+			arr[tail++] = val;
+			if(tail == size) {
+				tail = 0;
+			}
+			count++;
+			lock.notifyAll();
+		}
+	}
+	
+	int get() throws InterruptedException {
+		synchronized(lock) {
+			while(count == 0) {
+				lock.wait();
+			}
+			int temp = arr[head];
+			arr[head++] = null;
+			if(head == size) {
+				head = 0;
+			}
+			count--;
+			lock.notifyAll();
+			return temp;
+		}
+	}
+}
+
+======================
+
+// create BlockingQueue using Semaphore
+
