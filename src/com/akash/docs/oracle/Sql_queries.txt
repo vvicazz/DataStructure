@@ -11,15 +11,96 @@ marks number(10)
 -- insert into student(name,subject,marks) values('B', 'MATH', 89);
 -- commit;
 
--- (Q) find max marks of each subject
+(Q) find max marks of each subject
 select subject, max(marks) from student group by subject;
 
--- (Q) find topper of each subject
+(Q) find topper of each subject
 select s1.* from student s1, (select subject, max(marks) as marks from student group by subject)  s2
 where s1.subject=s2.subject and s1.marks=s2.marks;
 
--- (Q) find topper of class
+(Q) find topper of class
 select S.* from (
 select name, avg(marks) as marks from student group by name order by marks desc 
 ) S where ROWNUM = 1;
 
+(Q) find max id of a table  // rownum
+select * from 
+(select * from student order by id )
+where rownum=1;
+
+(Q) find 3rd highest in ENG
+
+select * from 
+  (select * from 
+    (select * from student order by marks desc )
+   where rownum=3)
+ where rownum=1;
+ 
+ 
+(Q) group is applied to return a single for each group
+below methods can be applied on group
+ AVG, COUNT, MAX, MIN, SUM
+ 
+--(Q) Merge performs an UPDATE if a row exists, or an INSERT if the row does not exist.
+https://www.geeksforgeeks.org/merge-statement-sql-explained/
+
+
+Select Projections from table/subquery
+ 	where Clause 
+ 	group by column 
+ 	having conditions_on_groups
+ 	
+ 
+ (Q) get all names of student
+ 
+ select distinct(name) from student
+ 
+ (Q) Diff b/w char and varchar2
+ char size is fixed and uses all space
+ 
+ (Q) What is view and what are its usage
+ view is data taken from one or multiple tables
+ 
+ (Q) methods that can be applied on columns
+ SUBSTRING , UPPER, LOWER
+ 
+ (Q) Types of Join
+ inner join
+ left join
+ right join
+ full join
+ 
+ (Q) Delete , Truncate and Drop
+ 
+ delete - it deletes data with some condition, all rows can be deleted
+ 			saves transaction logs, updates indexes, hence takes time
+ 			slower
+ 			can be rollbacked
+ 			DML command
+ 			
+ Trancate - it deletes all data of table except table structure
+ 			faster than delete
+ 			DDL
+ 			cannot be rollbacked
+ 			
+ Drop	- delete all rows and table columns
+ 
+ (Q) Disadvantages of using IN clause
+ 	IN clause does hard parsing and compile query for every different list size
+ 	Maximum list size supported by oracle in IN clause = 1000 , for more than that it will throw runtime exception
+ 	
+(Q) With clause
+he WITH clause may be processed as an inline view or resolved as a temporary table. 
+The advantage of the latter is that repeated references to the subquery may be more efficient
+ as the data is easily retrieved from the temporary table, 
+ rather than being requeried by each reference.
+ 
+ WITH N1 AS 
+ (select * from table),
+ N2 AS 
+ (select * from N1),
+ N3 AS 
+ (select * from N2)
+ select * from N3;
+ 
+ 
