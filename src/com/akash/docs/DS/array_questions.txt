@@ -20,6 +20,7 @@ find triplets having sum less than k
 Closest product pair in an array	
 
 majority element	-> hashmap, moore voting algo
+--majority element in a sorted array
 Lexicographically minimum string rotation	-> array of size 26,count occurence of character from A-Z
 --Rotate Matrix Elements (shift all elements by 1)
 --Print a given matrix in spiral form

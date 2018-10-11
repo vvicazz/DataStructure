@@ -12,6 +12,17 @@ https://www.geeksforgeeks.org/producer-consumer-solution-using-semaphores-java/
 	-> using ReentrantLock
 (Q) create BlockingQueue using Semaphore
 
+(Q) A mall can have a limit of 100 people
+	there are 5 in gates and 5 out gates
+	implement this in code
+	
+(Q) Create a database connection pool
+	5 connections are created initially 
+	and other connections can be created on request
+	at max 10 connections can be created.
+	If a connection is sitting idle for 5 min, 
+	then we have to remove that connection from pool
+	
 (Q) A service sends messages to 4 listeners.
 	A Message can have a priority as 1,2,3,4...
 	A listener can fetch a message with any priority
