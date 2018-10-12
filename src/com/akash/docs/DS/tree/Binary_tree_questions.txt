@@ -4,6 +4,9 @@ get level of a node -> queue, recursion
 get all nodes at a level -> queue, recursion
 height of a binary tree
 check if a binary tree is BST
+
+Inorder traversal of binary tree without recursion with stack
+Inorder traversal of binary tree without recursion without stack
 print left view of binary tree		-- NLR keep tracking depth from the root , iterative | recursive
 print right view of binary tree		-- NRL keep tracking depth from the root , iterative | recursive
 print top view of binary tree		-- level order traversal, keep track of horizontal dist from root, create a map for (dist_from_root, node)
@@ -12,9 +15,31 @@ print binary tree in vertical order
 print boundary nodes in binary tree
 print diagonal nodes in binary tree
 Diagonal sum of binary tree
+
+Print Level order traversal in spiral form starting from root node
+Print Level order traversal in spiral form starting from left most leaf node
+Print Level order traversal in spiral form starting from right most leaf node
+Reverse Level Order Traversal (RL order)
+	4 5 6 7
+	2 3
+	1
+
+Level order traversal with direction change after every two levels
+	1
+	2 3
+	7 6 5 4
+	15 14 13 12 11 10 9 8
+	16 17 18
+print perfect binary tree in below form:
+	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
+	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
+	-> take level of a tree in array
+
+Print root to leaf paths without using recursion
+	->parent pointer in map
+	
+
 Kth largest in BST
-Inorder traversal of binary tree without recursion with stack
-Inorder traversal of binary tree without recursion without stack
 Delete binary tree
 check if two binary trees are identical
 check if two binary trees are isomorphic
@@ -41,7 +66,8 @@ BST to min heap
 find median in BST
 	->check no of nodes in BST,do inorder traversal and stop at n/2
 BST from preorder
-	->first element will be root, find first number in array greater than root,right subtree starts from there.Recursive
+	-> O(n^2) first element will be root, find first number in array greater than root,right subtree starts from there.Recursive
+	-> O(n) 
 BST from postorder
 
 Construct Tree from given Inorder and Preorder traversals
@@ -80,11 +106,7 @@ path with max sum in binary tree
 Check if all leaves are at same level
 	-> do level order traversal, check if node is leaf, save its level 
 	-> recursive pre, in, post order traversal and perform same check
-print perfect binary tree in below form:
-	1 2 3 4 7 5 6 8 15 9 14 10 13 11 12 16 31 17 30 18 29 19 28 20 27 21 26  22 25 23 24
-	http://www.geeksforgeeks.org/perfect-binary-tree-specific-level-order-traversal/
-	-> take level of a tree in array
-	
+
 Two nodes of a BST are swapped, correct the BST
 	-> case 1 : two nodes are not adjacent
 	-> case 2 : two nodes are adjacent
@@ -98,30 +120,12 @@ Remove all nodes which don’t lie in any path with sum>= k
 Minimum no. of iterations to pass information to all nodes in the tree
 
 Check for Children Sum Property in a Binary Tree 
-	
-	
-Print Level order traversal in spiral form
-Reverse alternate levels of a perfect binary tree
-Print root to leaf paths without using recursion
-	->parent pointer in map
 
-Reverse Level Order Traversal (RL order)
-	4 5 6 7
-	2 3
-	1
-
-Level order traversal with direction change after every two levels
-	1
-	2 3
-	7 6 5 4
-	15 14 13 12 11 10 9 8
-	16 17 18
 
 --------------------------------------------------
 
 Foldable Binary Trees  -- left and right subtrees of the tree are structure wise mirror image 
-Symmetric Tree (Mirror Image of itself)
-Level order traversal with direction change after every two levels 
+Symmetric Tree (Mirror Image of itself) 
 Reverse tree path
 	-> store path in an array, swap data from front to end
 Reverse alternate levels of a perfect binary tree
