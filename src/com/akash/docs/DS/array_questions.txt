@@ -1,4 +1,4 @@
-=>Array Rotations :
+====>Array Rotations :
 
 rotate array by d elements 
 	->gcd way
@@ -33,7 +33,7 @@ Check if strings are rotations of each other or not
 Count rotations divisible by 4
 
 
-=>Array rearrangement
+====>Array rearrangement
 Rearrange an array such that arr[i] = i
 Move all negative numbers to beginning and positive to end
 Rearrange array such that arr[i] >= arr[j] if i is even and arr[i]<=arr[j] if i is odd and j < i
@@ -54,7 +54,7 @@ Maximum Sum Increasing Subsequence (positive numbers)
 
 
 
-=>Optimization Problems :
+====>Optimization Problems :
 --Find the smallest positive integer value that cannot be represented as sum of any subset of a given array
 Smallest subarray with sum greater than a given value
 Find subarray with given sum (Nonnegative Numbers)
@@ -72,6 +72,36 @@ histogram with water
 --max diff in an array of integers, such that A[j] > A[i] and j>i
 print all permutations of a given string
 print all subsequences of a string 
+
+
+====> stack questions
+
+reverse stack using recursion
+sort stack using recursion
+queue using stack
+Design a stack with operations on middle element
+stack with get min on constant time
+Next Greater Element
+The Stock Span Problem
+
+
+===>binary search problems
+
+Contains (True or False)
+Index of first occurrence of a key
+Index of last occurrence of a key
+Index of least element greater than key
+Index of greatest element less than key
+
+pivot element in a sorted and rotated array
+maximum occurence in a sorted array
+
+
+===>divisibility problems 
+
+all subsets in a set divisible by k
+Count all sub-arrays having sum divisible by k
+Longest subarray with sum divisible by k
 
 ----------------------------------------------------------------------
 
@@ -367,3 +397,32 @@ private List<List<Character>> getAllSubsequences(char arr[], int start, int end)
 }
 
 -------------------
+
+// sort stack using, pop() push() size() top() methods
+
+void emptyStack(Stack stack) {
+	
+	if(stack.size() != 0) {
+		int temp = stack.pop();
+		emptyStack(stack);
+		sortStack(stack, temp);
+	}
+}
+
+void sortStack(Stack stack, int temp) {
+	if(stack.size() != 0) {
+		int top = stack.peek();
+		if(top <= temp) {
+			stack.push(temp);
+		} else {
+			stack.pop();
+			sortStack(stack, temp);
+			stack.push(top);
+		}
+	} else {
+		stack.push(temp);
+	}
+}
+
+-------------------
+
