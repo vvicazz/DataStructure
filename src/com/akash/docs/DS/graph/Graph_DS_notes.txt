@@ -571,6 +571,8 @@ DAG : Directed Acyclic Graph
 (Q) Given a Directed graph G, check if G is Acyclic?
 	-> No back edge means no cycle
 	-> Coloring method in DFS (White, Gray, Black)
+		-- coloring method is similar to below check 
+		--vertex (u,v) if( v.visited == true && dep_time[v] == null)
 (Q) Given an Undirected graph G, check if G is Acyclic?
 	-> No back edge means no cycle
 	-> Use find-union disjoint set	
