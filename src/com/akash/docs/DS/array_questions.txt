@@ -46,7 +46,6 @@ Longest Bitonic Subsequence  -> DP
 Longest Bitonic SubArray	-> O(n) time, O(1) space
 Maximum Sum Increasing Subsequence (positive numbers)
 	->similar to longest increasing subsequence
---Largest Sum Contiguous Subarray	(negative and positive both)
 
 --Minimum swaps required to bring all elements less than or equal to k together
 --Find a sorted subsequence of size 3 in linear time
@@ -57,22 +56,18 @@ Maximum Sum Increasing Subsequence (positive numbers)
 ====>Optimization Problems :
 --Find the smallest positive integer value that cannot be represented as sum of any subset of a given array
 Smallest subarray with sum greater than a given value
-Find subarray with given sum (Nonnegative Numbers)
---Find subarray with given sum (array having negative numbers)
-
 
 --Print all subarrays with 0 sum
-Largest Rectangular Area in a Histogram
-	-> use segment tree , time = O(N.logN)
-	-> nearest min in left and nearest min in right
-		Find the nearest smaller numbers on left side in an array
-histogram with water
-	-> max index of left and right
---create and store segment tree
---max diff in an array of integers, such that A[j] > A[i] and j>i
+max sum subarray
+max sum subarray without adjacent
+max diff in an array of integers, such that A[j] > A[i] and j>i
+
+Find subarray with given sum (Nonnegative Numbers)
+--Find subarray with given sum (array having negative numbers)
 print all permutations of a given string
 print all subsequences of a string 
 
+--create and store segment tree
 
 ====> stack questions
 
@@ -83,7 +78,12 @@ Design a stack with operations on middle element
 stack with get min on constant time
 Next Greater Element
 The Stock Span Problem
-
+Largest Rectangular Area in a Histogram
+	-> use segment tree , time = O(N.logN)
+	-> nearest min in left and nearest min in right
+		Find the nearest smaller numbers on left side in an array
+histogram with water
+	-> max index of left and right
 
 ===>binary search problems
 
@@ -102,6 +102,16 @@ maximum occurence in a sorted array
 all subsets in a set divisible by k
 Count all sub-arrays having sum divisible by k
 Longest subarray with sum divisible by k
+
+
+===> Heap problems
+
+K’th Smallest/Largest Element in Unsorted Array
+	--min heap
+Kth smallest element in a row-wise and column-wise sorted 2D array
+	--min heap
+Median of Stream of Running Integers
+	--sliding window
 
 ----------------------------------------------------------------------
 
